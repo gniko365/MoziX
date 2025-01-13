@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 18, 2024 at 05:46 PM
+-- Generation Time: Jan 13, 2025 at 09:18 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -93,6 +93,9 @@ FROM movies
 INNER JOIN genres ON movies.genre_id = genres.genre_id
 WHERE genres.name LIKE genreIN$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movietitles` ()   SELECT movie_name
+FROM movies$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -152,7 +155,10 @@ INSERT INTO `directors` (`director_id`, `name`, `director_image`, `birth_date`) 
 (37, 'Korda Sándor', 'korda_sandor.jpg', '1893-09-16'),
 (38, 'Koltai Róbert', 'koltai_robert.jpg', '1943-12-16'),
 (39, 'Mihályfy Sándor', 'mihalyfy_sandor.jpg', '1937-01-21'),
-(40, 'Székely István', 'szekely_istvan.jpg', '1899-02-25');
+(40, 'Székely István', 'szekely_istvan.jpg', '1899-02-25'),
+(41, 'Szász János', 'szasz_janos.jpg', '1958-03-14'),
+(42, 'Reisz Gábor', 'reisz_gabor.jpg', '1980-01-19'),
+(43, 'Nemes Jeles László', 'nemes_jeles_laszlo.jpg', '1977-02-18');
 
 -- --------------------------------------------------------
 
@@ -240,7 +246,10 @@ INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `director_id`, 
 (127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 13, 1, 'Testről és lélekről', 116, NULL),
 (128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 36, 10, 'Fehér isten', 119, NULL),
 (129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 37, 1, 'Aranyember', 98, NULL),
-(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 38, 3, 'Sose halunk meg', 107, NULL);
+(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 38, 3, 'Sose halunk meg', 107, NULL),
+(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 41, 1, 'A Nagy Füzet', 109, NULL),
+(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 42, 3, 'VAN valami furcsa és megmagyarázhatatlan', 90, NULL),
+(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 42, 1, 'Saul fia', 107, NULL);
 
 -- --------------------------------------------------------
 
@@ -445,7 +454,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `directors`
 --
 ALTER TABLE `directors`
-  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `genres`
@@ -457,7 +466,7 @@ ALTER TABLE `genres`
 -- AUTO_INCREMENT for table `movies`
 --
 ALTER TABLE `movies`
-  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 
 --
 -- AUTO_INCREMENT for table `movie_actors`
