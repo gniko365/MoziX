@@ -2,8 +2,8 @@
 -- version 5.1.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 13, 2025 at 09:18 PM
+-- Host: localhost:8889
+-- Generation Time: Jan 15, 2025 at 09:36 AM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -78,6 +78,21 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `filmDetails` ()   SELECT
     (SELECT name FROM directors WHERE director_id = movies.director_id) AS director_name, 
     (SELECT name FROM genres WHERE genre_id = movies.genre_id) AS genre_name
 FROM movies$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `userIN` VARCHAR(100), IN `passwordIN` VARCHAR(100))   BEGIN
+    DECLARE user_count INT;
+
+    SELECT COUNT(*)
+    INTO user_count
+    FROM users
+    WHERE username = userIN AND password_hash = passwordIN;
+
+    IF user_count > 0 THEN
+        SELECT 'Login successful' AS Message;
+    ELSE
+        SELECT 'Invalid username or password' AS Message;
+    END IF;
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Movies directors` (IN `movieIN` VARCHAR(100))   SELECT movies.movie_name AS "movie name", directors.name AS "director name"
 FROM movies
@@ -371,36 +386,36 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `registration_date`) VALUES
-(1, 'user01', 'user01@example.com', 'hashed_password_01', '2022-05-01'),
-(2, 'user02', 'user02@example.com', 'hashed_password_02', '2022-06-15'),
-(3, 'user03', 'user03@example.com', 'hashed_password_03', '2022-07-20'),
-(4, 'user04', 'user04@example.com', 'hashed_password_04', '2022-08-05'),
-(5, 'user05', 'user05@example.com', 'hashed_password_05', '2022-09-12'),
-(6, 'user06', 'user06@example.com', 'hashed_password_06', '2022-10-01'),
-(7, 'user07', 'user07@example.com', 'hashed_password_07', '2022-11-15'),
-(8, 'user08', 'user08@example.com', 'hashed_password_08', '2022-12-25'),
-(9, 'user09', 'user09@example.com', 'hashed_password_09', '2023-01-10'),
-(10, 'user10', 'user10@example.com', 'hashed_password_10', '2023-02-14'),
-(11, 'user11', 'user11@example.com', 'hashed_password_11', '2023-03-05'),
-(12, 'user12', 'user12@example.com', 'hashed_password_12', '2023-03-18'),
-(13, 'user13', 'user13@example.com', 'hashed_password_13', '2023-04-01'),
-(14, 'user14', 'user14@example.com', 'hashed_password_14', '2023-04-15'),
-(15, 'user15', 'user15@example.com', 'hashed_password_15', '2023-05-20'),
-(16, 'user16', 'user16@example.com', 'hashed_password_16', '2023-06-10'),
-(17, 'user17', 'user17@example.com', 'hashed_password_17', '2023-07-01'),
-(18, 'user18', 'user18@example.com', 'hashed_password_18', '2023-08-25'),
-(19, 'user19', 'user19@example.com', 'hashed_password_19', '2023-09-05'),
-(20, 'user20', 'user20@example.com', 'hashed_password_20', '2023-10-15'),
-(21, 'user21', 'user21@example.com', 'hashed_password_21', '2023-10-30'),
-(22, 'user22', 'user22@example.com', 'hashed_password_22', '2023-11-05'),
-(23, 'user23', 'user23@example.com', 'hashed_password_23', '2023-11-10'),
-(24, 'user24', 'user24@example.com', 'hashed_password_24', '2023-11-12'),
-(25, 'user25', 'user25@example.com', 'hashed_password_25', '2023-11-13'),
-(26, 'user26', 'user26@example.com', 'hashed_password_26', '2023-11-14'),
-(27, 'user27', 'user27@example.com', 'hashed_password_27', '2023-11-15'),
-(28, 'user28', 'user28@example.com', 'hashed_password_28', '2023-11-16'),
-(29, 'user29', 'user29@example.com', 'hashed_password_29', '2023-11-17'),
-(30, 'user30', 'user30@example.com', 'hashed_password_30', '2023-11-18');
+(1, 'user01', 'user01@example.com', 'b01ce21ce5ac38191fcf0fb87c71f53756b2c57e57046f7320a463f1dba3e209', '2022-05-01'),
+(2, 'user02', 'user02@example.com', '1321166e0e6eaa14148b1d5a47f4bdfabdabe11800a4579fbf3f77ba55e86517', '2022-06-15'),
+(3, 'user03', 'user03@example.com', '433aa7f21428c6b75543cdb46caf31f6828e9a78d262dd5382eeb381c8c20787', '2022-07-20'),
+(4, 'user04', 'user04@example.com', '054e2ac1e5b89caf7446f6a6fee681d2259ce871149e162885b4263e6d77c852', '2022-08-05'),
+(5, 'user05', 'user05@example.com', '57a319ac89097ea47a14626564ba96f439bdeb213c31869603ec9efd4c612675', '2022-09-12'),
+(6, 'user06', 'user06@example.com', 'f1e150a8730a3d23729b4ec12392cb122f81a91fdcce7039f28e0a93cbdef17a', '2022-10-01'),
+(7, 'user07', 'user07@example.com', '7d8683503df3a53c54b6d9d18c9591ccb2369bd9c45739f93c34d274aa9dabae', '2022-11-15'),
+(8, 'user08', 'user08@example.com', 'e5967501373f7fbf336de9f99cde06d4b8bcd0326d670b13c3ee771d23df0255', '2022-12-25'),
+(9, 'user09', 'user09@example.com', 'bba783357187d99e3734fb568f1b901dfcb22050aa06a2cdef06e0531ee13712', '2023-01-10'),
+(10, 'user10', 'user10@example.com', '9bf5fe02f00be85700e3e665f83ef4b933f37c032f935619e4d9474359d2ad11', '2023-02-14'),
+(11, 'user11', 'user11@example.com', '8d95ce09bbdabd9d82a5397ca8768e11cee8c4d3240554939b75c0c847a65f57', '2023-03-05'),
+(12, 'user12', 'user12@example.com', 'd697c6dc67eea5aa93b4e8888a8601216ba3b0958161c4e779d54bff61099df6', '2023-03-18'),
+(13, 'user13', 'user13@example.com', '0c234922e5408c4af3af38288cb07f85c2fe8d354ec0d90bf722a3ca8fb320de', '2023-04-01'),
+(14, 'user14', 'user14@example.com', 'ce8a146893cbda37ea920d3df3587022998a5f47a110d71af541497acbfa0f8b', '2023-04-15'),
+(15, 'user15', 'user15@example.com', '21cdcf752bb5ec64d41290d244a85978b97a46b049cc7d068d380f0d6f619ea3', '2023-05-20'),
+(16, 'user16', 'user16@example.com', 'acaf749ea2842470b1f8a226f3a58f235d24b6f0701cf4231f1c945f178ee694', '2023-06-10'),
+(17, 'user17', 'user17@example.com', '770ed669934d123ade1232cb17d1bf060a03414145c01fa7c442054e3cbd6050', '2023-07-01'),
+(18, 'user18', 'user18@example.com', '5695159addb2c5c3c56a27f1540e213da49e45dca0757c1dd5a4a4cbbc7a7ed5', '2023-08-25'),
+(19, 'user19', 'user19@example.com', '6bd744fa602140f8002c41d6de7c3bae4019d89a3e79526afa9b5fd72205558d', '2023-09-05'),
+(20, 'user20', 'user20@example.com', 'b9b63b2c402091bcb7cd8220cf7cd03fe9391d670a23106d0513743ab37a1ef6', '2023-10-15'),
+(21, 'user21', 'user21@example.com', '5dd2df5864c4c28f0e41a7e6a5e063d4ace57aef6fa055cc66780f515c588ef1', '2023-10-30'),
+(22, 'user22', 'user22@example.com', '149079bcec8dd9e73feda93f42c8d909366f28f795afa8169ad0e4416803d0a5', '2023-11-05'),
+(23, 'user23', 'user23@example.com', '734b4ef493edb4e53e2df0b709f17c3b891ffe995167350b7d547b4fa57cd83b', '2023-11-10'),
+(24, 'user24', 'user24@example.com', '9430f5556c8cc3982c63cb6762566e006fbc7e299b4255cfa569ecc1be7a0b06', '2023-11-12'),
+(25, 'user25', 'user25@example.com', 'd18e22a2560dc2bac844c91bd868955cd5a3ea1d7a9c3504516d47f86313e6be', '2023-11-13'),
+(26, 'user26', 'user26@example.com', '2a65a1338108372f2422eafefc8809ae516f2039665ab721d0ffc0343d6707ad', '2023-11-14'),
+(27, 'user27', 'user27@example.com', 'c25da1436413639abc82c7891467ded58b86956ef793cc5ef72c6867b6d5e144', '2023-11-15'),
+(28, 'user28', 'user28@example.com', '1bb36c13be34479f487d2d42d15b19ac3ba52f329461376aae7c5f516f4e346b', '2023-11-16'),
+(29, 'user29', 'user29@example.com', '95eec19390b1ae11e0dfe6ae5548c92fb3da67f56fb4f01b731deb039c35ec3f', '2023-11-17'),
+(30, 'user30', 'user30@example.com', 'e8a940d4972a7e645e4ea1d712ff1f0c79ec4243378c47e114ca71be2af568e9', '2023-11-18');
 
 --
 -- Indexes for dumped tables
