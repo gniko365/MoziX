@@ -2,8 +2,8 @@
 -- version 5.1.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:8889
--- Generation Time: Jan 15, 2025 at 09:36 AM
+-- Host: localhost:3306
+-- Generation Time: Jan 17, 2025 at 08:44 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -27,34 +27,14 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `actorsRoleWithImage` ()   SELECT name, role, actor_image
-FROM movie_actors
-WHERE movie_id = 101$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AllRoleOfActors` (IN `nameIN` VARCHAR(100))   SELECT movie_id, role
 FROM movie_actors
 WHERE name LIKE nameIN$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Average_ratingsToAMovie` ()   SELECT 
-    movie_id, 
-    AVG(rating) AS average_rating
-FROM ratings
-WHERE movie_id = 102
-GROUP BY movie_id$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `BestRatedMovies` ()   SELECT 
-    movies.movie_id, 
-    movies.movie_name, 
-    AVG(ratings.rating) AS average_rating
-FROM movies
-INNER JOIN ratings ON movies.movie_id = ratings.movie_id
-GROUP BY movies.movie_id, movies.movie_name
-HAVING average_rating > 8.5
-ORDER BY average_rating DESC$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `BirthDateInOrder` ()   SELECT name, birth_date, role
-FROM movie_actors
-ORDER BY birth_date ASC$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateAdmin` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    INSERT INTO users (username, email, password, role, registration_date)
+    VALUES (p_username, p_email, SHA2(p_password, 512), 'admin', NOW());
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `directors movies` (IN `directorIN` VARCHAR(100))   SELECT directors.name AS "director name", movies.movie_name AS "movie name"
 FROM movies
@@ -67,7 +47,7 @@ GROUP BY movie_id
 ORDER BY actor_count DESC$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `filmActorsBirthDateInOrder` ()   SELECT name, birth_date
-FROM movie_actors
+FROM actors
 ORDER BY birth_date ASC$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `filmDetails` ()   SELECT 
@@ -79,18 +59,96 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `filmDetails` ()   SELECT
     (SELECT name FROM genres WHERE genre_id = movies.genre_id) AS genre_name
 FROM movies$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `userIN` VARCHAR(100), IN `passwordIN` VARCHAR(100))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `genreNames` ()   select name
+from genres$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetActorsByMovie` (IN `movie_title` VARCHAR(255))   BEGIN
+    SELECT a.actor_id, a.name AS actor_name, a.birth_date, a.actor_image
+    FROM actors a
+    JOIN movie_actors ma ON a.actor_id = ma.actor_id
+    JOIN movies m ON ma.movie_id = m.movie_id
+    WHERE m.movie_name = movie_title;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllActors` ()   BEGIN
+    SELECT * FROM actors;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllMoviesDetails` ()   BEGIN
+    SELECT 
+        m.movie_id,
+        m.movie_name,
+        m.release_year,
+        m.description,
+        GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ', ') AS genres,
+        GROUP_CONCAT(DISTINCT d.name ORDER BY d.name SEPARATOR ', ') AS directors,
+        GROUP_CONCAT(DISTINCT a.name ORDER BY a.name SEPARATOR ', ') AS actors
+    FROM movies m
+    LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.genre_id
+    LEFT JOIN movie_directors md ON m.movie_id = md.movie_id
+    LEFT JOIN directors d ON md.director_id = d.director_id
+    LEFT JOIN movie_actors ma ON m.movie_id = ma.movie_id
+    LEFT JOIN actors a ON ma.actor_id = a.actor_id
+    GROUP BY m.movie_id, m.movie_name, m.release_year, m.description;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllRatings` ()   BEGIN
+    SELECT 
+        r.rating_id,
+        u.username AS reviewer,
+        m.movie_name,
+        r.rating,
+        r.review,
+        r.rating_date
+    FROM ratings r
+    JOIN users u ON r.user_id = u.user_id
+    JOIN movies m ON r.movie_id = m.movie_id
+    ORDER BY r.rating_date DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getMoviesByActor` (IN `actor_name` VARCHAR(255))   BEGIN
+    SELECT m.movie_name, m.release_year
+    FROM movies m
+    JOIN movie_actors ma ON m.movie_id = ma.movie_id
+    JOIN actors a ON ma.actor_id = a.actor_id
+    WHERE a.name LIKE actor_name;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByGenre` (IN `genre_name` VARCHAR(255))   BEGIN
+    SELECT m.movie_id, m.movie_name, g.name
+    FROM movies m
+    JOIN movie_genres mg ON m.movie_id = mg.movie_id
+    JOIN genres g ON mg.genre_id = g.genre_id
+    WHERE g.name LIKE genre_name;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRatingsByMovie` (IN `movie_title` VARCHAR(255))   BEGIN
+    SELECT 
+        r.rating_id,
+        u.username AS reviewer,
+        r.rating,
+        r.review,
+        r.rating_date
+    FROM ratings r
+    JOIN users u ON r.user_id = u.user_id
+    JOIN movies m ON r.movie_id = m.movie_id
+    WHERE m.movie_name = movie_title
+    ORDER BY r.rating_date DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `loginUser` (IN `userIN` VARCHAR(100), IN `passwordIN` VARCHAR(100))   BEGIN
     DECLARE user_count INT;
 
     SELECT COUNT(*)
     INTO user_count
     FROM users
-    WHERE username = userIN AND password_hash = passwordIN;
+    WHERE username = userIN AND password = passwordIN;
 
     IF user_count > 0 THEN
-        SELECT 'Login successful' AS Message;
+        SELECT 'Sikeres bejelentkezés!' AS Message;
     ELSE
-        SELECT 'Invalid username or password' AS Message;
+        SELECT 'A felhasználónév vagy jelszó helytelen.' AS Message;
     END IF;
 END$$
 
@@ -99,19 +157,120 @@ FROM movies
 INNER JOIN directors ON movies.director_id = directors.director_id
 WHERE movies.movie_name LIKE movieIN$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `MoviesByGenre` (IN `genreIN` VARCHAR(100))   SELECT 
-    movies.movie_id, 
-    movies.movie_name, 
-    movies.release_year,
-    genres.name
-FROM movies
-INNER JOIN genres ON movies.genre_id = genres.genre_id
-WHERE genres.name LIKE genreIN$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `movietitles` ()   SELECT movie_name
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movieTitles` ()   SELECT movie_name
 FROM movies$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `RegisterUser` (IN `p_email` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_password` VARCHAR(255), OUT `p_status` VARCHAR(50))   BEGIN
+    DECLARE user_exists INT;
+    DECLARE username_exists INT;
+    DECLARE valid_email BOOLEAN;
+    DECLARE valid_password BOOLEAN;
+
+    -- Ellenőrizzük, hogy az e-mail formátuma helyes-e (reguláris kifejezés)
+    SET valid_email = p_email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$';
+
+    -- Jelszó validálás: min. 10 karakter, legalább 1 szám, 1 nagybetű, 1 speciális karakter
+    SET valid_password = 
+        LENGTH(p_password) >= 10 
+        AND p_password REGEXP '[0-9]'
+        AND p_password REGEXP '[A-Z]'
+        AND p_password REGEXP '[!@#$%^&*]';
+
+    -- Ha az e-mail cím formátuma érvénytelen
+    IF valid_email = 0 THEN
+        SET p_status = 'Az E-mail cím nem létezik.';
+
+    -- Ha a jelszó nem felel meg az elvárásoknak
+    ELSEIF valid_password = 0 THEN
+        SET p_status = 'A megadott jelszó túl gyenge.';
+
+    ELSE
+        -- Ellenőrizzük, hogy az e-mail cím már létezik-e
+        SELECT COUNT(*) INTO user_exists FROM users WHERE email = p_email;
+
+        -- Ellenőrizzük, hogy a felhasználónév már létezik-e
+        SELECT COUNT(*) INTO username_exists FROM users WHERE username = p_username;
+
+        IF user_exists > 0 THEN
+            SET p_status = 'Ezzel az e-mail címmel már regisztráltak.';
+        ELSEIF username_exists > 0 THEN
+            SET p_status = 'Ez a felhasználónév már használatba van.';
+        ELSE
+            -- Új felhasználó beszúrása
+            INSERT INTO users (email, username, password, registration_date)
+            VALUES (p_email, p_username, p_password, CURRENT_TIMESTAMP);
+
+            SET p_status = 'Sikeres regisztáció';
+        END IF;
+    END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsersByName` (IN `search_term` VARCHAR(255))   BEGIN
+    SELECT user_id, username, email, registration_date
+    FROM users
+    WHERE username LIKE CONCAT('%', search_term, '%');
+END$$
+
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `actors`
+--
+
+CREATE TABLE `actors` (
+  `actor_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `birth_date` date DEFAULT NULL,
+  `actor_image` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `actors`
+--
+
+INSERT INTO `actors` (`actor_id`, `name`, `birth_date`, `actor_image`) VALUES
+(1, 'Sinkovits Imre', '1928-09-21', 'sinkovits_imre.jpg'),
+(2, 'Bánsági Ildikó', '1947-06-19', 'bansagi_ildiko.jpg'),
+(3, 'Kállai Ferenc', '1925-07-04', 'kallai_ferenc.jpg'),
+(4, 'Bodrogi Gyula', '1934-04-15', 'bodrogi_gyula.jpg'),
+(5, 'Darvas Iván', '1925-06-14', 'darvas_ivan.jpg'),
+(6, 'Mikó István', '1947-11-24', 'miko_istvan.jpg'),
+(7, 'Cserhalmi György', '1948-02-17', 'cserhalmi_gyorgy.jpg'),
+(8, 'Latinovits Zoltán', '1931-09-09', 'latinovits_zoltan.jpg'),
+(9, 'Hernádi Judit', '1956-04-11', 'hernadi_judit.jpg'),
+(10, 'Kovács Kati', '1944-10-25', 'kovacs_kati.jpg'),
+(11, 'Kabos Gyula', '1887-03-19', 'kabos_gyula.jpg'),
+(12, 'Béres Ilona', '1942-06-04', 'beres_ilona.jpg'),
+(13, 'Balsai Móni', '1977-12-13', 'balsai_moni.jpg'),
+(14, 'Csányi Sándor', '1975-12-19', 'csanyi_sandor.jpg'),
+(15, 'Trill Zsolt', '1971-03-22', 'trill_zsolt.jpg'),
+(16, 'Czapkó Antal', '1978-05-06', 'czapko_antal.jpg'),
+(17, 'Pogány Judit', '1944-07-10', 'pogany_judit.jpg'),
+(18, 'Garas Dezső', '1934-12-09', 'garas_dezso.jpg'),
+(19, 'Törőcsik Mari', '1935-11-23', 'torocsik_mari.jpg'),
+(20, 'Nagy Zsolt', '1974-10-28', 'nagy_zsolt.jpg'),
+(21, 'Gera Marina', '1984-07-17', 'gera_marina.jpg'),
+(22, 'Dobó Kata', '1974-02-25', 'dobo_kata.jpg'),
+(23, 'Eperjes Károly', '1954-02-17', 'eperjes_karoly.jpg'),
+(24, 'Eszenyi Enikő', '1961-01-11', 'eszenyi_eniko.jpg'),
+(25, 'Rudolf Péter', '1959-10-15', 'rudolf_peter.jpg'),
+(26, 'Morcsányi Géza', '1952-09-28', 'morcsanyi_geza.jpg'),
+(27, 'Nagy Marcell', '2004-03-11', 'nagy_marcell.jpg'),
+(28, 'Jászai Mari', '1850-02-24', 'jaszai_mari.jpg'),
+(29, 'Koltai Róbert', '1943-12-16', 'koltai_robert.jpg'),
+(30, 'Somlay Artúr', '1883-02-28', 'somlay_artur.jpg'),
+(31, 'Gábor Miklós', '1919-04-07', 'gabor_miklos.jpg'),
+(32, 'Bánky Zsuzsa', '1921-10-19', 'banky_zsuzsa.jpg'),
+(33, 'Rónay Ábrahám', '1931-01-01', 'ronay_abraham.jpg'),
+(34, 'Bárdy György', '1921-05-26', 'bardy_gyorgy.jpg'),
+(35, 'Rozsos István', '1930-06-10', 'rozsos_istvan.jpg'),
+(36, 'Klaus Maria Brandauer', '1943-06-22', 'klaus_maria_brandauer.jpg'),
+(37, 'Krystyna Janda', '1952-12-18', 'krystyna_janda.jpg'),
+(38, 'Rolf Hoppe', '1930-12-06', 'rolf_hoppe.jpg'),
+(39, 'Both Béla', '1912-06-01', 'both_bela.jpg'),
+(40, 'Őze Lajos', '1935-04-27', 'oze_lajos.jpg');
 
 -- --------------------------------------------------------
 
@@ -173,7 +332,15 @@ INSERT INTO `directors` (`director_id`, `name`, `director_image`, `birth_date`) 
 (40, 'Székely István', 'szekely_istvan.jpg', '1899-02-25'),
 (41, 'Szász János', 'szasz_janos.jpg', '1958-03-14'),
 (42, 'Reisz Gábor', 'reisz_gabor.jpg', '1980-01-19'),
-(43, 'Nemes Jeles László', 'nemes_jeles_laszlo.jpg', '1977-02-18');
+(43, 'Nemes Jeles László', 'nemes_jeles_laszlo.jpg', '1977-02-18'),
+(44, 'Tarr Béla', 'tarr_bela.jpg', '1955-07-21'),
+(47, 'Gigor Attila', 'gigor_attila.jpg', '1978-04-05'),
+(48, 'Gábor Pál', 'gabor_pal.jpg', '1932-11-02'),
+(49, 'Bergendy Péter', 'bergendy_peter.jpg', '1969-04-04'),
+(50, 'Hajdu Szabolcs', 'hajdu_szabolcs.jpg', '1972-04-26'),
+(51, 'Jiří Menzel', 'jiri_menzel.jpg', '1938-02-23'),
+(52, 'Bodzsár Márk', 'bodzsar_mark.jpg', '1983-06-16'),
+(53, 'Szabó Virág', 'szabo_virag.jpg', '1985-10-04');
 
 -- --------------------------------------------------------
 
@@ -199,7 +366,7 @@ INSERT INTO `genres` (`genre_id`, `name`) VALUES
 (6, 'Történelmi'),
 (7, 'Ifjúsági'),
 (8, 'Sci-fi'),
-(9, 'Romantikus vígjáték'),
+(9, 'Sci-fi'),
 (10, 'Horror'),
 (11, 'Thriller'),
 (12, 'Kaland'),
@@ -208,7 +375,11 @@ INSERT INTO `genres` (`genre_id`, `name`) VALUES
 (15, 'Romantikus dráma'),
 (16, 'vígjáték-dráma horror'),
 (17, 'vígjáték-dráma'),
-(18, 'művészfilm');
+(18, 'művészfilm'),
+(19, 'Háborús'),
+(20, 'Politikai vígjáték'),
+(21, 'Krimi'),
+(22, 'Western');
 
 -- --------------------------------------------------------
 
@@ -220,51 +391,65 @@ CREATE TABLE `movies` (
   `movie_id` int(11) NOT NULL,
   `release_year` int(11) DEFAULT NULL,
   `description` text,
-  `director_id` int(11) DEFAULT NULL,
-  `genre_id` int(11) DEFAULT NULL,
   `movie_name` varchar(99) NOT NULL,
-  `Length` int(11) DEFAULT NULL,
-  `movie_actor_id` int(8) DEFAULT NULL
+  `Length` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `movies`
 --
 
-INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `director_id`, `genre_id`, `movie_name`, `Length`, `movie_actor_id`) VALUES
-(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 1, 1, 'Valahol Európában', 100, NULL),
-(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 2, 1, 'Mephisto', 144, NULL),
-(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 3, 2, 'A tanú', 110, NULL),
-(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 4, 3, 'Tizedes meg a többiek', 109, NULL),
-(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 5, 15, 'Szerelem', 96, NULL),
-(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 6, 4, 'Macskafogó', 96, NULL),
-(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 7, 5, 'Kopaszkutya', 98, NULL),
-(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 8, 6, 'Egri csillagok', 120, NULL),
-(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 9, 1, 'Az ötödik pecsét', 102, NULL),
-(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 10, 1, 'Csillagosok, katonák', 94, NULL),
-(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 39, 3, 'Indul a bakterház', 85, NULL),
-(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 40, 3, 'Hyppolit, a lakáj', 90, NULL),
-(113, 1989, 'Két nővérek élete a 20. század elején.', 13, 1, 'Az én XX. századom', 95, NULL),
-(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 14, 4, 'Liza, a rókatündér', 95, NULL),
-(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 15, 3, 'Kontroll', 105, NULL),
-(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 16, 16, 'Taxidermia', 91, NULL),
-(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 17, 6, 'Hídember', 100, NULL),
-(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 16, 2, 'Hukkle', 75, NULL),
-(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 2, 1, 'Apa', 90, NULL),
-(120, 1969, 'Egy fiúcsapat barátságának története.', 9, 7, 'Pál utcai fiúk', 95, NULL),
-(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 20, 3, 'Moszkva tér', 101, NULL),
-(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 31, 6, 'Örök tél', 98, NULL),
-(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 32, 15, 'Szabadság, szerelem', 103, NULL),
-(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 33, 3, 'Csapd le csacsi!', 95, NULL),
-(125, 1984, 'Egy szürreális szerelmi történet.', 34, 1, 'Eszkimó asszony fázik', 92, NULL),
-(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 35, 3, 'Magyar vándor', 116, NULL),
-(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 13, 1, 'Testről és lélekről', 116, NULL),
-(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 36, 10, 'Fehér isten', 119, NULL),
-(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 37, 1, 'Aranyember', 98, NULL),
-(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 38, 3, 'Sose halunk meg', 107, NULL),
-(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 41, 1, 'A Nagy Füzet', 109, NULL),
-(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 42, 3, 'VAN valami furcsa és megmagyarázhatatlan', 90, NULL),
-(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 42, 1, 'Saul fia', 107, NULL);
+INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `Length`) VALUES
+(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100),
+(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144),
+(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110),
+(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109),
+(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96),
+(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96),
+(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98),
+(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120),
+(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102),
+(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94),
+(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85),
+(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90),
+(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95),
+(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95),
+(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105),
+(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91),
+(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100),
+(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75),
+(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90),
+(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95),
+(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101),
+(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98),
+(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103),
+(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95),
+(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92),
+(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116),
+(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116),
+(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119),
+(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98),
+(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107),
+(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109),
+(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90),
+(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107),
+(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145),
+(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146),
+(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121),
+(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96),
+(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95),
+(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98),
+(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107),
+(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132),
+(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91),
+(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89),
+(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98),
+(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100),
+(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97),
+(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104),
+(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100),
+(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100),
+(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112);
 
 -- --------------------------------------------------------
 
@@ -273,48 +458,240 @@ INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `director_id`, 
 --
 
 CREATE TABLE `movie_actors` (
-  `movie_actor_id` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `movie_id` int(11) DEFAULT NULL,
-  `birth_date` date DEFAULT NULL,
-  `actor_image` varchar(255) DEFAULT NULL
+  `movie_id` int(11) NOT NULL,
+  `actor_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `movie_actors`
 --
 
-INSERT INTO `movie_actors` (`movie_actor_id`, `name`, `movie_id`, `birth_date`, `actor_image`) VALUES
-(1, 'Sinkovits Imre', 101, '1928-09-21', 'sinkovits_imre.jpg'),
-(2, 'Bánsági Ildikó', 102, '1947-06-19', 'bansagi_ildiko.jpg'),
-(3, 'Kállai Ferenc', 103, '1925-07-04', 'kallai_ferenc.jpg'),
-(4, 'Bodrogi Gyula', 104, '1934-04-15', 'bodrogi_gyula.jpg'),
-(5, 'Darvas Iván', 105, '1925-06-14', 'darvas_ivan.jpg'),
-(6, 'Mikó István', 106, '1947-11-24', 'miko_istvan.jpg'),
-(7, 'Cserhalmi György', 107, '1948-02-17', 'cserhalmi_gyorgy.jpg'),
-(8, 'Sinkovits Imre', 108, '1928-09-21', 'sinkovits_imre.jpg'),
-(9, 'Latinovits Zoltán', 109, '1931-09-09', 'latinovits_zoltan.jpg'),
-(10, 'Hernádi Judit', 110, '1956-04-11', 'hernadi_judit.jpg'),
-(11, 'Kovács Kati', 111, '1944-10-25', 'kovacs_kati.jpg'),
-(12, 'Kabos Gyula', 112, '1887-03-19', 'kabos_gyula.jpg'),
-(13, 'Béres Ilona', 113, '1942-06-04', 'beres_ilona.jpg'),
-(14, 'Balsai Móni', 114, '1977-12-13', 'balsai_moni.jpg'),
-(15, 'Csányi Sándor', 115, '1975-12-19', 'csanyi_sandor.jpg'),
-(16, 'Trill Zsolt', 116, '1971-03-22', 'trill_zsolt.jpg'),
-(17, 'Czapkó Antal', 117, '1978-05-06', 'czapko_antal.jpg'),
-(18, 'Pogány Judit', 118, '1944-07-10', 'pogany_judit.jpg'),
-(19, 'Garas Dezső', 119, '1934-12-09', 'garas_dezso.jpg'),
-(20, 'Törőcsik Mari', 120, '1935-11-23', 'torocsik_mari.jpg'),
-(21, 'Nagy Zsolt', 121, '1974-10-28', 'nagy_zsolt.jpg'),
-(22, 'Gera Marina', 122, '1984-07-17', 'gera_marina.jpg'),
-(23, 'Dobó Kata', 123, '1974-02-25', 'dobo_kata.jpg'),
-(24, 'Eperjes Károly', 124, '1954-02-17', 'eperjes_karoly.jpg'),
-(25, 'Eszenyi Enikő', 125, '1961-01-11', 'eszenyi_eniko.jpg'),
-(26, 'Rudolf Péter', 126, '1959-10-15', 'rudolf_peter.jpg'),
-(27, 'Morcsányi Géza', 127, '1952-09-28', 'morcsanyi_geza.jpg'),
-(28, 'Nagy Marcell', 128, '2004-03-11', 'nagy_marcell.jpg'),
-(29, 'Jászai Mari', 129, '1850-02-24', 'jaszai_mari.jpg'),
-(30, 'Koltai Róbert', 130, '1943-12-16', 'koltai_robert.jpg');
+INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
+(104, 12),
+(105, 13),
+(106, 14),
+(107, 15),
+(108, 9),
+(109, 16),
+(110, 17),
+(111, 18),
+(112, 19),
+(113, 20),
+(114, 21),
+(115, 22),
+(116, 23),
+(117, 24),
+(118, 25),
+(119, 26),
+(120, 27),
+(121, 28),
+(122, 29),
+(123, 30),
+(124, 31),
+(125, 32),
+(126, 33),
+(127, 34),
+(128, 35),
+(129, 36),
+(130, 37),
+(101, 30),
+(101, 31),
+(101, 32),
+(101, 33),
+(101, 34),
+(101, 35),
+(102, 36),
+(102, 37),
+(102, 2),
+(102, 38),
+(102, 7),
+(103, 3),
+(103, 39),
+(103, 40);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movie_directors`
+--
+
+CREATE TABLE `movie_directors` (
+  `movie_id` int(11) NOT NULL,
+  `director_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `movie_directors`
+--
+
+INSERT INTO `movie_directors` (`movie_id`, `director_id`) VALUES
+(101, 1),
+(102, 2),
+(119, 2),
+(139, 2),
+(103, 3),
+(104, 4),
+(105, 5),
+(106, 6),
+(107, 7),
+(108, 8),
+(109, 9),
+(120, 9),
+(110, 10),
+(146, 12),
+(113, 13),
+(127, 13),
+(145, 13),
+(114, 14),
+(115, 15),
+(116, 16),
+(118, 16),
+(117, 17),
+(121, 20),
+(136, 22),
+(122, 31),
+(150, 31),
+(123, 32),
+(147, 32),
+(124, 33),
+(125, 34),
+(126, 35),
+(128, 36),
+(129, 37),
+(130, 38),
+(111, 39),
+(112, 40),
+(131, 41),
+(132, 42),
+(133, 43),
+(134, 44),
+(135, 44),
+(141, 44),
+(138, 47),
+(140, 47),
+(137, 48),
+(143, 49),
+(142, 50),
+(148, 50),
+(144, 51),
+(149, 52);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movie_genres`
+--
+
+CREATE TABLE `movie_genres` (
+  `movie_id` int(11) NOT NULL,
+  `genre_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `movie_genres`
+--
+
+INSERT INTO `movie_genres` (`movie_id`, `genre_id`) VALUES
+(101, 1),
+(102, 1),
+(105, 1),
+(107, 1),
+(108, 1),
+(109, 1),
+(110, 1),
+(113, 1),
+(115, 1),
+(116, 1),
+(117, 1),
+(118, 1),
+(119, 1),
+(120, 1),
+(121, 1),
+(122, 1),
+(123, 1),
+(125, 1),
+(127, 1),
+(128, 1),
+(129, 1),
+(130, 1),
+(131, 1),
+(132, 1),
+(133, 1),
+(134, 1),
+(135, 1),
+(136, 1),
+(137, 1),
+(138, 1),
+(139, 1),
+(140, 1),
+(141, 1),
+(142, 1),
+(143, 1),
+(145, 1),
+(146, 1),
+(147, 1),
+(148, 1),
+(150, 1),
+(103, 2),
+(124, 2),
+(102, 3),
+(104, 3),
+(111, 3),
+(112, 3),
+(114, 3),
+(116, 3),
+(121, 3),
+(124, 3),
+(126, 3),
+(130, 3),
+(132, 3),
+(140, 3),
+(144, 3),
+(149, 3),
+(106, 4),
+(101, 5),
+(107, 5),
+(103, 6),
+(108, 6),
+(110, 6),
+(115, 6),
+(117, 6),
+(122, 6),
+(123, 6),
+(126, 6),
+(147, 6),
+(120, 7),
+(106, 8),
+(113, 9),
+(113, 10),
+(128, 11),
+(136, 11),
+(138, 11),
+(141, 11),
+(143, 11),
+(106, 12),
+(108, 12),
+(120, 12),
+(114, 13),
+(116, 13),
+(107, 14),
+(114, 15),
+(127, 15),
+(129, 15),
+(137, 15),
+(101, 19),
+(104, 19),
+(108, 19),
+(109, 19),
+(110, 19),
+(131, 19),
+(133, 19),
+(103, 20),
+(118, 21),
+(136, 21),
+(140, 21),
+(141, 21),
+(142, 22);
 
 -- --------------------------------------------------------
 
@@ -377,49 +754,60 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `username` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `password_hash` varchar(255) DEFAULT NULL,
-  `registration_date` date DEFAULT NULL
+  `password` varchar(255) NOT NULL,
+  `registration_date` date DEFAULT NULL,
+  `role` enum('user','admin') NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `registration_date`) VALUES
-(1, 'user01', 'user01@example.com', 'b01ce21ce5ac38191fcf0fb87c71f53756b2c57e57046f7320a463f1dba3e209', '2022-05-01'),
-(2, 'user02', 'user02@example.com', '1321166e0e6eaa14148b1d5a47f4bdfabdabe11800a4579fbf3f77ba55e86517', '2022-06-15'),
-(3, 'user03', 'user03@example.com', '433aa7f21428c6b75543cdb46caf31f6828e9a78d262dd5382eeb381c8c20787', '2022-07-20'),
-(4, 'user04', 'user04@example.com', '054e2ac1e5b89caf7446f6a6fee681d2259ce871149e162885b4263e6d77c852', '2022-08-05'),
-(5, 'user05', 'user05@example.com', '57a319ac89097ea47a14626564ba96f439bdeb213c31869603ec9efd4c612675', '2022-09-12'),
-(6, 'user06', 'user06@example.com', 'f1e150a8730a3d23729b4ec12392cb122f81a91fdcce7039f28e0a93cbdef17a', '2022-10-01'),
-(7, 'user07', 'user07@example.com', '7d8683503df3a53c54b6d9d18c9591ccb2369bd9c45739f93c34d274aa9dabae', '2022-11-15'),
-(8, 'user08', 'user08@example.com', 'e5967501373f7fbf336de9f99cde06d4b8bcd0326d670b13c3ee771d23df0255', '2022-12-25'),
-(9, 'user09', 'user09@example.com', 'bba783357187d99e3734fb568f1b901dfcb22050aa06a2cdef06e0531ee13712', '2023-01-10'),
-(10, 'user10', 'user10@example.com', '9bf5fe02f00be85700e3e665f83ef4b933f37c032f935619e4d9474359d2ad11', '2023-02-14'),
-(11, 'user11', 'user11@example.com', '8d95ce09bbdabd9d82a5397ca8768e11cee8c4d3240554939b75c0c847a65f57', '2023-03-05'),
-(12, 'user12', 'user12@example.com', 'd697c6dc67eea5aa93b4e8888a8601216ba3b0958161c4e779d54bff61099df6', '2023-03-18'),
-(13, 'user13', 'user13@example.com', '0c234922e5408c4af3af38288cb07f85c2fe8d354ec0d90bf722a3ca8fb320de', '2023-04-01'),
-(14, 'user14', 'user14@example.com', 'ce8a146893cbda37ea920d3df3587022998a5f47a110d71af541497acbfa0f8b', '2023-04-15'),
-(15, 'user15', 'user15@example.com', '21cdcf752bb5ec64d41290d244a85978b97a46b049cc7d068d380f0d6f619ea3', '2023-05-20'),
-(16, 'user16', 'user16@example.com', 'acaf749ea2842470b1f8a226f3a58f235d24b6f0701cf4231f1c945f178ee694', '2023-06-10'),
-(17, 'user17', 'user17@example.com', '770ed669934d123ade1232cb17d1bf060a03414145c01fa7c442054e3cbd6050', '2023-07-01'),
-(18, 'user18', 'user18@example.com', '5695159addb2c5c3c56a27f1540e213da49e45dca0757c1dd5a4a4cbbc7a7ed5', '2023-08-25'),
-(19, 'user19', 'user19@example.com', '6bd744fa602140f8002c41d6de7c3bae4019d89a3e79526afa9b5fd72205558d', '2023-09-05'),
-(20, 'user20', 'user20@example.com', 'b9b63b2c402091bcb7cd8220cf7cd03fe9391d670a23106d0513743ab37a1ef6', '2023-10-15'),
-(21, 'user21', 'user21@example.com', '5dd2df5864c4c28f0e41a7e6a5e063d4ace57aef6fa055cc66780f515c588ef1', '2023-10-30'),
-(22, 'user22', 'user22@example.com', '149079bcec8dd9e73feda93f42c8d909366f28f795afa8169ad0e4416803d0a5', '2023-11-05'),
-(23, 'user23', 'user23@example.com', '734b4ef493edb4e53e2df0b709f17c3b891ffe995167350b7d547b4fa57cd83b', '2023-11-10'),
-(24, 'user24', 'user24@example.com', '9430f5556c8cc3982c63cb6762566e006fbc7e299b4255cfa569ecc1be7a0b06', '2023-11-12'),
-(25, 'user25', 'user25@example.com', 'd18e22a2560dc2bac844c91bd868955cd5a3ea1d7a9c3504516d47f86313e6be', '2023-11-13'),
-(26, 'user26', 'user26@example.com', '2a65a1338108372f2422eafefc8809ae516f2039665ab721d0ffc0343d6707ad', '2023-11-14'),
-(27, 'user27', 'user27@example.com', 'c25da1436413639abc82c7891467ded58b86956ef793cc5ef72c6867b6d5e144', '2023-11-15'),
-(28, 'user28', 'user28@example.com', '1bb36c13be34479f487d2d42d15b19ac3ba52f329461376aae7c5f516f4e346b', '2023-11-16'),
-(29, 'user29', 'user29@example.com', '95eec19390b1ae11e0dfe6ae5548c92fb3da67f56fb4f01b731deb039c35ec3f', '2023-11-17'),
-(30, 'user30', 'user30@example.com', 'e8a940d4972a7e645e4ea1d712ff1f0c79ec4243378c47e114ca71be2af568e9', '2023-11-18');
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_date`, `role`) VALUES
+(1, 'user01', 'user01@example.com', 'b01ce21ce5ac38191fcf0fb87c71f53756b2c57e57046f7320a463f1dba3e209', '2022-05-01', 'user'),
+(2, 'user02', 'user02@example.com', '1321166e0e6eaa14148b1d5a47f4bdfabdabe11800a4579fbf3f77ba55e86517', '2022-06-15', 'user'),
+(3, 'user03', 'user03@example.com', '433aa7f21428c6b75543cdb46caf31f6828e9a78d262dd5382eeb381c8c20787', '2022-07-20', 'user'),
+(4, 'user04', 'user04@example.com', '054e2ac1e5b89caf7446f6a6fee681d2259ce871149e162885b4263e6d77c852', '2022-08-05', 'user'),
+(5, 'user05', 'user05@example.com', '57a319ac89097ea47a14626564ba96f439bdeb213c31869603ec9efd4c612675', '2022-09-12', 'user'),
+(6, 'user06', 'user06@example.com', 'f1e150a8730a3d23729b4ec12392cb122f81a91fdcce7039f28e0a93cbdef17a', '2022-10-01', 'user'),
+(7, 'user07', 'user07@example.com', '7d8683503df3a53c54b6d9d18c9591ccb2369bd9c45739f93c34d274aa9dabae', '2022-11-15', 'user'),
+(8, 'user08', 'user08@example.com', 'e5967501373f7fbf336de9f99cde06d4b8bcd0326d670b13c3ee771d23df0255', '2022-12-25', 'user'),
+(9, 'user09', 'user09@example.com', 'bba783357187d99e3734fb568f1b901dfcb22050aa06a2cdef06e0531ee13712', '2023-01-10', 'user'),
+(10, 'user10', 'user10@example.com', '9bf5fe02f00be85700e3e665f83ef4b933f37c032f935619e4d9474359d2ad11', '2023-02-14', 'user'),
+(11, 'user11', 'user11@example.com', '8d95ce09bbdabd9d82a5397ca8768e11cee8c4d3240554939b75c0c847a65f57', '2023-03-05', 'user'),
+(12, 'user12', 'user12@example.com', 'd697c6dc67eea5aa93b4e8888a8601216ba3b0958161c4e779d54bff61099df6', '2023-03-18', 'user'),
+(13, 'user13', 'user13@example.com', '0c234922e5408c4af3af38288cb07f85c2fe8d354ec0d90bf722a3ca8fb320de', '2023-04-01', 'user'),
+(14, 'user14', 'user14@example.com', 'ce8a146893cbda37ea920d3df3587022998a5f47a110d71af541497acbfa0f8b', '2023-04-15', 'user'),
+(15, 'user15', 'user15@example.com', '21cdcf752bb5ec64d41290d244a85978b97a46b049cc7d068d380f0d6f619ea3', '2023-05-20', 'user'),
+(16, 'user16', 'user16@example.com', 'acaf749ea2842470b1f8a226f3a58f235d24b6f0701cf4231f1c945f178ee694', '2023-06-10', 'user'),
+(17, 'user17', 'user17@example.com', '770ed669934d123ade1232cb17d1bf060a03414145c01fa7c442054e3cbd6050', '2023-07-01', 'user'),
+(18, 'user18', 'user18@example.com', '5695159addb2c5c3c56a27f1540e213da49e45dca0757c1dd5a4a4cbbc7a7ed5', '2023-08-25', 'user'),
+(19, 'user19', 'user19@example.com', '6bd744fa602140f8002c41d6de7c3bae4019d89a3e79526afa9b5fd72205558d', '2023-09-05', 'user'),
+(20, 'user20', 'user20@example.com', 'b9b63b2c402091bcb7cd8220cf7cd03fe9391d670a23106d0513743ab37a1ef6', '2023-10-15', 'user'),
+(21, 'user21', 'user21@example.com', '5dd2df5864c4c28f0e41a7e6a5e063d4ace57aef6fa055cc66780f515c588ef1', '2023-10-30', 'user'),
+(22, 'user22', 'user22@example.com', '149079bcec8dd9e73feda93f42c8d909366f28f795afa8169ad0e4416803d0a5', '2023-11-05', 'user'),
+(23, 'user23', 'user23@example.com', '734b4ef493edb4e53e2df0b709f17c3b891ffe995167350b7d547b4fa57cd83b', '2023-11-10', 'user'),
+(24, 'user24', 'user24@example.com', '9430f5556c8cc3982c63cb6762566e006fbc7e299b4255cfa569ecc1be7a0b06', '2023-11-12', 'user'),
+(25, 'user25', 'user25@example.com', 'd18e22a2560dc2bac844c91bd868955cd5a3ea1d7a9c3504516d47f86313e6be', '2023-11-13', 'user'),
+(26, 'user26', 'user26@example.com', '2a65a1338108372f2422eafefc8809ae516f2039665ab721d0ffc0343d6707ad', '2023-11-14', 'user'),
+(27, 'user27', 'user27@example.com', 'c25da1436413639abc82c7891467ded58b86956ef793cc5ef72c6867b6d5e144', '2023-11-15', 'user'),
+(28, 'user28', 'user28@example.com', '1bb36c13be34479f487d2d42d15b19ac3ba52f329461376aae7c5f516f4e346b', '2023-11-16', 'user'),
+(29, 'user29', 'user29@example.com', '95eec19390b1ae11e0dfe6ae5548c92fb3da67f56fb4f01b731deb039c35ec3f', '2023-11-17', 'user'),
+(30, 'user30', 'user30@example.com', 'e8a940d4972a7e645e4ea1d712ff1f0c79ec4243378c47e114ca71be2af568e9', '2023-11-18', 'user'),
+(32, 'ákoska', 'elkepeszto1995@gmail.com', '*0821C7D9F57AAB8C9ABF26B56F573571229FA626', '2025-01-17', 'user'),
+(36, 'elsoezenaneven', 'nagyb6605@gmail.com', 'igeniskapitány0123!', '2025-01-17', 'user'),
+(44, 'petike', 'horvathtibor@gmail.com', '082635b2eb16500b82ea6b7a05d175b233e907c8f33c9eb60acda370fd386b094ff2371aa1c0e750b0687e34aa210766fb57460b3cf31290d847a7570a464b91', '2025-01-17', 'admin');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `actors`
+--
+ALTER TABLE `actors`
+  ADD PRIMARY KEY (`actor_id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `directors`
@@ -437,15 +825,21 @@ ALTER TABLE `genres`
 -- Indexes for table `movies`
 --
 ALTER TABLE `movies`
-  ADD PRIMARY KEY (`movie_id`),
-  ADD KEY `fk_movies_genre` (`genre_id`);
+  ADD PRIMARY KEY (`movie_id`);
 
 --
--- Indexes for table `movie_actors`
+-- Indexes for table `movie_directors`
 --
-ALTER TABLE `movie_actors`
-  ADD PRIMARY KEY (`movie_actor_id`),
-  ADD UNIQUE KEY `unique_movie` (`movie_id`);
+ALTER TABLE `movie_directors`
+  ADD PRIMARY KEY (`movie_id`,`director_id`),
+  ADD KEY `director_id` (`director_id`);
+
+--
+-- Indexes for table `movie_genres`
+--
+ALTER TABLE `movie_genres`
+  ADD PRIMARY KEY (`movie_id`,`genre_id`),
+  ADD KEY `genre_id` (`genre_id`);
 
 --
 -- Indexes for table `ratings`
@@ -459,35 +853,36 @@ ALTER TABLE `ratings`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `unique_username` (`username`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
+-- AUTO_INCREMENT for table `actors`
+--
+ALTER TABLE `actors`
+  MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
 -- AUTO_INCREMENT for table `directors`
 --
 ALTER TABLE `directors`
-  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `genres`
 --
 ALTER TABLE `genres`
-  MODIFY `genre_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `genre_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `movies`
 --
 ALTER TABLE `movies`
-  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
-
---
--- AUTO_INCREMENT for table `movie_actors`
---
-ALTER TABLE `movie_actors`
-  MODIFY `movie_actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -499,29 +894,32 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `movies`
+-- Constraints for table `movie_directors`
 --
-ALTER TABLE `movies`
-  ADD CONSTRAINT `fk_movies_genre` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`);
+ALTER TABLE `movie_directors`
+  ADD CONSTRAINT `movie_directors_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `movie_directors_ibfk_2` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `movie_actors`
+-- Constraints for table `movie_genres`
 --
-ALTER TABLE `movie_actors`
-  ADD CONSTRAINT `fk_movie_actors_movie` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`);
+ALTER TABLE `movie_genres`
+  ADD CONSTRAINT `fk_movie_genre` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `movie_genres_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `movie_genres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
-  ADD CONSTRAINT `fk_ratings_movie` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`),
+  ADD CONSTRAINT `fk_ratings_movie` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_ratings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 COMMIT;
 
