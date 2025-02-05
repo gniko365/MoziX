@@ -2,8 +2,8 @@
 -- version 5.1.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 17, 2025 at 08:44 PM
+-- Host: localhost:8889
+-- Generation Time: Feb 05, 2025 at 09:40 AM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -35,11 +35,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateAdmin` (IN `p_username` VARCH
     INSERT INTO users (username, email, password, role, registration_date)
     VALUES (p_username, p_email, SHA2(p_password, 512), 'admin', NOW());
 END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `directors movies` (IN `directorIN` VARCHAR(100))   SELECT directors.name AS "director name", movies.movie_name AS "movie name"
-FROM movies
-INNER JOIN directors ON movies.director_id = directors.director_id
-WHERE directors.name LIKE directorIN$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `everyActorInAMovie` ()   SELECT movie_id, COUNT(*) AS actor_count
 FROM movie_actors
@@ -137,20 +132,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRatingsByMovie` (IN `movie_title
     ORDER BY r.rating_date DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `loginUser` (IN `userIN` VARCHAR(100), IN `passwordIN` VARCHAR(100))   BEGIN
-    DECLARE user_count INT;
-
-    SELECT COUNT(*)
-    INTO user_count
+CREATE DEFINER=`root`@`localhost` PROCEDURE `loginUser` (IN `userIN` VARCHAR(100), IN `passwordIN` VARCHAR(100))   SELECT COUNT(*)
     FROM users
-    WHERE username = userIN AND password = passwordIN;
-
-    IF user_count > 0 THEN
-        SELECT 'Sikeres bejelentkezés!' AS Message;
-    ELSE
-        SELECT 'A felhasználónév vagy jelszó helytelen.' AS Message;
-    END IF;
-END$$
+    WHERE username = userIN AND password = passwordIN$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Movies directors` (IN `movieIN` VARCHAR(100))   SELECT movies.movie_name AS "movie name", directors.name AS "director name"
 FROM movies
@@ -160,53 +144,13 @@ WHERE movies.movie_name LIKE movieIN$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `movieTitles` ()   SELECT movie_name
 FROM movies$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `RegisterUser` (IN `p_email` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_password` VARCHAR(255), OUT `p_status` VARCHAR(50))   BEGIN
-    DECLARE user_exists INT;
-    DECLARE username_exists INT;
-    DECLARE valid_email BOOLEAN;
-    DECLARE valid_password BOOLEAN;
-
-    -- Ellenőrizzük, hogy az e-mail formátuma helyes-e (reguláris kifejezés)
-    SET valid_email = p_email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$';
-
-    -- Jelszó validálás: min. 10 karakter, legalább 1 szám, 1 nagybetű, 1 speciális karakter
-    SET valid_password = 
-        LENGTH(p_password) >= 10 
-        AND p_password REGEXP '[0-9]'
-        AND p_password REGEXP '[A-Z]'
-        AND p_password REGEXP '[!@#$%^&*]';
-
-    -- Ha az e-mail cím formátuma érvénytelen
-    IF valid_email = 0 THEN
-        SET p_status = 'Az E-mail cím nem létezik.';
-
-    -- Ha a jelszó nem felel meg az elvárásoknak
-    ELSEIF valid_password = 0 THEN
-        SET p_status = 'A megadott jelszó túl gyenge.';
-
-    ELSE
-        -- Ellenőrizzük, hogy az e-mail cím már létezik-e
-        SELECT COUNT(*) INTO user_exists FROM users WHERE email = p_email;
-
-        -- Ellenőrizzük, hogy a felhasználónév már létezik-e
-        SELECT COUNT(*) INTO username_exists FROM users WHERE username = p_username;
-
-        IF user_exists > 0 THEN
-            SET p_status = 'Ezzel az e-mail címmel már regisztráltak.';
-        ELSEIF username_exists > 0 THEN
-            SET p_status = 'Ez a felhasználónév már használatba van.';
-        ELSE
-            -- Új felhasználó beszúrása
-            INSERT INTO users (email, username, password, registration_date)
-            VALUES (p_email, p_username, p_password, CURRENT_TIMESTAMP);
-
-            SET p_status = 'Sikeres regisztáció';
-        END IF;
-    END IF;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `register_user` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    INSERT INTO users (username, email, password, registration_date, role)
+    VALUES (p_username, p_email, p_password, CURDATE(), 'user');
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsersByName` (IN `search_term` VARCHAR(255))   BEGIN
-    SELECT user_id, username, email, registration_date
+    SELECT user_id, username, email, registration_date, role
     FROM users
     WHERE username LIKE CONCAT('%', search_term, '%');
 END$$
@@ -270,7 +214,24 @@ INSERT INTO `actors` (`actor_id`, `name`, `birth_date`, `actor_image`) VALUES
 (37, 'Krystyna Janda', '1952-12-18', 'krystyna_janda.jpg'),
 (38, 'Rolf Hoppe', '1930-12-06', 'rolf_hoppe.jpg'),
 (39, 'Both Béla', '1912-06-01', 'both_bela.jpg'),
-(40, 'Őze Lajos', '1935-04-27', 'oze_lajos.jpg');
+(40, 'Őze Lajos', '1935-04-27', 'oze_lajos.jpg'),
+(41, 'Major Tamás', '1910-01-26', 'major_tamas.jpg'),
+(42, 'Márkus László', '1927-06-10', 'markus_laszlo.jpg'),
+(43, 'Darvas Lili', '1902-04-10', 'darvas_lili.jpg'),
+(44, 'Schuster Lóránt', '1950-07-20', 'schuster_lorant.jpg'),
+(45, 'Földes László (Hobo)', '1945-02-13', 'foldes_laszlo_hobo.jpg'),
+(46, 'Deák Bill Gyula', '1948-11-08', 'deak_bill_gyula.jpg'),
+(47, 'Póka Egon', '1953-06-19', 'poka_egon.jpg'),
+(48, 'Venczel Vera', '1946-03-10', 'venczel_vera.jpg'),
+(49, 'Kovács István', '1944-06-27', 'kovacs_istvan.jpg'),
+(50, 'Horváth Sándor', '1941-06-14', 'horvath_sandor.jpg'),
+(51, 'Bencze Ferenc', '1912-07-04', 'bencze_ferenc.jpg'),
+(52, 'Jácint Juhász', '1944-11-28', 'jacint_juhasz.jpg'),
+(53, 'Kozák András', '1943-02-23', 'kozak_andras.jpg'),
+(54, 'Olvasztó Imre', '1967-01-01', 'olvaszto_imre.jpg'),
+(55, 'Haumann Péter', '1941-05-17', 'haumann_peter.jpg'),
+(56, 'Horváth Teri', '1925-08-27', 'horvath_teri.jpg'),
+(57, 'Pécsi Ildikó', '1940-05-21', 'pecsi_ildiko.jpg');
 
 -- --------------------------------------------------------
 
@@ -392,64 +353,66 @@ CREATE TABLE `movies` (
   `release_year` int(11) DEFAULT NULL,
   `description` text,
   `movie_name` varchar(99) NOT NULL,
-  `Length` int(11) DEFAULT NULL
+  `Length` int(11) DEFAULT NULL,
+  `cover` varchar(255) DEFAULT NULL,
+  `trailer_link` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `movies`
 --
 
-INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `Length`) VALUES
-(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100),
-(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144),
-(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110),
-(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109),
-(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96),
-(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96),
-(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98),
-(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120),
-(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102),
-(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94),
-(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85),
-(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90),
-(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95),
-(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95),
-(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105),
-(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91),
-(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100),
-(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75),
-(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90),
-(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95),
-(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101),
-(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98),
-(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103),
-(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95),
-(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92),
-(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116),
-(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116),
-(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119),
-(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98),
-(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107),
-(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109),
-(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90),
-(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107),
-(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145),
-(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146),
-(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121),
-(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96),
-(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95),
-(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98),
-(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107),
-(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132),
-(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91),
-(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89),
-(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98),
-(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100),
-(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97),
-(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104),
-(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100),
-(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100),
-(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112);
+INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `Length`, `cover`, `trailer_link`) VALUES
+(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100, NULL, 'https://www.youtube.com/watch?v=gwhE9A6Pzso'),
+(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144, NULL, 'https://www.youtube.com/watch?v=EbpCuStwXz4'),
+(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110, NULL, 'https://www.youtube.com/watch?v=B696W2Gwvmk'),
+(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109, NULL, 'https://www.youtube.com/watch?v=8bhb4eeJB7o'),
+(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96, NULL, 'https://www.youtube.com/watch?v=lgkicEevbSA'),
+(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96, NULL, 'https://www.youtube.com/watch?v=6WJxaSfAFXY'),
+(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98, NULL, 'https://www.youtube.com/watch?v=RVRiEwmwNd8'),
+(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120, NULL, 'https://www.youtube.com/watch?v=04CZI0A0Vgw'),
+(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102, NULL, 'https://www.youtube.com/watch?v=d8STQElOASA'),
+(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94, NULL, 'https://www.youtube.com/watch?v=xTnJ74KeTfs'),
+(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85, NULL, NULL),
+(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90, NULL, NULL),
+(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95, NULL, NULL),
+(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95, NULL, NULL),
+(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105, NULL, NULL),
+(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91, NULL, NULL),
+(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100, NULL, NULL),
+(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75, NULL, NULL),
+(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90, NULL, NULL),
+(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95, NULL, NULL),
+(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101, NULL, NULL),
+(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98, NULL, NULL),
+(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103, NULL, NULL),
+(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95, NULL, NULL),
+(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92, NULL, NULL),
+(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, NULL, NULL),
+(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, NULL, NULL),
+(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, NULL, NULL),
+(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98, NULL, NULL),
+(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, NULL, NULL),
+(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, NULL, NULL),
+(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, NULL, NULL),
+(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107, NULL, NULL),
+(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145, NULL, NULL),
+(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146, NULL, NULL),
+(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121, NULL, NULL),
+(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96, NULL, NULL),
+(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95, NULL, NULL),
+(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98, NULL, NULL),
+(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107, NULL, NULL),
+(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132, NULL, NULL),
+(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91, NULL, NULL),
+(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89, NULL, NULL),
+(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98, NULL, NULL),
+(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100, NULL, NULL),
+(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97, NULL, NULL),
+(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104, NULL, NULL),
+(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100, NULL, NULL),
+(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100, NULL, NULL),
+(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -467,33 +430,6 @@ CREATE TABLE `movie_actors` (
 --
 
 INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
-(104, 12),
-(105, 13),
-(106, 14),
-(107, 15),
-(108, 9),
-(109, 16),
-(110, 17),
-(111, 18),
-(112, 19),
-(113, 20),
-(114, 21),
-(115, 22),
-(116, 23),
-(117, 24),
-(118, 25),
-(119, 26),
-(120, 27),
-(121, 28),
-(122, 29),
-(123, 30),
-(124, 31),
-(125, 32),
-(126, 33),
-(127, 34),
-(128, 35),
-(129, 36),
-(130, 37),
 (101, 30),
 (101, 31),
 (101, 32),
@@ -507,7 +443,33 @@ INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
 (102, 7),
 (103, 3),
 (103, 39),
-(103, 40);
+(103, 40),
+(104, 1),
+(104, 5),
+(104, 41),
+(104, 42),
+(105, 5),
+(105, 19),
+(105, 43),
+(107, 44),
+(107, 45),
+(107, 46),
+(107, 47),
+(108, 1),
+(108, 48),
+(108, 49),
+(109, 8),
+(109, 40),
+(109, 42),
+(109, 50),
+(109, 51),
+(110, 52),
+(110, 53),
+(111, 29),
+(111, 54),
+(111, 55),
+(111, 56),
+(111, 57);
 
 -- --------------------------------------------------------
 
@@ -796,7 +758,8 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (30, 'user30', 'user30@example.com', 'e8a940d4972a7e645e4ea1d712ff1f0c79ec4243378c47e114ca71be2af568e9', '2023-11-18', 'user'),
 (32, 'ákoska', 'elkepeszto1995@gmail.com', '*0821C7D9F57AAB8C9ABF26B56F573571229FA626', '2025-01-17', 'user'),
 (36, 'elsoezenaneven', 'nagyb6605@gmail.com', 'igeniskapitány0123!', '2025-01-17', 'user'),
-(44, 'petike', 'horvathtibor@gmail.com', '082635b2eb16500b82ea6b7a05d175b233e907c8f33c9eb60acda370fd386b094ff2371aa1c0e750b0687e34aa210766fb57460b3cf31290d847a7570a464b91', '2025-01-17', 'admin');
+(44, 'petike', 'horvathtibor@gmail.com', '082635b2eb16500b82ea6b7a05d175b233e907c8f33c9eb60acda370fd386b094ff2371aa1c0e750b0687e34aa210766fb57460b3cf31290d847a7570a464b91', '2025-01-17', 'admin'),
+(45, 'fasz', 'szopo', 'jaha', '2025-01-31', 'user');
 
 --
 -- Indexes for dumped tables
@@ -864,13 +827,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `actors`
 --
 ALTER TABLE `actors`
-  MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `directors`
 --
 ALTER TABLE `directors`
-  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `genres`
@@ -882,7 +845,7 @@ ALTER TABLE `genres`
 -- AUTO_INCREMENT for table `movies`
 --
 ALTER TABLE `movies`
-  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=151;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -894,7 +857,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- Constraints for dumped tables
