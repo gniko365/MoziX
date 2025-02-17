@@ -1,0 +1,10 @@
+com\mycompany\mozixx\model\Actors.class
+com\mycompany\mozixx\model\Movies.class
+com\mycompany\mozixx\model\Users.class
+com\mycompany\mozixx\resources\JavaEE8Resource.class
+com\mycompany\mozixx\JAXRSConfiguration.class
+com\mycompany\mozixx\model\Ratings.class
+com\mycompany\mozixx\model\Directors.class
+com\mycompany\mozixx\model\Genres.class
+com\mycompany\mozixx\model\MovieGenres.class
+com\mycompany\mozixx\model\MovieGenresPK.class
