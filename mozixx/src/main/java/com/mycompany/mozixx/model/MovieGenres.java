@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 /**
  *
- * @author User
+ * @author szter
  */
 @Entity
 @Table(name = "movie_genres")

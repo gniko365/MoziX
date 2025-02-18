@@ -2,12 +2,12 @@
 <persistence version="2.2" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
   <!-- Define Persistence Unit -->
   <persistence-unit name="my_persistence_unit">
+    <class>com.mycompany.mozixx.model.Movies</class>
+    <class>com.mycompany.mozixx.model.Directors</class>
+    <class>com.mycompany.mozixx.model.Actors</class>
+    <class>com.mycompany.mozixx.model.Ratings</class>
+    <class>com.mycompany.mozixx.model.MovieGenres</class>
     <class>com.mycompany.mozixx.model.Genres</class>
     <class>com.mycompany.mozixx.model.Users</class>
-    <class>com.mycompany.mozixx.model.MovieGenres</class>
-    <class>com.mycompany.mozixx.model.Movies</class>
-    <class>com.mycompany.mozixx.model.Actors</class>
-    <class>com.mycompany.mozixx.model.Directors</class>
-    <class>com.mycompany.mozixx.model.Ratings</class>
   </persistence-unit>
 </persistence>

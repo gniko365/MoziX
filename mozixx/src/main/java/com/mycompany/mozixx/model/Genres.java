@@ -21,7 +21,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author User
+ * @author szter
  */
 @Entity
 @Table(name = "genres")

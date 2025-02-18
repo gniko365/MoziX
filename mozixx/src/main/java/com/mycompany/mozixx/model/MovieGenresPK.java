@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  *
- * @author User
+ * @author szter
  */
 @Embeddable
 public class MovieGenresPK implements Serializable {

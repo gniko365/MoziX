@@ -5,26 +5,33 @@
 package com.mycompany.mozixx.model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 /**
  *
- * @author User
+ * @author szter
  */
 @Entity
 @Table(name = "users")
@@ -39,6 +46,10 @@ import javax.validation.constraints.Size;
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    public static Object isUserExists(String email) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -67,6 +78,8 @@ public class Users implements Serializable {
     @OneToMany(mappedBy = "userId")
     private Collection<Ratings> ratingsCollection;
 
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.iakk_backendVizsga_war_1.0-SNAPSHOTPU");
+    
     public Users() {
     }
 
@@ -160,5 +173,70 @@ public class Users implements Serializable {
     public String toString() {
         return "com.mycompany.mozixx.model.Users[ userId=" + userId + " ]";
     }
-    
+
+    public Users login(String email, String password) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("login");
+
+            spq.registerStoredProcedureParameter("emailIN", String.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("passwordIN", String.class, ParameterMode.IN);
+
+            spq.setParameter("emailIN", email);
+            spq.setParameter("passwordIN", password);
+
+            spq.execute();
+
+            List<Object[]> resultList = spq.getResultList();
+            Users toReturn = new Users();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for (Object[] o : resultList) {
+                Users u = new Users(
+                        Integer.valueOf(o[0].toString()),
+                        o[1].toString(),
+                        o[2].toString(),
+                        o[3].toString(),
+                        o[4].toString(),
+                        o[5].toString(),
+                        Boolean.parseBoolean(o[6].toString()),
+                        Boolean.parseBoolean(o[7].toString()),
+                        formatter.parse(o[8].toString()),
+                        o[9] == null ? null : formatter.parse(o[9].toString())
+                );
+                toReturn = u;
+            }
+
+            return toReturn;
+
+        } catch (NumberFormatException | ParseException e) {
+            System.err.println("Hiba: " + e.getLocalizedMessage());
+            return null;
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public Object getId() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public boolean registerUser(Users u) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public boolean registerAdmin(Users u) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public boolean getCreatedAt() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public List<Users> getAllUser() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
 }
