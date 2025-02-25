@@ -50,6 +50,10 @@ public class Users implements Serializable {
     public static Object isUserExists(String email) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    public static Users findById(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -84,14 +88,42 @@ public class Users implements Serializable {
     }
 
     public Users(Integer userId) {
-        this.userId = userId;
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            Users u = em.find(Users.class, userId);
+
+            this.userId = u.getUserId();
+            this.email = u.getEmail();
+            this.username = u.getUsername();
+//            this.password = u.getPassword();
+            this.role = u.getRole();
+            this.registrationDate = u.getRegistrationDate();
+        } catch (Exception ex) {
+            System.err.println("Hiba: " + ex.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
     }
 
-    public Users(Integer userId, String password, String role) {
-        this.userId = userId;
-        this.password = password;
-        this.role = role;
-    }
+    public Users(Integer userId, String email, String username, String password, String role, boolean isActive, Date registrationDate) {
+    this.userId = userId;
+    this.email = email;
+    this.username = username;
+    this.password = password;
+    this.role = role;
+    this.registrationDate = registrationDate;
+}
+    
+    public Users(String email, String username, String password) {
+    this.email = email;
+    this.username = username;
+    this.password = password;
+    this.role = "USER";
+    this.registrationDate = new Date();
+}
+
 
     public Integer getUserId() {
         return userId;
@@ -174,7 +206,7 @@ public class Users implements Serializable {
         return "com.mycompany.mozixx.model.Users[ userId=" + userId + " ]";
     }
 
-    public Users login(String email, String password) {
+    public Users loginUser(String email, String password) {
         EntityManager em = emf.createEntityManager();
 
         try {
@@ -190,7 +222,7 @@ public class Users implements Serializable {
 
             List<Object[]> resultList = spq.getResultList();
             Users toReturn = new Users();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             for (Object[] o : resultList) {
                 Users u = new Users(
                         Integer.valueOf(o[0].toString()),
@@ -198,11 +230,8 @@ public class Users implements Serializable {
                         o[2].toString(),
                         o[3].toString(),
                         o[4].toString(),
-                        o[5].toString(),
-                        Boolean.parseBoolean(o[6].toString()),
-                        Boolean.parseBoolean(o[7].toString()),
-                        formatter.parse(o[8].toString()),
-                        o[9] == null ? null : formatter.parse(o[9].toString())
+                        Boolean.parseBoolean(o[5].toString()),
+                        o[9] == null ? null : formatter.parse(o[7].toString())
                 );
                 toReturn = u;
             }
@@ -218,8 +247,8 @@ public class Users implements Serializable {
         }
     }
 
-    public Object getId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Integer getId() {
+        return userId;
     }
 
     public boolean registerUser(Users u) {
@@ -236,6 +265,14 @@ public class Users implements Serializable {
 
     public List<Users> getAllUser() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Object role() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Date getRegistration_date() {
+        return registrationDate;
     }
 
 
