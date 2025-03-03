@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
-  <!-- Define Persistence Unit -->
-  <persistence-unit name="com.iakk_backendVizsga_war_1.0-SNAPSHOTPU">
-    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="mozixx-1.0-SNAPSHOT">
+      <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+      
+      <jta-data-source>MySqlDS</jta-data-source>
+      
     <class>com.mycompany.mozixx.model.Movies</class>
     <class>com.mycompany.mozixx.model.Directors</class>
     <class>com.mycompany.mozixx.model.Actors</class>
     <class>com.mycompany.mozixx.model.Ratings</class>
     <class>com.mycompany.mozixx.model.MovieGenres</class>
+    <class>com.mycompany.mozixx.model.MovieGenresPK</class>
     <class>com.mycompany.mozixx.model.Genres</class>
     <class>com.mycompany.mozixx.model.Users</class>
+    <class>com.mycompany.mozixx.model.MovieActors</class>
+    <class>com.mycompany.mozixx.model.MovieActorsPK</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mozix?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

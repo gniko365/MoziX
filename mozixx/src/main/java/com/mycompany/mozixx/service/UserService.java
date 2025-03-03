@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 
 public class UserService {
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.iakk_backendVizsga_war_1.0-SNAPSHOTPU");
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
     private final Users layer = new Users();
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
     
@@ -173,22 +173,19 @@ public class UserService {
         EntityManager em = emf.createEntityManager();
 
         try {
-            // Felhasználó keresése az e-mail cím alapján
             Users user = em.createQuery("SELECT u FROM Users u WHERE u.email = :email", Users.class)
                            .setParameter("email", email)
                            .getSingleResult();
 
-            // Jelszó ellenőrzése
             if (user != null && user.getPassword().equals(password)) {
                 response.put("statusCode", 200);
                 response.put("message", "Login successful");
-                response.put("user", new JSONObject(user)); // Felhasználó adatainak hozzáadása
+                response.put("user", new JSONObject(user));
             } else {
                 response.put("statusCode", 401);
                 response.put("message", "Hibás e-mail cím vagy jelszó.");
             }
         } catch (NoResultException e) {
-            // Ha nincs ilyen felhasználó
             response.put("statusCode", 401);
             response.put("message", "Hibás e-mail cím vagy jelszó.");
         } catch (Exception e) {
@@ -220,13 +217,13 @@ public class UserService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         for (Object[] o : resultList) {
             Users u = new Users(
-                Integer.valueOf(o[0].toString()), // id
-                o[2].toString(),                 // email
-                o[1].toString(),                 // username
-                o[3].toString(),                 // password
-                o[4].toString(),                 // role
-                Boolean.parseBoolean(o[5].toString()), // active
-                o.length > 6 ? (o[6] == null ? null : formatter.parse(o[6].toString())) : null // createdAt
+                Integer.valueOf(o[0].toString()),
+                o[2].toString(),
+                o[1].toString(),
+                o[3].toString(),
+                o[4].toString(),
+                Boolean.parseBoolean(o[5].toString()), 
+                o.length > 6 ? (o[6] == null ? null : formatter.parse(o[6].toString())) : null
             );
             toReturn = u;
         }
@@ -254,14 +251,12 @@ public class UserService {
     public JSONObject registerUser(Users user) {
     JSONObject response = new JSONObject();
 
-    // E-mail cím ellenőrzése
     if (!isValidEmail(user.getEmail())) {
         response.put("statusCode", 400);
         response.put("message", "Érvénytelen e-mail cím.");
         return response;
     }
 
-    // Jelszó ellenőrzése
     List<String> passwordErrors = isValidPassword(user.getPassword());
     if (!passwordErrors.isEmpty()) {
         response.put("statusCode", 400);
@@ -270,14 +265,12 @@ public class UserService {
         return response;
     }
 
-    // Ellenőrizze, hogy az e-mail cím már regisztrálva van-e
     if (isEmailAlreadyRegistered(user.getEmail())) {
         response.put("statusCode", 400);
         response.put("message", "Az e-mail cím már regisztrálva van.");
         return response;
     }
 
-    // Ellenőrizze, hogy a felhasználónév már használatban van-e
     if (isUsernameAlreadyTaken(user.getUsername())) {
         response.put("statusCode", 400);
         response.put("message", "A felhasználónév már foglalt.");
@@ -288,7 +281,7 @@ public class UserService {
 
     try {
         em.getTransaction().begin();
-        em.persist(user); // Az új felhasználó mentése az adatbázisba
+        em.persist(user);
         em.getTransaction().commit();
 
         response.put("statusCode", 200);
@@ -309,7 +302,6 @@ public class UserService {
 
 public JSONObject registerAdmin(Users user, String jwt) {
     JSONObject response = new JSONObject();
-    // Admin regisztrációs logika
     response.put("statusCode", 200);
     response.put("message", "Admin registered successfully");
     return response;

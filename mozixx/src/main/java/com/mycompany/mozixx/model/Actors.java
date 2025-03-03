@@ -9,11 +9,14 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityResult;
+import javax.persistence.FieldResult;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,6 +35,19 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Actors.findByName", query = "SELECT a FROM Actors a WHERE a.name = :name"),
     @NamedQuery(name = "Actors.findByBirthDate", query = "SELECT a FROM Actors a WHERE a.birthDate = :birthDate"),
     @NamedQuery(name = "Actors.findByActorImage", query = "SELECT a FROM Actors a WHERE a.actorImage = :actorImage")})
+
+@SqlResultSetMapping(
+    name = "ActorMapping",
+    entities = @EntityResult(
+        entityClass = Actors.class,
+        fields = {
+            @FieldResult(name = "actorId", column = "actor_id"),
+            @FieldResult(name = "name", column = "actor_name"),
+            @FieldResult(name = "birthDate", column = "birth_date"),
+            @FieldResult(name = "actorImage", column = "actor_image")
+        }
+    )
+)
 public class Actors implements Serializable {
 
     private static final long serialVersionUID = 1L;

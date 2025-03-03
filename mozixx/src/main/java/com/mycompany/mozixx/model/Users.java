@@ -82,7 +82,7 @@ public class Users implements Serializable {
     @OneToMany(mappedBy = "userId")
     private Collection<Ratings> ratingsCollection;
 
-    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.iakk_backendVizsga_war_1.0-SNAPSHOTPU");
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
     
     public Users() {
     }
