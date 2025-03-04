@@ -72,45 +72,6 @@ public class UserService {
     return errors;
 }
     
-    public Users login_old(String email, String password) {
-        return layer.loginUser(email, password);
-    }
-    
-    public JSONObject loginhaha(String email, String password) {
-        JSONObject toReturn = new JSONObject();
-        String status = "success";
-        int statusCode = 200;
-
-        if (isValidEmail(email)) {
-            Users modelResult = layer.loginUser(email, password);
-
-            if (modelResult == null) {
-                status = "modelException";
-                statusCode = 500;
-            } else {
-                if (modelResult.getId() == null) {
-                    status = "userNotFound";
-                    statusCode = 417;
-                } else {
-                    JSONObject result = new JSONObject();
-                    result.put("id", modelResult.getId());
-                    result.put("email", modelResult.getEmail());
-                    result.put("firstName", modelResult.getUsername());
-                    result.put("jwt", JWT.createJWT(modelResult));
-
-                    toReturn.put("result", result);
-                }
-            }
-
-        } else {
-            status = "invalidEmail";
-            statusCode = 417;
-        }
-
-        toReturn.put("status", status);
-        toReturn.put("statusCode", statusCode);
-        return toReturn;
-    }
     public org.json.JSONObject getAllUser() {
         org.json.JSONObject toReturn = new org.json.JSONObject();
         String status = "success";
@@ -169,73 +130,39 @@ public class UserService {
     }
     
     public JSONObject login(String email, String password) {
-        JSONObject response = new JSONObject();
-        EntityManager em = emf.createEntityManager();
+        JSONObject toReturn = new JSONObject();
+        String status = "success";
+        int statusCode = 200;
 
-        try {
-            Users user = em.createQuery("SELECT u FROM Users u WHERE u.email = :email", Users.class)
-                           .setParameter("email", email)
-                           .getSingleResult();
+        if (isValidEmail(email)) {
+            Users modelResult = layer.loginUser(email, password);
 
-            if (user != null && user.getPassword().equals(password)) {
-                response.put("statusCode", 200);
-                response.put("message", "Login successful");
-                response.put("user", new JSONObject(user));
+            if (modelResult == null) {
+                status = "modelException";
+                statusCode = 500;
             } else {
-                response.put("statusCode", 401);
-                response.put("message", "Hibás e-mail cím vagy jelszó.");
+                if (modelResult.getId() == null) {
+                    status = "userNotFound";
+                    statusCode = 417;
+                } else {
+                    JSONObject result = new JSONObject();
+                    result.put("id", modelResult.getId());
+                    result.put("email", modelResult.getEmail());
+                    result.put("jwt", JWT.createJWT(modelResult));
+
+                    toReturn.put("result", result);
+                }
             }
-        } catch (NoResultException e) {
-            response.put("statusCode", 401);
-            response.put("message", "Hibás e-mail cím vagy jelszó.");
-        } catch (Exception e) {
-            System.err.println("Hiba a bejelentkezés során: " + e.getLocalizedMessage());
-            response.put("statusCode", 500);
-            response.put("message", "Internal server error");
-        } finally {
-            em.close();
+
+        } else {
+            status = "invalidEmail";
+            statusCode = 417;
         }
 
-        return response;
+        toReturn.put("status", status);
+        toReturn.put("statusCode", statusCode);
+        return toReturn;
     }
-    private Users loginUser(String email, String password) {
-    EntityManager em = emf.createEntityManager();
-    Users toReturn = new Users();
-
-    try {
-        StoredProcedureQuery spq = em.createStoredProcedureQuery("login");
-
-        spq.registerStoredProcedureParameter("emailIN", String.class, ParameterMode.IN);
-        spq.registerStoredProcedureParameter("passwordIN", String.class, ParameterMode.IN);
-
-        spq.setParameter("emailIN", email);
-        spq.setParameter("passwordIN", password);
-
-        spq.execute();
-
-        List<Object[]> resultList = spq.getResultList();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        for (Object[] o : resultList) {
-            Users u = new Users(
-                Integer.valueOf(o[0].toString()),
-                o[2].toString(),
-                o[1].toString(),
-                o[3].toString(),
-                o[4].toString(),
-                Boolean.parseBoolean(o[5].toString()), 
-                o.length > 6 ? (o[6] == null ? null : formatter.parse(o[6].toString())) : null
-            );
-            toReturn = u;
-        }
-    } catch (NumberFormatException | ParseException e) {
-        System.err.println("Hiba: " + e.getLocalizedMessage());
-    } finally {
-        em.clear();
-        em.close();
-    }
-
-    return toReturn;
-}
 
     private JSONObject userToJSON(Users user) {
         JSONObject json = new JSONObject();

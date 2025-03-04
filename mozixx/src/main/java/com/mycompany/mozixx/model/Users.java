@@ -83,6 +83,7 @@ public class Users implements Serializable {
     private Collection<Ratings> ratingsCollection;
 
     static EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
+    private boolean isAdmin;
     
     public Users() {
     }
@@ -225,15 +226,15 @@ public class Users implements Serializable {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             for (Object[] o : resultList) {
                 Users u = new Users(
-                        Integer.valueOf(o[0].toString()),
-                        o[1].toString(),
-                        o[2].toString(),
-                        o[3].toString(),
-                        o[4].toString(),
-                        Boolean.parseBoolean(o[5].toString()),
-                        o[9] == null ? null : formatter.parse(o[7].toString())
-                );
-                toReturn = u;
+            Integer.valueOf(o[0].toString()),
+            o[1].toString(),
+            o[2].toString(),
+            o[3].toString(),
+            o[4].toString(),
+            Boolean.parseBoolean(o[5].toString()),  
+            (o.length > 6 && o[6] != null) ? formatter.parse(o[6].toString()) : null // Biztosítja, hogy az o[6] létezzen
+    );
+    toReturn = u;
             }
 
             return toReturn;
@@ -274,6 +275,4 @@ public class Users implements Serializable {
     public Date getRegistration_date() {
         return registrationDate;
     }
-
-
 }

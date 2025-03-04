@@ -43,6 +43,10 @@ public class RatingController {
             int movieId = jsonObject.getInt("movieId");
             int rating = jsonObject.getInt("rating");
             String review = jsonObject.getString("review");
+            
+            if (rating < 0 || rating > 5) {
+            throw new Exception("Rating must be between 0 and 5.");
+            }
 
             // Rating hozzáadása
             ratingService.addRating(userId, movieId, rating, review);
@@ -51,11 +55,11 @@ public class RatingController {
             response.put("status", "success");
             response.put("message", "Rating added successfully.");
             return Response.status(Response.Status.CREATED).entity(response.toString()).build();
-        } catch (Exception e) {
+            } catch (Exception e) {
             JSONObject errorResponse = new JSONObject();
             errorResponse.put("status", "error");
             errorResponse.put("message", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+            }
         }
-    }
 }
