@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mozixx.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -13,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -21,10 +17,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author szter
- */
 @Entity
 @Table(name = "directors")
 @NamedQueries({
@@ -36,22 +28,24 @@ import javax.validation.constraints.Size;
 public class Directors implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "director_id")
     private Integer directorId;
+
     @Size(max = 255)
     @Column(name = "name")
     private String name;
+
     @Size(max = 255)
     @Column(name = "director_image")
     private String directorImage;
+
     @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
     private Date birthDate;
-    @ManyToMany(mappedBy = "directorsCollection")
-    private Collection<Movies> moviesCollection;
 
     public Directors() {
     }
@@ -92,14 +86,6 @@ public class Directors implements Serializable {
         this.birthDate = birthDate;
     }
 
-    public Collection<Movies> getMoviesCollection() {
-        return moviesCollection;
-    }
-
-    public void setMoviesCollection(Collection<Movies> moviesCollection) {
-        this.moviesCollection = moviesCollection;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -109,7 +95,6 @@ public class Directors implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Directors)) {
             return false;
         }
@@ -124,5 +109,4 @@ public class Directors implements Serializable {
     public String toString() {
         return "com.mycompany.mozixx.model.Directors[ directorId=" + directorId + " ]";
     }
-    
 }

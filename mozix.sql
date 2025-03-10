@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 01, 2025 at 12:09 AM
+-- Generation Time: Mar 10, 2025 at 09:22 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -27,14 +27,23 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `AddRating` (IN `p_user_id` INT, IN `p_movie_id` INT, IN `p_rating` INT, IN `p_review` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddRating` (IN `p_user_id` INT, IN `p_movie_id` INT, IN `p_rating` INT, IN `p_review` VARCHAR(255))   BEGIN
     INSERT INTO ratings (user_id, movie_id, rating, review, rating_date)
-    VALUES (p_user_id, p_movie_id, p_rating, p_review, CURDATE());
+    VALUES (p_user_id, p_movie_id, p_rating, p_review, NOW());
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateAdmin` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     INSERT INTO users (username, email, password, role, registration_date)
     VALUES (p_username, p_email, SHA2(p_password, 512), 'admin', NOW());
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateDirector` (IN `p_name` VARCHAR(100), IN `p_director_image` VARCHAR(255), IN `p_birth_date` DATE)   BEGIN
+    INSERT INTO Directors (name, director_image, birth_date)
+    VALUES (p_name, p_director_image, p_birth_date);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteDirector` (IN `p_director_id` INT)   BEGIN
+    DELETE FROM Directors WHERE director_id = p_director_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `everyActorInAMovie` ()   SELECT movie_id, COUNT(*) AS actor_count
@@ -64,6 +73,10 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllActors` ()   BEGIN
     SELECT * FROM actors;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllDirectors` ()   BEGIN
+    SELECT * FROM Directors;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllMoviesDetails` ()   BEGIN
@@ -103,6 +116,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAllUsers` ()   BEGIN
     SELECT * FROM users;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDirectorById` (IN `p_director_id` INT)   BEGIN
+    SELECT * FROM Directors WHERE director_id = p_director_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getMoviesByActor` (IN `actor_name` VARCHAR(255))   BEGIN
     SELECT m.movie_name, m.release_year
     FROM movies m
@@ -137,11 +154,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `emailIN` VARCHAR(255), 
     SELECT * FROM users WHERE email = emailIN AND password = passwordIN;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Movies directors` (IN `movieIN` VARCHAR(100))   SELECT movies.movie_name AS "movie name", directors.name AS "director name"
-FROM movies
-INNER JOIN directors ON movies.director_id = directors.director_id
-WHERE movies.movie_name LIKE movieIN$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `movieTitles` ()   SELECT movie_name
 FROM movies$$
 
@@ -154,6 +166,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsersByName` (IN `search_term
     SELECT user_id, username, email, registration_date, role
     FROM users
     WHERE username LIKE CONCAT('%', search_term, '%');
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateDirector` (IN `p_director_id` INT, IN `p_name` VARCHAR(100), IN `p_director_image` VARCHAR(255), IN `p_birth_date` DATE)   BEGIN
+    UPDATE Directors
+    SET name = p_name,
+        director_image = p_director_image,
+        birth_date = p_birth_date
+    WHERE director_id = p_director_id;
 END$$
 
 DELIMITER ;
@@ -707,7 +727,11 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 (29, 29, 129, 9, 'Gyönyörű irodalmi adaptáció.', '2023-11-12'),
 (30, 30, 130, 10, 'Tökéletes filmélmény.', '2023-11-15'),
 (31, 20, 101, 3, 'Nem tetszett >:(', '2025-02-27'),
-(32, 10, 114, 8, 'tetszi', '2025-02-27');
+(32, 10, 114, 8, 'tetszi', '2025-02-27'),
+(33, 52, 101, 5, 'hatalmas', '2025-03-04'),
+(34, 52, 101, 5, 'Great movie!', '2025-03-04'),
+(35, 52, 120, 11, 'Great movie!', '2025-03-04'),
+(36, 52, 112, 5, 'ennyire tetszett', '2025-03-04');
 
 -- --------------------------------------------------------
 
@@ -766,7 +790,9 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (46, 'ujfelhasználó', 'uj@example.com', 'ujjelszó', '2025-02-25', 'user'),
 (48, 'ujfelhasználó2', 'uj@exampple.com', 'Ujjelszó1!', '2025-02-26', 'user'),
 (49, 'faszosom', 'uj@valami.com', 'Ujjelszó1!', '2025-02-26', 'user'),
-(50, 'hatalma', 'faszosom@gmail.hu', 'Hatalom6!', '2025-02-27', 'user');
+(50, 'hatalma', 'faszosom@gmail.hu', 'Hatalom6!', '2025-02-27', 'user'),
+(51, 'hatalmaa', 'faszossom@gmail.hu', 'Hatalom6!', '2025-03-04', 'user'),
+(52, 'wáááopoo', 'vicces@gmail.hu', 'Hatalom6!', '2025-03-04', 'user');
 
 --
 -- Indexes for dumped tables
@@ -846,7 +872,7 @@ ALTER TABLE `actors`
 -- AUTO_INCREMENT for table `directors`
 --
 ALTER TABLE `directors`
-  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `genres`
@@ -864,13 +890,13 @@ ALTER TABLE `movies`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- Constraints for dumped tables
@@ -880,6 +906,8 @@ ALTER TABLE `users`
 -- Constraints for table `movie_directors`
 --
 ALTER TABLE `movie_directors`
+  ADD CONSTRAINT `fk_director` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`),
+  ADD CONSTRAINT `fk_movie` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`),
   ADD CONSTRAINT `movie_directors_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `movie_directors_ibfk_2` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`) ON DELETE CASCADE;
 

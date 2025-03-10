@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mozixx.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,10 +20,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author szter
- */
 @Entity
 @Table(name = "movies")
 @NamedQueries({
@@ -41,39 +33,39 @@ import javax.validation.constraints.Size;
 public class Movies implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "movie_id")
     private Integer movieId;
+
     @Column(name = "release_year")
     private Integer releaseYear;
+
     @Lob
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 99)
     @Column(name = "movie_name")
     private String movieName;
+
     @Column(name = "Length")
     private Integer length;
+
     @Size(max = 255)
     @Column(name = "cover")
     private String cover;
+
     @Size(max = 255)
     @Column(name = "trailer_link")
     private String trailerLink;
-    @JoinTable(name = "movie_directors", joinColumns = {
-        @JoinColumn(name = "movie_id", referencedColumnName = "movie_id")}, inverseJoinColumns = {
-        @JoinColumn(name = "director_id", referencedColumnName = "director_id")})
-    @ManyToMany
-    private Collection<Directors> directorsCollection;
-    @OneToMany(mappedBy = "movieId")
-    private Collection<Ratings> ratingsCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "movies")
-    private Collection<MovieGenres> movieGenresCollection;
+
+    // ... egyéb mezők és metódusok ...
 
     public Movies() {
     }
@@ -143,30 +135,6 @@ public class Movies implements Serializable {
         this.trailerLink = trailerLink;
     }
 
-    public Collection<Directors> getDirectorsCollection() {
-        return directorsCollection;
-    }
-
-    public void setDirectorsCollection(Collection<Directors> directorsCollection) {
-        this.directorsCollection = directorsCollection;
-    }
-
-    public Collection<Ratings> getRatingsCollection() {
-        return ratingsCollection;
-    }
-
-    public void setRatingsCollection(Collection<Ratings> ratingsCollection) {
-        this.ratingsCollection = ratingsCollection;
-    }
-
-    public Collection<MovieGenres> getMovieGenresCollection() {
-        return movieGenresCollection;
-    }
-
-    public void setMovieGenresCollection(Collection<MovieGenres> movieGenresCollection) {
-        this.movieGenresCollection = movieGenresCollection;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -176,7 +144,6 @@ public class Movies implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Movies)) {
             return false;
         }
@@ -191,5 +158,4 @@ public class Movies implements Serializable {
     public String toString() {
         return "com.mycompany.mozixx.model.Movies[ movieId=" + movieId + " ]";
     }
-    
 }
