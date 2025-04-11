@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 10, 2025 at 09:22 PM
+-- Generation Time: Apr 11, 2025 at 06:59 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -32,6 +32,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AddRating` (IN `p_user_id` INT, IN 
     VALUES (p_user_id, p_movie_id, p_rating, p_review, NOW());
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateActor` (IN `p_name` VARCHAR(255), IN `p_birth_date` DATE, IN `p_actor_image` VARCHAR(255))   BEGIN
+    INSERT INTO actors (name, birth_date, actor_image)
+    VALUES (p_name, p_birth_date, p_actor_image);
+    
+    SELECT * FROM actors WHERE actor_id = LAST_INSERT_ID();
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateAdmin` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     INSERT INTO users (username, email, password, role, registration_date)
     VALUES (p_username, p_email, SHA2(p_password, 512), 'admin', NOW());
@@ -42,8 +49,47 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CreateDirector` (IN `p_name` VARCHA
     VALUES (p_name, p_director_image, p_birth_date);
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteActor` (IN `p_actor_id` INT)   BEGIN
+    DECLARE actor_count INT;
+    
+    SELECT COUNT(*) INTO actor_count FROM actors WHERE actor_id = p_actor_id;
+    
+    IF actor_count > 0 THEN
+        DELETE FROM actors WHERE actor_id = p_actor_id;
+        SELECT CONCAT('Actor with ID ', p_actor_id, ' deleted successfully') AS message;
+    ELSE
+        SELECT CONCAT('Actor with ID ', p_actor_id, ' not found') AS message;
+    END IF;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteDirector` (IN `p_director_id` INT)   BEGIN
     DELETE FROM Directors WHERE director_id = p_director_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteRatingById` (IN `p_rating_id` INT, IN `p_user_id` INT)   BEGIN
+    DECLARE rating_count INT;
+
+    SELECT COUNT(*) INTO rating_count FROM ratings 
+    WHERE rating_id = p_rating_id AND user_id = p_user_id;
+
+    IF rating_count = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Rating not found or you do not have permission to delete this rating.';
+    ELSE
+        DELETE FROM ratings WHERE rating_id = p_rating_id;
+    END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUser` (IN `p_user_id` INT)   BEGIN
+    DECLARE user_exists INT;
+    
+    SELECT COUNT(*) INTO user_exists FROM users WHERE user_id = p_user_id;
+    
+    IF user_exists > 0 THEN
+        DELETE FROM users WHERE user_id = p_user_id;
+        SELECT CONCAT('User with ID ', p_user_id, ' deleted successfully') AS message;
+    ELSE
+        SELECT CONCAT('User with ID ', p_user_id, ' not found') AS message;
+    END IF;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `everyActorInAMovie` ()   SELECT movie_id, COUNT(*) AS actor_count
@@ -62,6 +108,10 @@ FROM movies$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `genreNames` ()   select name
 from genres$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetActorById` (IN `p_actor_id` INT)   BEGIN
+    SELECT * FROM actors WHERE actor_id = p_actor_id;
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetActorsByMovie` (IN `movie_title` VARCHAR(255))   BEGIN
     SELECT a.actor_id, a.name AS actor_name, a.birth_date, a.actor_image
@@ -168,12 +218,39 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsersByName` (IN `search_term
     WHERE username LIKE CONCAT('%', search_term, '%');
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateActor` (IN `p_actor_id` INT, IN `p_name` VARCHAR(255), IN `p_birth_date` DATE, IN `p_actor_image` VARCHAR(255))   BEGIN
+    SET @current_name = (SELECT name FROM actors WHERE actor_id = p_actor_id);
+    SET @current_birth = (SELECT birth_date FROM actors WHERE actor_id = p_actor_id);
+    SET @current_image = (SELECT actor_image FROM actors WHERE actor_id = p_actor_id);
+    
+    UPDATE actors
+    SET 
+        name = IF(p_name IS NULL, @current_name, p_name),
+        birth_date = IF(p_birth_date IS NULL, @current_birth, p_birth_date),
+        actor_image = IF(p_actor_image IS NULL, @current_image, p_actor_image)
+    WHERE actor_id = p_actor_id;
+    
+    SELECT * FROM actors WHERE actor_id = p_actor_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateDirector` (IN `p_director_id` INT, IN `p_name` VARCHAR(100), IN `p_director_image` VARCHAR(255), IN `p_birth_date` DATE)   BEGIN
     UPDATE Directors
     SET name = p_name,
         director_image = p_director_image,
         birth_date = p_birth_date
     WHERE director_id = p_director_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateUser` (IN `p_user_id` INT, IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_role` VARCHAR(5))   BEGIN
+    UPDATE users
+    SET 
+        username = COALESCE(p_username, username),
+        email = COALESCE(p_email, email),
+        password = COALESCE(p_password, password),
+        role = COALESCE(p_role, role)
+    WHERE user_id = p_user_id;
+    
+    SELECT * FROM users WHERE user_id = p_user_id;
 END$$
 
 DELIMITER ;
@@ -705,12 +782,9 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 (7, 7, 107, 7, 'Jó, de nem kiemelkedő.', '2023-03-10'),
 (8, 8, 108, 9, 'Kiváló történelmi film.', '2023-03-15'),
 (9, 9, 109, 9, 'Elképesztően jó színészi alakítás.', '2023-04-01'),
-(10, 10, 110, 8, 'Egyedi hangulatú film.', '2023-04-12'),
 (11, 11, 111, 10, 'Igazi klasszikus humor.', '2023-04-20'),
-(12, 12, 112, 8, 'Régi, de mindig szórakoztató.', '2023-05-01'),
 (13, 13, 113, 9, 'Művészi alkotás.', '2023-05-10'),
 (14, 14, 114, 8, 'Furcsa, de szórakoztató.', '2023-06-01'),
-(15, 15, 115, 8, 'Izgalmas és sötét.', '2023-06-15'),
 (16, 16, 116, 7, 'Túl szürreális nekem.', '2023-07-01'),
 (17, 17, 117, 9, 'Széchenyi története nagyon inspiráló.', '2023-07-10'),
 (18, 18, 118, 8, 'Csendes, de lenyűgöző.', '2023-07-25'),
@@ -728,10 +802,8 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 (30, 30, 130, 10, 'Tökéletes filmélmény.', '2023-11-15'),
 (31, 20, 101, 3, 'Nem tetszett >:(', '2025-02-27'),
 (32, 10, 114, 8, 'tetszi', '2025-02-27'),
-(33, 52, 101, 5, 'hatalmas', '2025-03-04'),
-(34, 52, 101, 5, 'Great movie!', '2025-03-04'),
 (35, 52, 120, 11, 'Great movie!', '2025-03-04'),
-(36, 52, 112, 5, 'ennyire tetszett', '2025-03-04');
+(38, 52, 114, 5, 'jajj de szereteeem wááá', '2025-03-13');
 
 -- --------------------------------------------------------
 
@@ -741,10 +813,10 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `registration_date` date DEFAULT NULL,
+  `registration_date` date NOT NULL,
   `role` enum('user','admin') NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -792,7 +864,12 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (49, 'faszosom', 'uj@valami.com', 'Ujjelszó1!', '2025-02-26', 'user'),
 (50, 'hatalma', 'faszosom@gmail.hu', 'Hatalom6!', '2025-02-27', 'user'),
 (51, 'hatalmaa', 'faszossom@gmail.hu', 'Hatalom6!', '2025-03-04', 'user'),
-(52, 'wáááopoo', 'vicces@gmail.hu', 'Hatalom6!', '2025-03-04', 'user');
+(52, 'wáááopoo', 'vicces@gmail.hu', 'Hatalom6!', '2025-03-04', 'user'),
+(53, 'tesztfelhasználó', 'teszt@example.com', 'titkosjelszó', '2023-10-01', 'user'),
+(56, 'ákoskaa', 'faszm@gmail.com', 'igeniskapitány0123!', '2025-03-13', 'user'),
+(57, 'trallala', 'trallalero@gmail.com', '$2a$10$CKf62aHNooKglXM4PN0APuU4srVeLMScYUXle8zbAIoy3sK9K3rG.', '2025-03-13', 'user'),
+(58, 'gecico', 'waohaha@gmail.com', 'Porquedillo4!', '2025-03-13', 'user'),
+(59, 'weewee', 'madness@gmail.com', 'Porquedillo4!', '2025-03-29', 'user');
 
 --
 -- Indexes for dumped tables
@@ -856,7 +933,8 @@ ALTER TABLE `ratings`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `unique_username` (`username`);
+  ADD UNIQUE KEY `unique_username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -872,7 +950,7 @@ ALTER TABLE `actors`
 -- AUTO_INCREMENT for table `directors`
 --
 ALTER TABLE `directors`
-  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `genres`
@@ -890,13 +968,13 @@ ALTER TABLE `movies`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- Constraints for dumped tables

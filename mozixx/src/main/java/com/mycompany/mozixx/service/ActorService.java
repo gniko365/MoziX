@@ -1,6 +1,7 @@
 package com.mycompany.mozixx.service;
 
 import com.mycompany.mozixx.model.Actors;
+import java.sql.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,5 +50,62 @@ public class ActorService {
         if (emf != null) {
             emf.close();
         }
+    }
+    public EntityManager getEntityManager() {
+        return em;
+    }
+
+    public void beginTransaction() {
+        em.getTransaction().begin();
+    }
+
+    public void commitTransaction() {
+        em.getTransaction().commit();
+    }
+
+    public void rollbackTransaction() {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+    }
+    
+    public void createActor(String name, String actorImage, String birthDate) {
+        Actors actor = new Actors();
+        actor.setName(name);
+        actor.setActorImage(actorImage);
+        actor.setBirthDate(java.sql.Date.valueOf(birthDate));
+
+        em.getTransaction().begin();
+        em.persist(actor);
+        em.getTransaction().commit();
+    }
+
+    // Színész frissítése
+    public void updateActor(int actorId, String name, String actorImage, String birthDate) {
+        Actors actor = em.find(Actors.class, actorId);
+        if (actor != null) {
+            actor.setName(name);
+            actor.setActorImage(actorImage);
+            actor.setBirthDate(java.sql.Date.valueOf(birthDate));
+
+            em.getTransaction().begin();
+            em.merge(actor);
+            em.getTransaction().commit();
+        }
+    }
+
+    public String deleteActor(Integer actorId) {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("DeleteActor");
+        query.registerStoredProcedureParameter("p_actor_id", Integer.class, ParameterMode.IN);
+        query.setParameter("p_actor_id", actorId);
+        query.execute();
+        return (String) query.getSingleResult();
+    }
+
+    public Actors getActorById(Integer actorId) {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetActorById", Actors.class);
+        query.registerStoredProcedureParameter("p_actor_id", Integer.class, ParameterMode.IN);
+        query.setParameter("p_actor_id", actorId);
+        return (Actors) query.getSingleResult();
     }
 }

@@ -3,6 +3,7 @@ package com.mycompany.mozixx.controller;
 import com.mycompany.mozixx.config.JWT;
 import com.mycompany.mozixx.service.RatingService;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -62,4 +63,45 @@ public class RatingController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
             }
         }
+    @DELETE
+@Path("/delete")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response deleteRating(
+        @HeaderParam("Authorization") String authHeader,
+        String jsonInput) {
+    try {
+        // JWT token ellenőrzése
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new Exception("Invalid or missing Authorization header.");
+        }
+
+        String jwtToken = authHeader.substring("Bearer ".length()).trim();
+        int validationResult = JWT.validateJWT(jwtToken);
+
+        if (validationResult != 1) {
+            throw new Exception("Invalid or expired JWT token.");
+        }
+
+        // Felhasználó azonosítása a token alapján
+        int userId = JWT.getUserIdByToken(jwtToken);
+
+        // JSON adatok feldolgozása
+        JSONObject jsonObject = new JSONObject(jsonInput);
+        int ratingId = jsonObject.getInt("ratingId");
+
+        // Rating törlése
+        ratingService.deleteRatingById(ratingId, userId);
+
+        JSONObject response = new JSONObject();
+        response.put("status", "success");
+        response.put("message", "Rating deleted successfully.");
+        return Response.status(Response.Status.OK).entity(response.toString()).build();
+    } catch (Exception e) {
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", e.getMessage());
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
+    }
+}
 }

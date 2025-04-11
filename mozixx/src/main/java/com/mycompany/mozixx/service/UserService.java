@@ -6,6 +6,7 @@ import com.mycompany.mozixx.utils.PasswordValidator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,16 +16,20 @@ import javax.persistence.NoResultException;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
 import javax.persistence.StoredProcedureQuery;
+import javax.persistence.TypedQuery;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
-    private final Users layer = new Users();
+    private final EntityManagerFactory emf;
+    private final EntityManager em;
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
     
+    public UserService() {
+        this.emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
+        this.em = emf.createEntityManager();
+    }
     
     public static boolean isValidEmail(String email) {
         Pattern pattern = Pattern.compile(EMAIL_REGEX);
@@ -33,228 +38,260 @@ public class UserService {
     }
     
     public static List<String> isValidPassword(String password) {
-    List<String> errors = new ArrayList<>();
-
-    if (password.length() < 8) {
-        errors.add("A jelszónak legalább 8 karakter hosszúnak kell lennie.");
-    }
-
-    boolean hasNumber = false;
-    boolean hasUpperCase = false;
-    boolean hasLowerCase = false;
-    boolean hasSpecialChar = false;
-
-    for (char c : password.toCharArray()) {
-        if (Character.isDigit(c)) {
-            hasNumber = true;
-        } else if (Character.isUpperCase(c)) {
-            hasUpperCase = true;
-        } else if (Character.isLowerCase(c)) {
-            hasLowerCase = true;
-        } else if ("!@#$%^&*()_+-=[]{}|;':,.<>?/`~".indexOf(c) != -1) {
-            hasSpecialChar = true;
+        List<String> errors = new ArrayList<>();
+        if (password.length() < 8) {
+            errors.add("A jelszónak legalább 8 karakter hosszúnak kell lennie.");
         }
-    }
 
-    if (!hasNumber) {
-        errors.add("A jelszónak tartalmaznia kell legalább egy számot.");
-    }
-    if (!hasUpperCase) {
-        errors.add("A jelszónak tartalmaznia kell legalább egy nagybetűt.");
-    }
-    if (!hasLowerCase) {
-        errors.add("A jelszónak tartalmaznia kell legalább egy kisbetűt.");
-    }
-    if (!hasSpecialChar) {
-        errors.add("A jelszónak tartalmaznia kell legalább egy speciális karaktert.");
-    }
+        boolean hasNumber = false;
+        boolean hasUpperCase = false;
+        boolean hasLowerCase = false;
+        boolean hasSpecialChar = false;
 
-    return errors;
-}
+        for (char c : password.toCharArray()) {
+            if (Character.isDigit(c)) {
+                hasNumber = true;
+            } else if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if ("!@#$%^&*()_+-=[]{}|;':,.<>?/`~".indexOf(c) != -1) {
+                hasSpecialChar = true;
+            }
+        }
+
+        if (!hasNumber) errors.add("A jelszónak tartalmaznia kell legalább egy számot.");
+        if (!hasUpperCase) errors.add("A jelszónak tartalmaznia kell legalább egy nagybetűt.");
+        if (!hasLowerCase) errors.add("A jelszónak tartalmaznia kell legalább egy kisbetűt.");
+        if (!hasSpecialChar) errors.add("A jelszónak tartalmaznia kell legalább egy speciális karaktert.");
+
+        return errors;
+    }
     
-    public org.json.JSONObject getAllUser() {
-        org.json.JSONObject toReturn = new org.json.JSONObject();
-        String status = "success";
-        int statusCode = 200;
-        List<Users> modelResult = layer.getAllUser();
-
-        if (modelResult == null) {
-            status = "ModelException";
-            statusCode = 500;
-        } else if (modelResult.isEmpty()) {
-            status = "NoUsersFound";
-            statusCode = 417;
-        } else {
-            JSONArray result = new JSONArray();
+    public JSONObject getAllUser() {
+        JSONObject toReturn = new JSONObject();
+        try {
+            beginTransaction();
+            List<Users> users = getAllUsers();
+            commitTransaction();
             
-            for(Users actualUser : modelResult){
-                org.json.JSONObject toAdd = new org.json.JSONObject();
-
-                toAdd.put("id", actualUser.getId());
-                toAdd.put("email", actualUser.getEmail());
-                toAdd.put("Registration date", actualUser.getRegistration_date());
-                
-                result.put(toAdd);
+            JSONArray result = new JSONArray();
+            for (Users user : users) {
+                JSONObject userJson = userToJSON(user);
+                result.put(userJson);
             }
             
+            toReturn.put("status", "success");
+            toReturn.put("statusCode", 200);
             toReturn.put("result", result);
+        } catch (Exception e) {
+            rollbackTransaction();
+            toReturn.put("status", "error");
+            toReturn.put("statusCode", 500);
+            toReturn.put("message", e.getMessage());
         }
-
-        toReturn.put("status", status);
-        toReturn.put("statusCode", statusCode);
         return toReturn;
     }
     
-    public org.json.JSONObject getUserById(Integer id){
-        org.json.JSONObject toReturn = new org.json.JSONObject();
-        String status = "success";
-        int statusCode = 200;
-        Users modelResult = new Users(id);
-        
-        if(modelResult.getEmail() == null){
-            status = "UserNotFound";
-            statusCode = 417;
-        }else{
-            org.json.JSONObject user = new org.json.JSONObject();
+    public JSONObject getUserById(Integer id) {
+        JSONObject toReturn = new JSONObject();
+        try {
+            beginTransaction();
+            Users user = em.find(Users.class, id);
+            commitTransaction();
             
-            user.put("id", modelResult.getId());
-            user.put("email", modelResult.getEmail());
-            user.put("Registration date", modelResult.getRegistration_date());
-            
-            toReturn.put("result", user);
+            if (user == null) {
+                toReturn.put("status", "not_found");
+                toReturn.put("statusCode", 404);
+            } else {
+                toReturn.put("status", "success");
+                toReturn.put("statusCode", 200);
+                toReturn.put("result", userToJSON(user));
+            }
+        } catch (Exception e) {
+            rollbackTransaction();
+            toReturn.put("status", "error");
+            toReturn.put("statusCode", 500);
+            toReturn.put("message", e.getMessage());
         }
-        
-        toReturn.put("status", status);
-        toReturn.put("statusCode", statusCode);
         return toReturn;
     }
     
     public JSONObject login(String email, String password) {
-        JSONObject toReturn = new JSONObject();
-        String status = "success";
-        int statusCode = 200;
-
-        if (isValidEmail(email)) {
-            Users modelResult = layer.loginUser(email, password);
-
-            if (modelResult == null) {
-                status = "modelException";
-                statusCode = 500;
+        JSONObject response = new JSONObject();
+        try {
+            beginTransaction();
+            TypedQuery<Users> query = em.createQuery(
+                "SELECT u FROM Users u WHERE u.email = :email AND u.password = :password", 
+                Users.class);
+            query.setParameter("email", email);
+            query.setParameter("password", password);
+            Users user = query.getSingleResult();
+            commitTransaction();
+            
+            if (user != null) {
+                response.put("status", "success");
+                response.put("statusCode", 200);
+                response.put("result", userToJSON(user));
+                response.put("jwt", JWT.createJWT(user));
             } else {
-                if (modelResult.getId() == null) {
-                    status = "userNotFound";
-                    statusCode = 417;
-                } else {
-                    JSONObject result = new JSONObject();
-                    result.put("id", modelResult.getId());
-                    result.put("email", modelResult.getEmail());
-                    result.put("jwt", JWT.createJWT(modelResult));
-
-                    toReturn.put("result", result);
-                }
+                response.put("status", "unauthorized");
+                response.put("statusCode", 401);
             }
-
-        } else {
-            status = "invalidEmail";
-            statusCode = 417;
+        } catch (NoResultException e) {
+            response.put("status", "unauthorized");
+            response.put("statusCode", 401);
+        } catch (Exception e) {
+            rollbackTransaction();
+            response.put("status", "error");
+            response.put("statusCode", 500);
+            response.put("message", e.getMessage());
         }
-
-        toReturn.put("status", status);
-        toReturn.put("statusCode", statusCode);
-        return toReturn;
+        return response;
     }
 
-    private JSONObject userToJSON(Users user) {
-        JSONObject json = new JSONObject();
-        json.put("id", user.getId());
-        json.put("email", user.getEmail());
-        json.put("username", user.getUsername());
-        json.put("password", user.getPassword());
-        json.put("role", user.getRole());
-        json.put("Registration Date", user.getRegistration_date());
-        return json;
+    public JSONObject registerUser(Users user) {
+        JSONObject response = new JSONObject();
+        try {
+            beginTransaction();
+            
+            if (isEmailAlreadyRegistered(user.getEmail())) {
+                response.put("status", "conflict");
+                response.put("statusCode", 409);
+                response.put("message", "Email already registered");
+                return response;
+            }
+            
+            if (isUsernameAlreadyTaken(user.getUsername())) {
+                response.put("status", "conflict");
+                response.put("statusCode", 409);
+                response.put("message", "Username already taken");
+                return response;
+            }
+            
+            user.setRegistrationDate(new Date());
+            user.setRole("USER");
+            em.persist(user);
+            commitTransaction();
+            
+            response.put("status", "success");
+            response.put("statusCode", 200);
+            response.put("message", "User registered successfully");
+        } catch (Exception e) {
+            rollbackTransaction();
+            response.put("status", "error");
+            response.put("statusCode", 500);
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    public JSONObject registerAdmin(Users user, String jwt) {
+        // Implementáció a JWT validálásával
+        return registerUser(user); // Ideiglenes megoldás
+    }
+
+    public boolean isEmailAlreadyRegistered(String email) {
+        TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class);
+        query.setParameter("email", email);
+        return query.getSingleResult() > 0;
+    }
+
+    public boolean isUsernameAlreadyTaken(String username) {
+        TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class);
+        query.setParameter("username", username);
+        return query.getSingleResult() > 0;
     }
     
-    public JSONObject registerUser(Users user) {
-    JSONObject response = new JSONObject();
-
-    if (!isValidEmail(user.getEmail())) {
-        response.put("statusCode", 400);
-        response.put("message", "Érvénytelen e-mail cím.");
-        return response;
+    public void updateUser(int userId, String username, String email, String password, String role) {
+        try {
+            beginTransaction();
+            Users user = em.find(Users.class, userId);
+            if (user != null) {
+                user.setUsername(username);
+                user.setEmail(email);
+                user.setPassword(password);
+                user.setRole(role);
+                em.merge(user);
+            }
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
-    List<String> passwordErrors = isValidPassword(user.getPassword());
-    if (!passwordErrors.isEmpty()) {
-        response.put("statusCode", 400);
-        response.put("message", "A jelszó nem felel meg a követelményeknek:");
-        response.put("errors", passwordErrors);
-        return response;
+    public void deleteUser(int userId) {
+        try {
+            beginTransaction();
+            Users user = em.find(Users.class, userId);
+            if (user != null) {
+                em.remove(user);
+            }
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
-    if (isEmailAlreadyRegistered(user.getEmail())) {
-        response.put("statusCode", 400);
-        response.put("message", "Az e-mail cím már regisztrálva van.");
-        return response;
-    }
-
-    if (isUsernameAlreadyTaken(user.getUsername())) {
-        response.put("statusCode", 400);
-        response.put("message", "A felhasználónév már foglalt.");
-        return response;
-    }
-
+    public List<Users> getAllUsers() {
     EntityManager em = emf.createEntityManager();
-
     try {
-        em.getTransaction().begin();
-        em.persist(user);
-        em.getTransaction().commit();
+        // Explicit módon megadva a tábla és oszlopneveket
+        TypedQuery<Users> query = em.createQuery(
+            "SELECT u FROM Users u ORDER BY u.userId", 
+            Users.class);
+        return query.getResultList();
+    } finally {
+        em.close();
+    }
+}
+    
+    public EntityManager getEntityManager() {
+        return em;
+    }
 
-        response.put("statusCode", 200);
-        response.put("message", "User registered successfully");
-    } catch (Exception e) {
+    public void beginTransaction() {
+        if (!em.getTransaction().isActive()) {
+            em.getTransaction().begin();
+        }
+    }
+
+    public void commitTransaction() {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().commit();
+        }
+    }
+
+    public void rollbackTransaction() {
         if (em.getTransaction().isActive()) {
             em.getTransaction().rollback();
         }
-        System.err.println("Hiba a regisztráció során: " + e.getLocalizedMessage());
-        response.put("statusCode", 500);
-        response.put("message", "Internal server error");
-    } finally {
-        em.close();
     }
 
-    return response;
-}
-
-public JSONObject registerAdmin(Users user, String jwt) {
-    JSONObject response = new JSONObject();
-    response.put("statusCode", 200);
-    response.put("message", "Admin registered successfully");
-    return response;
-}
-
-    public boolean isEmailAlreadyRegistered(String email) {
-    EntityManager em = emf.createEntityManager();
-    try {
-        Long count = em.createQuery("SELECT COUNT(u) FROM Users u WHERE u.email = :email", Long.class)
-                       .setParameter("email", email)
-                       .getSingleResult();
-        return count > 0;
-    } finally {
-        em.close();
-    }
-}
-
-    public boolean isUsernameAlreadyTaken(String username) {
-        EntityManager em = emf.createEntityManager();
+    public void close() {
         try {
-            Long count = em.createQuery("SELECT COUNT(u) FROM Users u WHERE u.username = :username", Long.class)
-                           .setParameter("username", username)
-                           .getSingleResult();
-            return count > 0;
+            if (em != null && em.isOpen()) {
+                rollbackTransaction();
+                em.close();
+            }
         } finally {
-            em.close();
+            if (emf != null && emf.isOpen()) {
+                emf.close();
+            }
         }
+    }
+    
+    private JSONObject userToJSON(Users user) {
+        JSONObject json = new JSONObject();
+        json.put("id", user.getUserId());
+        json.put("username", user.getUsername());
+        json.put("email", user.getEmail());
+        json.put("role", user.getRole());
+        json.put("registrationDate", user.getRegistrationDate());
+        return json;
     }
 }

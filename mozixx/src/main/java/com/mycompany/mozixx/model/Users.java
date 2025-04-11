@@ -46,24 +46,20 @@ import javax.validation.constraints.Size;
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    public static Object isUserExists(String email) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Users findById(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "user_id")
     private Integer userId;
-    @Size(max = 255)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
     @Column(name = "username")
     private String username;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
-    @Size(max = 255)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
     @Column(name = "email")
     private String email;
     @Basic(optional = false)
@@ -71,6 +67,8 @@ public class Users implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "registration_date")
     @Temporal(TemporalType.DATE)
     private Date registrationDate;
@@ -79,6 +77,7 @@ public class Users implements Serializable {
     @Size(min = 1, max = 5)
     @Column(name = "role")
     private String role;
+
     @OneToMany(mappedBy = "userId")
     private Collection<Ratings> ratingsCollection;
 
