@@ -2,10 +2,10 @@
 -- version 5.1.2
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Apr 11, 2025 at 06:59 PM
--- Server version: 5.7.24
--- PHP Version: 8.3.1
+-- Gép: localhost:3306
+-- Létrehozás ideje: 2025. Ápr 12. 19:53
+-- Kiszolgáló verziója: 5.7.24
+-- PHP verzió: 8.3.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,14 +18,14 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `mozix`
+-- Adatbázis: `mozix`
 --
 CREATE DATABASE IF NOT EXISTS `mozix` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `mozix`;
 
 DELIMITER $$
 --
--- Procedures
+-- Eljárások
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AddRating` (IN `p_user_id` INT, IN `p_movie_id` INT, IN `p_rating` INT, IN `p_review` VARCHAR(255))   BEGIN
     INSERT INTO ratings (user_id, movie_id, rating, review, rating_date)
@@ -258,7 +258,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `actors`
+-- Tábla szerkezet ehhez a táblához `actors`
 --
 
 CREATE TABLE `actors` (
@@ -269,7 +269,7 @@ CREATE TABLE `actors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `actors`
+-- A tábla adatainak kiíratása `actors`
 --
 
 INSERT INTO `actors` (`actor_id`, `name`, `birth_date`, `actor_image`) VALUES
@@ -334,7 +334,7 @@ INSERT INTO `actors` (`actor_id`, `name`, `birth_date`, `actor_image`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `directors`
+-- Tábla szerkezet ehhez a táblához `directors`
 --
 
 CREATE TABLE `directors` (
@@ -345,7 +345,7 @@ CREATE TABLE `directors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `directors`
+-- A tábla adatainak kiíratása `directors`
 --
 
 INSERT INTO `directors` (`director_id`, `name`, `director_image`, `birth_date`) VALUES
@@ -404,7 +404,7 @@ INSERT INTO `directors` (`director_id`, `name`, `director_image`, `birth_date`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `genres`
+-- Tábla szerkezet ehhez a táblához `genres`
 --
 
 CREATE TABLE `genres` (
@@ -413,7 +413,7 @@ CREATE TABLE `genres` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `genres`
+-- A tábla adatainak kiíratása `genres`
 --
 
 INSERT INTO `genres` (`genre_id`, `name`) VALUES
@@ -443,7 +443,7 @@ INSERT INTO `genres` (`genre_id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movies`
+-- Tábla szerkezet ehhez a táblához `movies`
 --
 
 CREATE TABLE `movies` (
@@ -457,11 +457,11 @@ CREATE TABLE `movies` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `movies`
+-- A tábla adatainak kiíratása `movies`
 --
 
 INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `Length`, `cover`, `trailer_link`) VALUES
-(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100, NULL, 'https://www.youtube.com/watch?v=gwhE9A6Pzso'),
+(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100, 'https://m.blog.hu/36/365nap365film/image/valahol_europaban_02_1.jpg', 'https://www.youtube.com/watch?v=gwhE9A6Pzso'),
 (102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144, NULL, 'https://www.youtube.com/watch?v=EbpCuStwXz4'),
 (103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110, NULL, 'https://www.youtube.com/watch?v=B696W2Gwvmk'),
 (104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109, NULL, 'https://www.youtube.com/watch?v=8bhb4eeJB7o'),
@@ -471,51 +471,51 @@ INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `
 (108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120, NULL, 'https://www.youtube.com/watch?v=04CZI0A0Vgw'),
 (109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102, NULL, 'https://www.youtube.com/watch?v=d8STQElOASA'),
 (110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94, NULL, 'https://www.youtube.com/watch?v=xTnJ74KeTfs'),
-(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85, NULL, NULL),
-(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90, NULL, NULL),
-(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95, NULL, NULL),
-(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95, NULL, NULL),
-(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105, NULL, NULL),
-(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91, NULL, NULL),
-(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100, NULL, NULL),
-(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75, NULL, NULL),
-(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90, NULL, NULL),
-(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95, NULL, NULL),
-(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101, NULL, NULL),
-(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98, NULL, NULL),
-(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103, NULL, NULL),
-(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95, NULL, NULL),
-(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92, NULL, NULL),
-(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, NULL, NULL),
-(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, NULL, NULL),
-(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, NULL, NULL),
+(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85, 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.imdb.com%2Ftitle%2Ftt0121403%2Ffullcredits%2F&psig=AOvVaw38t8lwuU3IiFDT1T3gyLTd&ust=1744485344328000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPDSobvY0IwDFQAAAAAdAAAAABAI', 'https://www.youtube.com/watch?v=tH6uX1_1_yg'),
+(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90, NULL, 'https://www.youtube.com/watch?v=nw4ch5oG3fg'),
+(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95, NULL, 'https://www.youtube.com/watch?v=CCdXnsxON_A'),
+(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95, NULL, 'https://www.youtube.com/watch?v=N1gQ3eZCH8w'),
+(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105, NULL, 'https://www.youtube.com/watch?v=qultfnaMP50'),
+(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91, NULL, 'https://www.youtube.com/watch?v=xeQqwG3D0l4'),
+(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100, NULL, 'https://www.youtube.com/watch?v=JB-UW1oLl6A'),
+(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75, NULL, 'https://www.youtube.com/watch?v=o-n6exBvK3E'),
+(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90, NULL, 'https://www.youtube.com/watch?v=wNmcEAeV3OM'),
+(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95, NULL, 'https://www.youtube.com/watch?v=cyuWNiQBpZs'),
+(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101, NULL, 'https://www.youtube.com/watch?v=yIQmwb9pgiI'),
+(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98, NULL, 'https://www.youtube.com/watch?v=HZSTvEVz87I'),
+(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103, NULL, 'https://www.youtube.com/watch?v=k3NIwJEzdyY'),
+(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95, NULL, 'https://www.youtube.com/watch?v=HXh4TNoLyF4'),
+(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92, NULL, 'https://www.youtube.com/watch?v=-ENx0weqhhk'),
+(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, NULL, 'https://www.youtube.com/watch?v=HEMHUpUzeFY'),
+(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, NULL, 'https://www.youtube.com/watch?v=pnYts52GaiA'),
+(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, NULL, 'https://www.youtube.com/watch?v=seflzYctPI8'),
 (129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98, NULL, NULL),
-(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, NULL, NULL),
-(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, NULL, NULL),
-(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, NULL, NULL),
-(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107, NULL, NULL),
-(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145, NULL, NULL),
-(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146, NULL, NULL),
-(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121, NULL, NULL),
-(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96, NULL, NULL),
-(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95, NULL, NULL),
-(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98, NULL, NULL),
-(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107, NULL, NULL),
-(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132, NULL, NULL),
-(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91, NULL, NULL),
-(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89, NULL, NULL),
-(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98, NULL, NULL),
-(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100, NULL, NULL),
-(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97, NULL, NULL),
-(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104, NULL, NULL),
-(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100, NULL, NULL),
-(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100, NULL, NULL),
-(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112, NULL, NULL);
+(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, NULL, 'https://www.youtube.com/watch?v=rJsGF1nOmRY'),
+(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, NULL, 'https://www.youtube.com/watch?v=4MLJ09XmugA'),
+(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, NULL, 'https://www.youtube.com/watch?v=rbyOcZHGjZc'),
+(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107, NULL, 'https://www.youtube.com/watch?v=5V5TZkFa5AM'),
+(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145, NULL, 'https://www.youtube.com/watch?v=-tJVdq_G_Go'),
+(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146, NULL, 'https://www.youtube.com/watch?v=zk41BR72csI'),
+(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121, NULL, 'https://www.youtube.com/watch?v=HIYxv_aQH_0'),
+(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96, NULL, 'https://www.youtube.com/watch?v=y6Xt3f2Mg48'),
+(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95, NULL, 'https://www.youtube.com/watch?v=lwGQ6yr7rns'),
+(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98, NULL, 'https://www.youtube.com/watch?v=c_45YrzoO9A'),
+(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107, NULL, 'https://www.youtube.com/watch?v=9CrLIEwkN7w'),
+(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132, NULL, 'https://www.youtube.com/watch?v=Kln8t-5RYxw'),
+(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91, NULL, 'https://www.youtube.com/watch?v=fS9tD-RlHBI'),
+(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89, NULL, 'https://www.youtube.com/watch?v=eQXXuC9eaYQ'),
+(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98, NULL, 'https://www.youtube.com/watch?v=sRkYEYKQjsg'),
+(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100, NULL, 'https://www.youtube.com/watch?v=H0Ubj7RlJsY'),
+(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97, NULL, 'https://www.youtube.com/watch?v=XDzU5UsLxRo'),
+(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104, NULL, 'https://www.youtube.com/watch?v=7-H9UQb2EqM'),
+(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100, NULL, 'https://www.youtube.com/watch?v=Dh8czRR25X4'),
+(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100, NULL, 'https://www.youtube.com/watch?v=iIfYbQjuIWM'),
+(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112, NULL, 'https://www.youtube.com/watch?v=MwBolbr8g0s');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movie_actors`
+-- Tábla szerkezet ehhez a táblához `movie_actors`
 --
 
 CREATE TABLE `movie_actors` (
@@ -524,7 +524,7 @@ CREATE TABLE `movie_actors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `movie_actors`
+-- A tábla adatainak kiíratása `movie_actors`
 --
 
 INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
@@ -572,7 +572,7 @@ INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movie_directors`
+-- Tábla szerkezet ehhez a táblához `movie_directors`
 --
 
 CREATE TABLE `movie_directors` (
@@ -581,7 +581,7 @@ CREATE TABLE `movie_directors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `movie_directors`
+-- A tábla adatainak kiíratása `movie_directors`
 --
 
 INSERT INTO `movie_directors` (`movie_id`, `director_id`) VALUES
@@ -639,7 +639,7 @@ INSERT INTO `movie_directors` (`movie_id`, `director_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movie_genres`
+-- Tábla szerkezet ehhez a táblához `movie_genres`
 --
 
 CREATE TABLE `movie_genres` (
@@ -648,7 +648,7 @@ CREATE TABLE `movie_genres` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `movie_genres`
+-- A tábla adatainak kiíratása `movie_genres`
 --
 
 INSERT INTO `movie_genres` (`movie_id`, `genre_id`) VALUES
@@ -756,7 +756,7 @@ INSERT INTO `movie_genres` (`movie_id`, `genre_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ratings`
+-- Tábla szerkezet ehhez a táblához `ratings`
 --
 
 CREATE TABLE `ratings` (
@@ -769,7 +769,7 @@ CREATE TABLE `ratings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `ratings`
+-- A tábla adatainak kiíratása `ratings`
 --
 
 INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `rating_date`) VALUES
@@ -808,7 +808,7 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Tábla szerkezet ehhez a táblához `users`
 --
 
 CREATE TABLE `users` (
@@ -821,7 +821,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `users`
+-- A tábla adatainak kiíratása `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_date`, `role`) VALUES
@@ -872,56 +872,56 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (59, 'weewee', 'madness@gmail.com', 'Porquedillo4!', '2025-03-29', 'user');
 
 --
--- Indexes for dumped tables
+-- Indexek a kiírt táblákhoz
 --
 
 --
--- Indexes for table `actors`
+-- A tábla indexei `actors`
 --
 ALTER TABLE `actors`
   ADD PRIMARY KEY (`actor_id`),
   ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `directors`
+-- A tábla indexei `directors`
 --
 ALTER TABLE `directors`
   ADD PRIMARY KEY (`director_id`);
 
 --
--- Indexes for table `genres`
+-- A tábla indexei `genres`
 --
 ALTER TABLE `genres`
   ADD PRIMARY KEY (`genre_id`);
 
 --
--- Indexes for table `movies`
+-- A tábla indexei `movies`
 --
 ALTER TABLE `movies`
   ADD PRIMARY KEY (`movie_id`);
 
 --
--- Indexes for table `movie_actors`
+-- A tábla indexei `movie_actors`
 --
 ALTER TABLE `movie_actors`
   ADD PRIMARY KEY (`movie_id`,`actor_id`);
 
 --
--- Indexes for table `movie_directors`
+-- A tábla indexei `movie_directors`
 --
 ALTER TABLE `movie_directors`
   ADD PRIMARY KEY (`movie_id`,`director_id`),
   ADD KEY `director_id` (`director_id`);
 
 --
--- Indexes for table `movie_genres`
+-- A tábla indexei `movie_genres`
 --
 ALTER TABLE `movie_genres`
   ADD PRIMARY KEY (`movie_id`,`genre_id`),
   ADD KEY `genre_id` (`genre_id`);
 
 --
--- Indexes for table `ratings`
+-- A tábla indexei `ratings`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`rating_id`),
@@ -929,7 +929,7 @@ ALTER TABLE `ratings`
   ADD KEY `fk_ratings_movie` (`movie_id`);
 
 --
--- Indexes for table `users`
+-- A tábla indexei `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
@@ -937,51 +937,51 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT for table `actors`
+-- AUTO_INCREMENT a táblához `actors`
 --
 ALTER TABLE `actors`
   MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
--- AUTO_INCREMENT for table `directors`
+-- AUTO_INCREMENT a táblához `directors`
 --
 ALTER TABLE `directors`
   MODIFY `director_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
--- AUTO_INCREMENT for table `genres`
+-- AUTO_INCREMENT a táblához `genres`
 --
 ALTER TABLE `genres`
   MODIFY `genre_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
--- AUTO_INCREMENT for table `movies`
+-- AUTO_INCREMENT a táblához `movies`
 --
 ALTER TABLE `movies`
   MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=151;
 
 --
--- AUTO_INCREMENT for table `ratings`
+-- AUTO_INCREMENT a táblához `ratings`
 --
 ALTER TABLE `ratings`
   MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
--- Constraints for dumped tables
+-- Megkötések a kiírt táblákhoz
 --
 
 --
--- Constraints for table `movie_directors`
+-- Megkötések a táblához `movie_directors`
 --
 ALTER TABLE `movie_directors`
   ADD CONSTRAINT `fk_director` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`),
@@ -990,7 +990,7 @@ ALTER TABLE `movie_directors`
   ADD CONSTRAINT `movie_directors_ibfk_2` FOREIGN KEY (`director_id`) REFERENCES `directors` (`director_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `movie_genres`
+-- Megkötések a táblához `movie_genres`
 --
 ALTER TABLE `movie_genres`
   ADD CONSTRAINT `fk_movie_genre` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
@@ -998,7 +998,7 @@ ALTER TABLE `movie_genres`
   ADD CONSTRAINT `movie_genres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `ratings`
+-- Megkötések a táblához `ratings`
 --
 ALTER TABLE `ratings`
   ADD CONSTRAINT `fk_ratings_movie` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE,
