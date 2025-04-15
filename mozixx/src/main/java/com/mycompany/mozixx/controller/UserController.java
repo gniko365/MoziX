@@ -19,6 +19,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @Path("users")
@@ -42,6 +43,18 @@ public class UserController {
     @Consumes(MediaType.APPLICATION_XML)
     public void putXml(String content) {
     }
+    
+    public enum Role {
+    user, admin;
+    
+    public static Role fromString(String value) {
+        try {
+            return Role.valueOf(value.toLowerCase());
+        } catch (IllegalArgumentException e) {
+            return user; // default to user if invalid
+        }
+    }
+}
     
     private UserService userService;
     
@@ -151,53 +164,85 @@ public Response registerUser(String bodyString) {
     }
     
     @GET
-    @Path("/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers() {
-        try {
-            List<Users> users = userService.getAllUsers();
-            JSONArray jsonArray = new JSONArray(users);
-            return Response.ok(jsonArray.toString()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("{\"error\": \"" + e.getMessage() + "\"}")
-                           .build();
-        } finally {
-            userService.close();
-        }
+@Path("/all")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getAllUsers() {
+    try {
+        List<Users> users = userService.getAllUsers();
+        JSONArray jsonArray = new JSONArray(users);
+        return Response.ok(jsonArray.toString()).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                       .build();
     }
+}
     
     @PUT
-    @Path("/update/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUser(@PathParam("userId") Integer userId, String jsonBody) {
-        try {
-            JSONObject body = new JSONObject(jsonBody);
-            userService.beginTransaction();
-            Users user = userService.getEntityManager().find(Users.class, userId);
-            
-            if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                               .entity("{\"error\": \"User not found\"}")
-                               .build();
-            }
-            
-            if (body.has("username")) user.setUsername(body.getString("username"));
-            if (body.has("email")) user.setEmail(body.getString("email"));
-            if (body.has("password")) user.setPassword(body.getString("password"));
-            if (body.has("role")) user.setRole(body.getString("role"));
-            
-            userService.getEntityManager().merge(user);
-            userService.commitTransaction();
-            
-            return Response.ok(new JSONObject().put("message", "User updated successfully").toString()).build();
-        } catch (Exception e) {
-            userService.rollbackTransaction();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("{\"error\": \"" + e.getMessage() + "\"}")
+@Path("/update/{userId}")
+@Consumes(MediaType.APPLICATION_JSON)
+public Response updateUser(@PathParam("userId") Integer userId, String jsonBody) {
+    try {
+        JSONObject body = new JSONObject(jsonBody);
+        userService.beginTransaction();
+        Users user = userService.getEntityManager().find(Users.class, userId);
+        
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("{\"error\": \"User not found\"}")
                            .build();
-        } finally {
-            userService.close();
         }
+        
+        if (body.has("username")) user.setUsername(body.getString("username"));
+        if (body.has("email")) user.setEmail(body.getString("email"));
+        if (body.has("password")) user.setPassword(body.getString("password"));
+        if (body.has("role")) {
+            user.setRole(Users.Role.fromString(body.getString("role")));
+        }
+        
+        userService.getEntityManager().merge(user);
+        userService.commitTransaction();
+        
+        return Response.ok(new JSONObject().put("message", "User updated successfully").toString()).build();
+    } catch (Exception e) {
+        userService.rollbackTransaction();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                       .build();
+    } finally {
+        userService.close();
     }
+}
+
+@POST
+@Path("/update-username")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response updateUsername(String requestBody) {
+    try {
+        JSONObject request = new JSONObject(requestBody);
+        
+        // Kötelező mezők ellenőrzése
+        if (!request.has("userId") || !request.has("currentPassword") || !request.has("newUsername")) {
+            return Response.status(400)
+                         .entity("{\"error\":\"Missing required fields\"}")
+                         .build();
+        }
+
+        JSONObject result = userService.updateUsername(
+            request.getInt("userId"),
+            request.getString("currentPassword"),
+            request.getString("newUsername")
+        );
+
+        return Response.status(result.getString("status").equals("success") ? 200 : 400)
+                     .entity(result.toString())
+                     .build();
+
+    } catch (Exception e) {
+        return Response.status(500)
+                     .entity("{\"error\":\"" + e.getMessage() + "\"}")
+                     .build();
+    }
+}
 }

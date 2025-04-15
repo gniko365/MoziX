@@ -24,12 +24,13 @@ public class ActorService {
         return query.getResultList();
     }
 
-    public List<Actors> getActorsByMovie(String movieTitle) {
-    StoredProcedureQuery query = em.createStoredProcedureQuery("GetActorsByMovie", "ActorMapping");
-    query.registerStoredProcedureParameter("movie_title", String.class, ParameterMode.IN);
-    query.setParameter("movie_title", movieTitle);
-    return query.getResultList();
-}
+    public List<Actors> getActorsByMovieId(int movieId) {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetActorsByMovie");
+        query.registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
+             .setParameter("p_movie_id", movieId);
+        
+        return query.getResultList();
+    }
 
     public List<Object[]> getMoviesByActor(String actorName) {
         StoredProcedureQuery query = em.createStoredProcedureQuery("getMoviesByActor");

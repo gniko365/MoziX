@@ -4,7 +4,10 @@
  */
 package com.mycompany.mozixx.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,6 +20,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -50,13 +54,20 @@ public class Ratings implements Serializable {
     @Column(name = "rating_date")
     @Temporal(TemporalType.DATE)
     private Date ratingDate;
-    @JoinColumn(name = "movie_id", referencedColumnName = "movie_id")
     @ManyToOne
+    @JoinColumn(name = "movie_id")
+    @JsonIgnoreProperties("ratings") // Ha a Movies entitásban van ratings kollekció
     private Movies movieId;
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @ManyToOne
+    @JsonIgnoreProperties("ratingsCollection") // Prevents back reference
     private Users userId;
+    
 
+    @OneToMany(mappedBy = "movieId")
+    @JsonIgnore
+    private Collection<Ratings> ratings;
+    
     public Ratings() {
     }
 

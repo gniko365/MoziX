@@ -2,6 +2,7 @@ package com.mycompany.mozixx.service;
 
 import com.mycompany.mozixx.config.JWT;
 import com.mycompany.mozixx.model.Users;
+import com.mycompany.mozixx.model.Users.Role;
 import com.mycompany.mozixx.utils.PasswordValidator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
@@ -151,40 +153,40 @@ public class UserService {
     }
 
     public JSONObject registerUser(Users user) {
-        JSONObject response = new JSONObject();
-        try {
-            beginTransaction();
-            
-            if (isEmailAlreadyRegistered(user.getEmail())) {
-                response.put("status", "conflict");
-                response.put("statusCode", 409);
-                response.put("message", "Email already registered");
-                return response;
-            }
-            
-            if (isUsernameAlreadyTaken(user.getUsername())) {
-                response.put("status", "conflict");
-                response.put("statusCode", 409);
-                response.put("message", "Username already taken");
-                return response;
-            }
-            
-            user.setRegistrationDate(new Date());
-            user.setRole("USER");
-            em.persist(user);
-            commitTransaction();
-            
-            response.put("status", "success");
-            response.put("statusCode", 200);
-            response.put("message", "User registered successfully");
-        } catch (Exception e) {
-            rollbackTransaction();
-            response.put("status", "error");
-            response.put("statusCode", 500);
-            response.put("message", e.getMessage());
+    JSONObject response = new JSONObject();
+    try {
+        beginTransaction();
+        
+        if (isEmailAlreadyRegistered(user.getEmail())) {
+            response.put("status", "conflict");
+            response.put("statusCode", 409);
+            response.put("message", "Email already registered");
+            return response;
         }
-        return response;
+        
+        if (isUsernameAlreadyTaken(user.getUsername())) {
+            response.put("status", "conflict");
+            response.put("statusCode", 409);
+            response.put("message", "Username already taken");
+            return response;
+        }
+        
+        user.setRegistrationDate(new Date());
+        user.setRole(Users.Role.user);  // Changed to use enum
+        em.persist(user);
+        commitTransaction();
+        
+        response.put("status", "success");
+        response.put("statusCode", 200);
+        response.put("message", "User registered successfully");
+    } catch (Exception e) {
+        rollbackTransaction();
+        response.put("status", "error");
+        response.put("statusCode", 500);
+        response.put("message", e.getMessage());
     }
+    return response;
+}
 
     public JSONObject registerAdmin(Users user, String jwt) {
         // Implementáció a JWT validálásával
@@ -205,23 +207,23 @@ public class UserService {
         return query.getSingleResult() > 0;
     }
     
-    public void updateUser(int userId, String username, String email, String password, String role) {
-        try {
-            beginTransaction();
-            Users user = em.find(Users.class, userId);
-            if (user != null) {
-                user.setUsername(username);
-                user.setEmail(email);
-                user.setPassword(password);
-                user.setRole(role);
-                em.merge(user);
-            }
-            commitTransaction();
-        } catch (Exception e) {
-            rollbackTransaction();
-            throw e;
+    public void updateUser(int userId, String username, String email, String password, Role role) {
+    try {
+        beginTransaction();
+        Users user = em.find(Users.class, userId);
+        if (user != null) {
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setRole(role);
+            em.merge(user);
         }
+        commitTransaction();
+    } catch (Exception e) {
+        rollbackTransaction();
+        throw e;
     }
+}
 
     public void deleteUser(int userId) {
         try {
@@ -238,16 +240,7 @@ public class UserService {
     }
 
     public List<Users> getAllUsers() {
-    EntityManager em = emf.createEntityManager();
-    try {
-        // Explicit módon megadva a tábla és oszlopneveket
-        TypedQuery<Users> query = em.createQuery(
-            "SELECT u FROM Users u ORDER BY u.userId", 
-            Users.class);
-        return query.getResultList();
-    } finally {
-        em.close();
-    }
+    return em.createQuery("SELECT u FROM Users u", Users.class).getResultList();
 }
     
     public EntityManager getEntityManager() {
@@ -290,8 +283,70 @@ public class UserService {
         json.put("id", user.getUserId());
         json.put("username", user.getUsername());
         json.put("email", user.getEmail());
-        json.put("role", user.getRole());
+        json.put("role", user.getRole().name());
         json.put("registrationDate", user.getRegistrationDate());
         return json;
     }
+    
+    public JSONObject updateUsername(Integer userId, String currentPassword, String newUsername) {
+    JSONObject response = new JSONObject();
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = null;
+    
+    try {
+        tx = em.getTransaction();
+        tx.begin();
+
+        // 1. Felhasználó keresése ID alapján
+        Users user = em.find(Users.class, userId);
+        if (user == null) {
+            response.put("status", "error");
+            response.put("message", "User not found");
+            return response;
+        }
+
+        // 2. Jelszó ellenőrzése
+        if (!user.getPassword().equals(currentPassword)) { // Vagy BCrypt.checkpw(), ha hashelve van
+            response.put("status", "error");
+            response.put("message", "Incorrect password");
+            return response;
+        }
+
+        // 3. Felhasználónév validációk
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            response.put("status", "error");
+            response.put("message", "Username cannot be empty");
+            return response;
+        }
+
+        // 4. Egyediség ellenőrzés
+        TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(u) FROM Users u WHERE u.username = :username AND u.userId != :userId", 
+            Long.class);
+        query.setParameter("username", newUsername);
+        query.setParameter("userId", userId);
+        
+        if (query.getSingleResult() > 0) {
+            response.put("status", "error");
+            response.put("message", "Username already taken");
+            return response;
+        }
+
+        // 5. Módosítás végrehajtása
+        user.setUsername(newUsername);
+        em.merge(user);
+        tx.commit();
+
+        response.put("status", "success");
+        response.put("message", "Username updated successfully");
+    } catch (Exception e) {
+        if (tx != null && tx.isActive()) tx.rollback();
+        response.put("status", "error");
+        response.put("message", "Error: " + e.getMessage());
+    } finally {
+        em.close();
+    }
+    
+    return response;
+}
 }

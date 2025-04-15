@@ -1,9 +1,12 @@
 package com.mycompany.mozixx.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "movies")
@@ -31,6 +35,9 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Movies.findByCover", query = "SELECT m FROM Movies m WHERE m.cover = :cover"),
     @NamedQuery(name = "Movies.findByTrailerLink", query = "SELECT m FROM Movies m WHERE m.trailerLink = :trailerLink")})
 public class Movies implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "movieId")
+    private Collection<UserFavorites> userFavoritesCollection;
 
     private static final long serialVersionUID = 1L;
 
@@ -65,7 +72,13 @@ public class Movies implements Serializable {
     @Column(name = "trailer_link")
     private String trailerLink;
 
-    // ... egyéb mezők és metódusok ...
+    @OneToMany(mappedBy = "movieId")
+    @JsonIgnore
+    private Collection<Ratings> ratings;
+    
+     @ManyToMany(mappedBy = "favoriteMovies")
+    @JsonIgnore
+    private Set<Users> favoritedByUsers;
 
     public Movies() {
     }
@@ -157,5 +170,14 @@ public class Movies implements Serializable {
     @Override
     public String toString() {
         return "com.mycompany.mozixx.model.Movies[ movieId=" + movieId + " ]";
+    }
+
+    @XmlTransient
+    public Collection<UserFavorites> getUserFavoritesCollection() {
+        return userFavoritesCollection;
+    }
+
+    public void setUserFavoritesCollection(Collection<UserFavorites> userFavoritesCollection) {
+        this.userFavoritesCollection = userFavoritesCollection;
     }
 }

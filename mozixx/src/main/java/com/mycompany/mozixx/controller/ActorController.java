@@ -85,21 +85,18 @@ public class ActorController {
     }
 
     @GET
-    @Path("/by-movie/{movieTitle}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getActorsByMovie(@PathParam("movieTitle") String movieTitle) {
-        try {
-            List<Actors> actors = actorService.getActorsByMovie(movieTitle);
-            JSONArray jsonArray = new JSONArray(actors);
-            return Response.ok(jsonArray.toString()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("{\"error\": \"" + e.getMessage() + "\"}")
-                           .build();
-        } finally {
-            actorService.close();
-        }
+@Path("/{movieId}/actors")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getMovieActors(@PathParam("movieId") int movieId) {
+    try {
+        List<Actors> actors = actorService.getActorsByMovieId(movieId);
+        return Response.ok(actors).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("{\"error\":\"Failed to get actors: " + e.getMessage() + "\"}")
+                     .build();
     }
+}
 
     @GET
     @Path("/movies-by-actor/{actorName}")

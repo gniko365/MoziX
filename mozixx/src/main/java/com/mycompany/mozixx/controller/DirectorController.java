@@ -129,4 +129,18 @@ public class DirectorController {
             directorService.close();
         }
     }
+    
+    @GET
+@Path("/{movieId}/directors")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getMovieDirectors(@PathParam("movieId") int movieId) {
+    try {
+        List directors = directorService.getDirectorsByMovieId(movieId);
+        return Response.ok(directors).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("{\"error\":\"Failed to get directors: " + e.getMessage() + "\"}")
+                     .build();
+    }
+}
 }
