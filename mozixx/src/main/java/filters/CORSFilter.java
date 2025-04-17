@@ -18,7 +18,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     public void filter(ContainerRequestContext requestContext) {
         if (isPreflightRequest(requestContext)) {
             requestContext.abortWith(Response.ok()
-                .header("Access-Control-Allow-Origin", "*")
+    .header("Access-Control-Allow-Origin", "http://localhost:4200")
                 .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
                 .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with")
                 .header("Access-Control-Allow-Credentials", "true")
@@ -33,7 +33,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:4200");
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add("Access-Control-Expose-Headers", "content-type, authorization");
     }
