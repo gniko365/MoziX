@@ -4,11 +4,14 @@
  */
 package com.mycompany.mozixx.service;
 
+import com.mycompany.mozixx.model.Movies;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TypedQuery;
 import org.json.JSONArray;
@@ -20,8 +23,11 @@ import org.json.JSONObject;
  */
 public class MovieService {
     // Statikus EntityManagerFactory inicializálása
+    private Movies layer = new Movies();
     private static final EntityManagerFactory emf = 
         Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
+    @PersistenceContext
+    private EntityManager em;
     
     public JSONArray getRandomMovies(int count) {
         JSONArray movies = new JSONArray();
@@ -61,4 +67,16 @@ public class MovieService {
             emf.close();
         }
     }
+    
+    public ArrayList<Movies> GetMovies() {
+    ArrayList<Movies> movieList = new ArrayList<>(); 
+    try {
+        movieList = layer.getMovies();
+
+    } catch (Exception e) {
+        System.err.println("Error fetching shoes: " + e.getMessage());
+    }
+
+    return movieList;
+}
 }

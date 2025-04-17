@@ -3,12 +3,15 @@ package com.mycompany.mozixx.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,6 +22,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -79,6 +84,8 @@ public class Movies implements Serializable {
      @ManyToMany(mappedBy = "favoriteMovies")
     @JsonIgnore
     private Set<Users> favoritedByUsers;
+     
+     static EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
 
     public Movies() {
     }
@@ -180,4 +187,23 @@ public class Movies implements Serializable {
     public void setUserFavoritesCollection(Collection<UserFavorites> userFavoritesCollection) {
         this.userFavoritesCollection = userFavoritesCollection;
     }
+    
+    public static ArrayList<Movies> getMovies() {
+    EntityManager em = emf.createEntityManager();
+    ArrayList<Movies> movieList = new ArrayList<>();
+
+    try {
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("GetMovies", Movies.class);
+        spq.execute();
+        movieList = new ArrayList<>(spq.getResultList());
+
+    } catch (Exception e) {
+        System.err.println("Error: " + e.getLocalizedMessage());
+    } finally {
+        em.clear();
+        em.close();
+    }
+
+    return movieList;
+}
 }

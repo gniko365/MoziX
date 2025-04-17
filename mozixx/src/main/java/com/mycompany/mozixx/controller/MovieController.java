@@ -4,7 +4,9 @@
  */
 package com.mycompany.mozixx.controller;
 
+import com.mycompany.mozixx.model.Movies;
 import com.mycompany.mozixx.service.MovieService;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -17,6 +19,22 @@ import org.json.JSONObject;
 public class MovieController {
     private MovieService movieService = new MovieService();
     
+    @GET
+@Path("/all")
+@Produces(MediaType.APPLICATION_JSON)
+public Response GetMovies() {
+    try {
+        List<Movies> movies = movieService.GetMovies();
+        JSONArray jsonArray = new JSONArray(movies);  // Direct konverzió List -> JSON
+        return Response.ok(jsonArray.toString()).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                      .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                      .build();
+    } finally {
+        movieService.close();  // Ha close() metódusod van
+    }
+}
     @GET
     @Path("/random")
     @Produces(MediaType.APPLICATION_JSON)

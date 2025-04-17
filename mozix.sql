@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 16, 2025 at 05:25 PM
+-- Generation Time: Apr 17, 2025 at 03:49 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -224,6 +224,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetDirectorsByMovie` (IN `p_movie_i
     WHERE 
         md.movie_id = p_movie_id;
 END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovies` ()   SELECT * FROM movies$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getMoviesByActor` (IN `actor_name` VARCHAR(255))   BEGIN
     SELECT m.movie_name, m.release_year
