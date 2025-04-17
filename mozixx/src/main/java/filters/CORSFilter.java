@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package filters;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -10,6 +6,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.util.logging.Logger;
 
 @Provider
 public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilter {
@@ -17,12 +14,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext) {
         if (isPreflightRequest(requestContext)) {
-            requestContext.abortWith(Response.ok()
-    .header("Access-Control-Allow-Origin", "http://localhost:4200")
-                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with")
-                .header("Access-Control-Allow-Credentials", "true")
-                .build());
+            requestContext.abortWith(Response.ok().build());
         }
     }
 
@@ -32,9 +24,20 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:4200");
-        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
-        responseContext.getHeaders().add("Access-Control-Expose-Headers", "content-type, authorization");
+    public void filter(ContainerRequestContext requestContext, 
+                     ContainerResponseContext responseContext) {
+        responseContext.getHeaders().add(
+            "Access-Control-Allow-Origin", "*");
+        responseContext.getHeaders().add(
+            "Access-Control-Allow-Credentials", "true");
+        responseContext.getHeaders().add(
+            "Access-Control-Allow-Headers",
+            "origin, content-type, accept, authorization, x-requested-with");
+        responseContext.getHeaders().add(
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+        responseContext.getHeaders().add(
+            "Access-Control-Expose-Headers",
+            "content-type, authorization");
     }
 }
