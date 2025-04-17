@@ -13,6 +13,7 @@ D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectorsPK.jav
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Directors.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectors.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\config\JWT.java
+D:\ae\mozix\mozixx\src\main\java\filters\CORSFilter.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\ApplicationConfig.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\FavoriteController.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Actors.java
