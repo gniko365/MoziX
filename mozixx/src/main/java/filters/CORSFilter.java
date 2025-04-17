@@ -17,7 +17,12 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext) {
         if (isPreflightRequest(requestContext)) {
-            requestContext.abortWith(Response.ok().build());
+            requestContext.abortWith(Response.ok()
+                .header("Access-Control-Allow-Origin", "")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with")
+                .header("Access-Control-Allow-Credentials", "true")
+                .build());
         }
     }
 
@@ -29,18 +34,8 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext, 
                      ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add(
-            "Access-Control-Allow-Origin", "*");
-        responseContext.getHeaders().add(
-            "Access-Control-Allow-Credentials", "true");
-        responseContext.getHeaders().add(
-            "Access-Control-Allow-Headers",
-            "origin, content-type, accept, authorization, x-requested-with");
-        responseContext.getHeaders().add(
-            "Access-Control-Allow-Methods",
-            "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-        responseContext.getHeaders().add(
-            "Access-Control-Expose-Headers",
-            "content-type, authorization");
+        responseContext.getHeaders().add("Access-Control-Allow-Origin", "");
+        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        responseContext.getHeaders().add("Access-Control-Expose-Headers", "content-type, authorization");
     }
 }
