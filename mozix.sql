@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 18, 2025 at 03:24 PM
+-- Generation Time: Apr 18, 2025 at 06:12 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -280,15 +280,22 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByGenreId` (IN `p_genre_id
         m.movie_name AS title,
         m.cover,
         m.release_year,
-        g.name
+        g.name AS genre,
+        m.length,
+        m.description,
+        COALESCE(AVG(r.rating), 0) AS average_rating
     FROM 
         movies m
     JOIN 
         movie_genres mg ON m.movie_id = mg.movie_id
     JOIN 
         genres g ON mg.genre_id = g.genre_id
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
     WHERE 
         g.genre_id = p_genre_id
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover, m.release_year, g.name, m.length, m.description
     ORDER BY 
         m.movie_name;
 END$$
@@ -312,17 +319,22 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_ro
         exact_average DESC, rating_count DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRandomMovies` (IN `p_count` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRandomMovies` ()   BEGIN
     SELECT 
-        movie_id AS movieId,
-        movie_name AS title,
-        cover
+        m.movie_id AS movieId,
+        m.movie_name AS title,
+        m.cover,
+        COALESCE(AVG(r.rating), 0) AS averageRating
     FROM 
-        movies
+        movies m
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover
     ORDER BY 
         RAND()
     LIMIT 
-        p_count;
+        4;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRatingsByMovie` (IN `movie_title` VARCHAR(255))   BEGIN
@@ -377,6 +389,33 @@ FROM movies$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `register_user` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     INSERT INTO users (username, email, password, registration_date, role)
     VALUES (p_username, p_email, p_password, CURDATE(), 'user');
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchMoviesByName` (IN `p_search_term` VARCHAR(255))   BEGIN
+    SELECT 
+        m.movie_id,
+        m.movie_name AS title,
+        m.cover,
+        m.release_year,
+        m.length,
+        m.description,
+        m.trailer_link,
+        COALESCE(AVG(r.rating), 0) AS average_rating,
+        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
+    FROM 
+        movies m
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
+    LEFT JOIN
+        movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN
+        genres g ON mg.genre_id = g.genre_id
+    WHERE 
+        m.movie_name LIKE CONCAT('%', p_search_term, '%')
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover, m.release_year, m.length, m.description, m.trailer_link
+    ORDER BY 
+        m.movie_name;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsersByName` (IN `search_term` VARCHAR(255))   BEGIN
