@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 18, 2025 at 06:12 PM
+-- Generation Time: Apr 18, 2025 at 06:30 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -235,6 +235,31 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetLatestReleases` ()   BEGIN
     FROM movies
     ORDER BY movies.release_year DESC
     LIMIT 8;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovieById` (IN `p_movie_id` INT)   BEGIN
+    SELECT 
+        m.movie_id,
+        m.movie_name AS title,
+        m.cover,
+        m.release_year,
+        m.length,
+        m.description,
+        m.trailer_link,
+        COALESCE(AVG(r.rating), 0) AS average_rating,
+        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
+    FROM 
+        movies m
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
+    LEFT JOIN
+        movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN
+        genres g ON mg.genre_id = g.genre_id
+    WHERE 
+        m.movie_id = p_movie_id
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover, m.release_year, m.length, m.description, m.trailer_link;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovies` ()   SELECT * FROM movies$$
