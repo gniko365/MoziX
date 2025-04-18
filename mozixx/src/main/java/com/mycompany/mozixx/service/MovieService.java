@@ -30,31 +30,30 @@ public class MovieService {
     }
     
     public JSONArray getRandomMovies(int count) {
-        EntityManager em = getEntityManagerFactory().createEntityManager();
-        try {
-            Query query = em.createNativeQuery(
-                "SELECT movie_id, title, cover FROM movies ORDER BY RAND() LIMIT ?")
-                .setParameter(1, count);
-            
-            List<Object[]> results = query.getResultList();
-            JSONArray movies = new JSONArray();
-            
-            for (Object[] row : results) {
-                JSONObject movie = new JSONObject();
-                movie.put("movieId", row[0]);
-                movie.put("title", row[1]);
-                movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-                movies.put(movie);
-            }
-            return movies;
-        } catch (Exception e) {
-            throw new RuntimeException("Hiba a filmek lekérdezésekor", e);
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+    EntityManager em = getEntityManagerFactory().createEntityManager();
+    try {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetRandomMovies");
+        
+        List<Object[]> results = query.getResultList();
+        JSONArray movies = new JSONArray();
+        
+        for (Object[] row : results) {
+            JSONObject movie = new JSONObject();
+            movie.put("movieId", row[0]);
+            movie.put("title", row[1]);
+            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+            movie.put("averageRating", row[3]);
+            movies.put(movie);
+        }
+        return movies;
+    } catch (Exception e) {
+        throw new RuntimeException("Hiba a filmek lekérdezésekor", e);
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
         }
     }
+}
     
     public ArrayList<Movies> getMovies() {
         ArrayList<Movies> movieList = new ArrayList<>(); 
@@ -105,4 +104,37 @@ public class MovieService {
     private String toString(Object value) {
         return value != null ? value.toString() : null;
     }
+    
+    public JSONArray searchMoviesByName(String searchTerm) {
+    EntityManager em = getEntityManagerFactory().createEntityManager();
+    try {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("SearchMoviesByName")
+            .registerStoredProcedureParameter("p_search_term", String.class, ParameterMode.IN)
+            .setParameter("p_search_term", searchTerm);
+        
+        List<Object[]> results = query.getResultList();
+        JSONArray movies = new JSONArray();
+        
+        for (Object[] row : results) {
+            JSONObject movie = new JSONObject();
+            movie.put("movieId", row[0]);
+            movie.put("title", row[1]);
+            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+            movie.put("releaseYear", row[3]);
+            movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
+            movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
+            movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
+            movie.put("averageRating", row[7]);
+            movie.put("genres", row[8] != null ? row[8] : "");
+            movies.put(movie);
+        }
+        return movies;
+    } catch (Exception e) {
+        throw new RuntimeException("Hiba a filmek keresésekor: " + searchTerm, e);
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
+        }
+    }
+}
 }

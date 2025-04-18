@@ -25,10 +25,14 @@ public class GenreController {
         try {
             JSONArray movies = genreService.getMoviesByGenreId(genreId);
             
+            // Átlag értékelés kiszámolása a műfaj összes filmjére
+            double genreAverage = calculateGenreAverage(movies);
+            
             JSONObject response = new JSONObject();
             response.put("status", "success");
             response.put("genreId", genreId);
             response.put("count", movies.length());
+            response.put("genreAverageRating", genreAverage);
             response.put("movies", movies);
             
             return Response.ok(response.toString()).build();
@@ -42,5 +46,23 @@ public class GenreController {
                          .entity(errorResponse.toString())
                          .build();
         }
+    }
+    
+    private double calculateGenreAverage(JSONArray movies) {
+        if (movies.length() == 0) return 0.0;
+        
+        double sum = 0;
+        int count = 0;
+        
+        for (int i = 0; i < movies.length(); i++) {
+            JSONObject movie = movies.getJSONObject(i);
+            double rating = movie.getDouble("averageRating");
+            if (rating > 0) {
+                sum += rating;
+                count++;
+            }
+        }
+        
+        return count > 0 ? Math.round((sum / count) * 10) / 10.0 : 0.0; // 1 tizedesjegyre kerekítve
     }
 }

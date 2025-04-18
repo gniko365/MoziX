@@ -22,38 +22,38 @@ public class GenreService {
         Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
 
     public JSONArray getMoviesByGenreId(int genreId) {
-        JSONArray movies = new JSONArray();
-        EntityManager em = emf.createEntityManager();
+    JSONArray movies = new JSONArray();
+    EntityManager em = emf.createEntityManager();
+    
+    try {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetMoviesByGenreId")
+            .registerStoredProcedureParameter("p_genre_id", Integer.class, ParameterMode.IN)
+            .setParameter("p_genre_id", genreId);
         
-        try {
-            // Tárolt eljárás meghívása
-            StoredProcedureQuery query = em.createStoredProcedureQuery("GetMoviesByGenreId")
-                .registerStoredProcedureParameter("p_genre_id", Integer.class, ParameterMode.IN)
-                .setParameter("p_genre_id", genreId);
-            
-            // Eredmények lekérése
-            List<Object[]> results = query.getResultList();
-            
-            // Eredmény feldolgozása
-            for (Object[] row : results) {
-                JSONObject movie = new JSONObject();
-                movie.put("movieId", row[0]);
-                movie.put("title", row[1]);
-                movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-                movie.put("releaseYear", row[3]);
-                movie.put("genre", row[4]); // Műfaj neve is visszaadásra kerül
-                movies.put(movie);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch movies by genre ID", e);
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+        List<Object[]> results = query.getResultList();
+        
+        for (Object[] row : results) {
+            JSONObject movie = new JSONObject();
+            movie.put("movieId", row[0]);
+            movie.put("title", row[1]);
+            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+            movie.put("releaseYear", row[3]);
+            movie.put("genre", row[4]);
+            movie.put("length", row[5] != null ? row[5] : JSONObject.NULL);
+            movie.put("description", row[6] != null ? row[6] : JSONObject.NULL);
+            movie.put("averageRating", row[7]);
+            movies.put(movie);
         }
-        
-        return movies;
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to fetch movies by genre ID", e);
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
+        }
     }
+    
+    return movies;
+}
     
     public static void close() {
         if (emf != null && emf.isOpen()) {
