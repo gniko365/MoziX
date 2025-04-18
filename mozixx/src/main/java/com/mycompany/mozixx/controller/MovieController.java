@@ -28,15 +28,13 @@ public class MovieController {
 @Produces(MediaType.APPLICATION_JSON)
 public Response GetMovies() {
     try {
-        List<Movies> movies = movieService.GetMovies();
+        List<Movies> movies = movieService.getMovies();
         JSONArray jsonArray = new JSONArray(movies);  // Direct konverzió List -> JSON
         return Response.ok(jsonArray.toString()).build();
     } catch (Exception e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                       .entity("{\"error\": \"" + e.getMessage() + "\"}")
                       .build();
-    } finally {
-        movieService.close();  // Ha close() metódusod van
     }
 }
     @GET
