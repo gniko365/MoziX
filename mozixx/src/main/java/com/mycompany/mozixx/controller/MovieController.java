@@ -7,6 +7,10 @@ package com.mycompany.mozixx.controller;
 import com.mycompany.mozixx.model.Movies;
 import com.mycompany.mozixx.service.MovieService;
 import java.util.List;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -40,20 +44,38 @@ public Response GetMovies() {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRandomMovies() {
         try {
-            // 4 véletlenszerű film lekérése
             JSONArray randomMovies = movieService.getRandomMovies(4);
             
+            // Sikeres válasz
             JSONObject response = new JSONObject();
             response.put("status", "success");
+            response.put("count", randomMovies.length());
             response.put("data", randomMovies);
             
             return Response.ok(response.toString()).build();
+            
         } catch (Exception e) {
-            JSONObject errorResponse = new JSONObject();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "Failed to fetch random movies");
+            // Hiba esetén
+            JSONObject error = new JSONObject();
+            error.put("status", "error");
+            error.put("message", "Nem sikerült lekérni a filmeket");
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(error.toString())
+                .build();
+        }
+    }
+    
+    @GET
+    @Path("/latest")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLatestReleases() {
+        try {
+            List<Movies> movies = movieService.getLatestReleases();
+            return Response.ok(movies).build();
+        } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                         .entity(errorResponse.toString())
+                         .entity("{\"error\":\"" + e.getMessage() + "\"}")
                          .build();
         }
     }

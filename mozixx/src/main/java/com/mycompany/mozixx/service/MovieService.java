@@ -12,6 +12,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TypedQuery;
 import org.json.JSONArray;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
  * @author szter
  */
 public class MovieService {
+
     // Statikus EntityManagerFactory inicializálása
     private Movies layer = new Movies();
     private static final EntityManagerFactory emf = 
@@ -34,15 +36,13 @@ public class MovieService {
         EntityManager em = emf.createEntityManager();
         
         try {
-            // Tárolt eljárás meghívása
-            StoredProcedureQuery query = em.createStoredProcedureQuery("GetRandomMovies")
-                .registerStoredProcedureParameter("p_count", Integer.class, ParameterMode.IN)
-                .setParameter("p_count", count);
+            // NATIVE QUERY használata közvetlen SQL-lel
+            Query query = em.createNativeQuery(
+                "SELECT movie_id, title, cover FROM movies ORDER BY RAND() LIMIT ?")
+                .setParameter(1, count);
             
-            // Eredmények lekérése
             List<Object[]> results = query.getResultList();
             
-            // Eredmény feldolgozása
             for (Object[] row : results) {
                 JSONObject movie = new JSONObject();
                 movie.put("movieId", row[0]);
@@ -52,20 +52,13 @@ public class MovieService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to fetch random movies", e);
+            throw new RuntimeException("Hiba a filmek lekérdezésekor", e);
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
             }
         }
-        
         return movies;
-    }
-    
-    public static void close() {
-        if (emf != null && emf.isOpen()) {
-            emf.close();
-        }
     }
     
     public ArrayList<Movies> GetMovies() {
@@ -79,4 +72,51 @@ public class MovieService {
 
     return movieList;
 }
+    
+    public List<Movies> getLatestReleases() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("GetLatestReleases");
+            List<Object[]> resultList = query.getResultList();
+            List<Movies> movies = new ArrayList<>();
+            
+            for (Object[] row : resultList) {
+                Movies movie = new Movies();
+                movie.setMovieId(parseInt(row[0]));
+                movie.setMovieName(toString(row[1]));
+                movie.setLength(parseInt(row[2]));
+                movie.setCover(toString(row[3]));
+                movie.setTrailerLink(toString(row[4]));
+                movies.add(movie);
+            }
+            return movies;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+    
+    private Integer parseInt(Object value) {
+        if (value == null) return null;
+        try {
+            if (value instanceof Number) {
+                return ((Number) value).intValue();
+            }
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return null; // vagy dobj egy kivételt, ha szükséges
+        }
+    }
+    
+    private String toString(Object value) {
+        return value != null ? value.toString() : null;
+    }
+    
+    // Egyéb metódusok...
+    public static void close() {
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
+    }
 }

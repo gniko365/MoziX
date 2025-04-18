@@ -1,30 +1,11 @@
 package com.mycompany.mozixx.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Persistence;
-import javax.persistence.StoredProcedureQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
@@ -40,9 +21,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Movies.findByCover", query = "SELECT m FROM Movies m WHERE m.cover = :cover"),
     @NamedQuery(name = "Movies.findByTrailerLink", query = "SELECT m FROM Movies m WHERE m.trailerLink = :trailerLink")})
 public class Movies implements Serializable {
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "movieId")
-    private Collection<UserFavorites> userFavoritesCollection;
 
     private static final long serialVersionUID = 1L;
 
@@ -81,11 +59,12 @@ public class Movies implements Serializable {
     @JsonIgnore
     private Collection<Ratings> ratings;
     
-     @ManyToMany(mappedBy = "favoriteMovies")
+    @ManyToMany(mappedBy = "favoriteMovies")
     @JsonIgnore
     private Set<Users> favoritedByUsers;
-     
-     static EntityManagerFactory emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "movieId")
+    private Collection<UserFavorites> userFavoritesCollection;
 
     public Movies() {
     }
@@ -99,12 +78,14 @@ public class Movies implements Serializable {
         this.movieName = movieName;
     }
 
+    // Getterek és setterek
     public Integer getMovieId() {
         return movieId;
     }
 
-    public void setMovieId(Integer movieId) {
-        this.movieId = movieId;
+    public void setMovieId(Object id) {
+        this.movieId = id instanceof Integer ? (Integer)id : 
+                      id instanceof String ? Integer.parseInt((String)id) : null;
     }
 
     public Integer getReleaseYear() {
@@ -135,8 +116,9 @@ public class Movies implements Serializable {
         return length;
     }
 
-    public void setLength(Integer length) {
-        this.length = length;
+    public void setLength(Object length) {
+        this.length = length instanceof Integer ? (Integer)length : 
+                      length instanceof String ? Integer.parseInt((String)length) : null;
     }
 
     public String getCover() {
@@ -153,6 +135,31 @@ public class Movies implements Serializable {
 
     public void setTrailerLink(String trailerLink) {
         this.trailerLink = trailerLink;
+    }
+
+    @XmlTransient
+    public Collection<UserFavorites> getUserFavoritesCollection() {
+        return userFavoritesCollection;
+    }
+
+    public void setUserFavoritesCollection(Collection<UserFavorites> userFavoritesCollection) {
+        this.userFavoritesCollection = userFavoritesCollection;
+    }
+
+    public Collection<Ratings> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Collection<Ratings> ratings) {
+        this.ratings = ratings;
+    }
+
+    public Set<Users> getFavoritedByUsers() {
+        return favoritedByUsers;
+    }
+
+    public void setFavoritedByUsers(Set<Users> favoritedByUsers) {
+        this.favoritedByUsers = favoritedByUsers;
     }
 
     @Override
@@ -179,31 +186,17 @@ public class Movies implements Serializable {
         return "com.mycompany.mozixx.model.Movies[ movieId=" + movieId + " ]";
     }
 
-    @XmlTransient
-    public Collection<UserFavorites> getUserFavoritesCollection() {
-        return userFavoritesCollection;
-    }
-
-    public void setUserFavoritesCollection(Collection<UserFavorites> userFavoritesCollection) {
-        this.userFavoritesCollection = userFavoritesCollection;
-    }
-    
     public static ArrayList<Movies> getMovies() {
-    EntityManager em = emf.createEntityManager();
-    ArrayList<Movies> movieList = new ArrayList<>();
-
-    try {
-        StoredProcedureQuery spq = em.createStoredProcedureQuery("GetMovies", Movies.class);
-        spq.execute();
-        movieList = new ArrayList<>(spq.getResultList());
-
-    } catch (Exception e) {
-        System.err.println("Error: " + e.getLocalizedMessage());
-    } finally {
-        em.clear();
-        em.close();
+        EntityManager em = null;
+        try {
+            em = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT").createEntityManager();
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("GetMovies", Movies.class);
+            spq.execute();
+            return new ArrayList<>(spq.getResultList());
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
     }
-
-    return movieList;
-}
 }
