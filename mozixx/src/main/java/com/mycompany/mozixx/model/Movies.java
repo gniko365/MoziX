@@ -210,9 +210,19 @@ public class Movies implements Serializable {
             movie.put("description", row[5]);
             movie.put("trailerLink", row[6]);
             movie.put("averageRating", row[7]);
-            movie.put("directors", row[8]);
-            movie.put("actors", row[9]);
-            movie.put("genres", row[10]);
+            
+            // Rendezők feldolgozása - itt a ":"-on való split korlátozva van
+            String directorsInfo = row[8] != null ? row[8].toString() : "";
+            movie.put("directors", parsePeopleInfo(directorsInfo, "director"));
+            
+            // Színészek feldolgozása - itt a ":"-on való split korlátozva van
+            String actorsInfo = row[9] != null ? row[9].toString() : "";
+            movie.put("actors", parsePeopleInfo(actorsInfo, "actor"));
+            
+            // Műfajok feldolgozása
+            String genresInfo = row[10] != null ? row[10].toString() : "";
+            movie.put("genres", parseGenresInfo(genresInfo));
+            
             movies.add(movie);
         }
         return movies;
@@ -223,6 +233,44 @@ public class Movies implements Serializable {
             em.close();
         }
     }
+}
+
+private static List<Map<String, String>> parsePeopleInfo(String info, String type) {
+    List<Map<String, String>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] people = info.split("\\|");
+        for (String person : people) {
+            // Korlátozzuk a split-et 3 részre, mert a URL tartalmazhat ":" karaktert
+            String[] parts = person.split(":", 3);
+            if (parts.length == 3) {
+                Map<String, String> personMap = new HashMap<>();
+                personMap.put("id", parts[0]);
+                personMap.put("name", parts[1]);
+                // A kép URL változatlanul marad, nem módosítjuk
+                personMap.put("image", parts[2].isEmpty() ? null : parts[2]);
+                personMap.put("type", type);
+                result.add(personMap);
+            }
+        }
+    }
+    return result;
+}
+
+private static List<Map<String, String>> parseGenresInfo(String info) {
+    List<Map<String, String>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] genres = info.split("\\|");
+        for (String genre : genres) {
+            String[] parts = genre.split(":");
+            if (parts.length >= 2) {
+                Map<String, String> genreMap = new HashMap<>();
+                genreMap.put("id", parts[0]);
+                genreMap.put("name", parts[1]);
+                result.add(genreMap);
+            }
+        }
+    }
+    return result;
 }
 }
     

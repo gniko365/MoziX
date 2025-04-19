@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 19, 2025 at 12:12 PM
+-- Generation Time: Apr 19, 2025 at 01:26 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -342,31 +342,59 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_ro
         exact_average DESC, rating_count DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesWithDetails` ()   SELECT 
-        m.movie_id,
-        m.movie_name,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesWithDetails` ()   BEGIN
+    SELECT 
+        m.movie_id AS movieId,
+        m.movie_name AS title,
         m.cover,
-        m.release_year,
+        m.release_year AS releaseYear,
         m.length,
         m.description,
-        m.trailer_link,
-        ROUND(COALESCE(AVG(r.rating), 0), 1) AS average_rating,
-        GROUP_CONCAT(DISTINCT d.name SEPARATOR ', ') AS directors,
-        GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS actors,
-        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
+        m.trailer_link AS trailerLink,
+        ROUND(COALESCE(AVG(r.rating), 0), 1) AS averageRating,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(d.director_id, ':', d.name, ':', 
+                CASE 
+                    WHEN d.director_image IS NULL OR d.director_image = 'https' THEN ''
+                    ELSE d.director_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_directors md
+            JOIN directors d ON md.director_id = d.director_id
+            WHERE md.movie_id = m.movie_id
+        ) AS directors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(a.actor_id, ':', a.name, ':', 
+                CASE 
+                    WHEN a.actor_image IS NULL OR a.actor_image = 'https' THEN ''
+                    ELSE a.actor_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_actors ma
+            JOIN actors a ON ma.actor_id = a.actor_id
+            WHERE ma.movie_id = m.movie_id
+        ) AS actors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(g.genre_id, ':', g.name) 
+                SEPARATOR '|'
+            )
+            FROM movie_genres mg
+            JOIN genres g ON mg.genre_id = g.genre_id
+            WHERE mg.movie_id = m.movie_id
+        ) AS genres
     FROM 
         movies m
     LEFT JOIN ratings r ON m.movie_id = r.movie_id
-    LEFT JOIN movie_directors md ON m.movie_id = md.movie_id
-    LEFT JOIN directors d ON md.director_id = d.director_id
-    LEFT JOIN movie_actors ma ON m.movie_id = ma.movie_id
-    LEFT JOIN actors a ON ma.actor_id = a.actor_id
-    LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-    LEFT JOIN genres g ON mg.genre_id = g.genre_id
     GROUP BY 
         m.movie_id, m.movie_name, m.cover, m.release_year, 
         m.length, m.description, m.trailer_link
-    ORDER BY m.movie_id$$
+    ORDER BY m.movie_id;
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRandomMovies` ()   BEGIN
     SELECT 
@@ -1321,7 +1349,30 @@ INSERT INTO `ratings` (`rating_id`, `user_id`, `movie_id`, `rating`, `review`, `
 (32, 10, 114, 2, 'nem tetszik.', '2025-02-27'),
 (35, 52, 120, 5, 'Great movie!', '2025-03-04'),
 (38, 52, 114, 5, 'jajj de szereteeem wááá', '2025-03-13'),
-(41, 23, 126, 3, 'elég mid', '2025-04-13');
+(41, 23, 126, 3, 'elég mid', '2025-04-13'),
+(42, 10, 110, 2, 'Bár volt benne potenciál, a gyenge forgatókönyv sajnos teljesen elszalasztotta a lehetőséget.', '2025-04-19'),
+(43, 12, 112, 2, 'Szép próbálkozás, de a színészi játék és a rendezés egyaránt csalódást okozott.', '2025-04-19'),
+(44, 15, 115, 2, 'Volt pár jó pillanata, de összességében felejthető és elnyújtott élmény volt.', '2025-04-19'),
+(45, 57, 131, 1, 'Kínkeserves másfél óra volt, egyetlen emlékezetes jelenet nélkül.', '2025-04-15'),
+(46, 44, 132, 2, 'A látványvilág néha megcsillant, de a történet teljesen lapos maradt.', '2025-04-01'),
+(47, 32, 133, 3, 'Nem volt rossz, de nem is fogom újranézni.', '2025-04-04'),
+(48, 29, 134, 4, 'Erős hangulat, kiváló operatőri munka, csak néhol lassú.', '2025-04-08'),
+(49, 52, 135, 5, 'Minden percét imádtam – egy igazi mestermű!', '2025-04-21'),
+(50, 17, 136, 1, 'A színészi játék gyenge, a sztori sablonos – sajnos időpocsékolás.', '2025-04-05'),
+(51, 50, 137, 3, 'Középszerű, de volt benne pár meglepően jó jelenet.', '2025-04-09'),
+(52, 7, 138, 2, 'Voltak jó ötletek, de a megvalósítás sajnos nem állta meg a helyét.', '2025-04-08'),
+(53, 52, 139, 4, 'Nagyon tetszett, főleg a karakterfejlődés volt emlékezetes.', '2025-04-19'),
+(54, 5, 140, 5, 'Lenyűgöző, mély, és rendkívül elgondolkodtató alkotás.', '2025-04-19'),
+(55, 53, 141, 1, 'Minden szempontból igénytelen munka, mintha első próbálkozás lenne.', '2025-04-19'),
+(56, 29, 142, 2, 'Néhány szereplő korrekt volt, de a film összességében csalódás.', '2025-04-19'),
+(57, 45, 143, 3, 'Egyszer nézhető, de sokkal több is lehetett volna benne.', '2025-04-19'),
+(58, 21, 144, 4, 'Pár hibától eltekintve remekül sikerült, élvezetes film.', '2025-03-20'),
+(59, 6, 145, 5, 'Ez a film újra visszaadta a hitemet a magyar moziban.', '2025-04-19'),
+(60, 57, 146, 1, 'A film alatt többször is azon gondolkodtam, hogy inkább kikapcsolom.', '2025-04-16'),
+(61, 4, 147, 1, 'Ez a mozi inkább büntetés volt, mint szórakozás.', '2025-04-10'),
+(62, 53, 148, 2, 'Sajnálom, de ez a film nem hagyott bennem semmi maradandót.', '2025-04-02'),
+(63, 36, 149, 3, 'A színészek jók voltak, de a forgatókönyv gyenge lábakon állt.', '2025-04-07'),
+(64, 17, 150, 2, 'A színészek jók voltak, de a forgatókönyv gyenge lábakon állt.', '2025-04-11');
 
 -- --------------------------------------------------------
 
@@ -1516,7 +1567,7 @@ ALTER TABLE `movies`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `users`

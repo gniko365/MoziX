@@ -66,6 +66,7 @@ public class MovieService {
         
         for (Map<String, Object> movie : movieList) {
             JSONObject jsonMovie = new JSONObject();
+            // Alap adatok
             jsonMovie.put("movieId", movie.get("movieId"));
             jsonMovie.put("title", movie.get("title"));
             jsonMovie.put("cover", movie.get("cover"));
@@ -74,9 +75,39 @@ public class MovieService {
             jsonMovie.put("description", movie.get("description"));
             jsonMovie.put("trailerLink", movie.get("trailerLink"));
             jsonMovie.put("averageRating", movie.get("averageRating"));
-            jsonMovie.put("directors", movie.get("directors"));
-            jsonMovie.put("actors", movie.get("actors"));
-            jsonMovie.put("genres", movie.get("genres"));
+            
+            // Rendezők JSON tömbbe
+            JSONArray directorsArray = new JSONArray();
+            for (Map<String, String> director : (List<Map<String, String>>) movie.get("directors")) {
+                JSONObject directorJson = new JSONObject();
+                directorJson.put("id", director.get("id"));
+                directorJson.put("name", director.get("name"));
+                directorJson.put("image", director.get("image"));
+                directorsArray.put(directorJson);
+            }
+            jsonMovie.put("directors", directorsArray);
+            
+            // Színészek JSON tömbbe
+            JSONArray actorsArray = new JSONArray();
+            for (Map<String, String> actor : (List<Map<String, String>>) movie.get("actors")) {
+                JSONObject actorJson = new JSONObject();
+                actorJson.put("id", actor.get("id"));
+                actorJson.put("name", actor.get("name"));
+                actorJson.put("image", actor.get("image"));
+                actorsArray.put(actorJson);
+            }
+            jsonMovie.put("actors", actorsArray);
+            
+            // Műfajok JSON tömbbe
+            JSONArray genresArray = new JSONArray();
+            for (Map<String, String> genre : (List<Map<String, String>>) movie.get("genres")) {
+                JSONObject genreJson = new JSONObject();
+                genreJson.put("id", genre.get("id"));
+                genreJson.put("name", genre.get("name"));
+                genresArray.put(genreJson);
+            }
+            jsonMovie.put("genres", genresArray);
+            
             jsonArray.put(jsonMovie);
         }
     } catch (Exception e) {
@@ -153,6 +184,40 @@ public class MovieService {
         return movies;
     } catch (Exception e) {
         throw new RuntimeException("Hiba a filmek keresésekor: " + searchTerm, e);
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
+        }
+    }
+}
+    public JSONObject getMovieById(int movieId) {
+    EntityManager em = getEntityManagerFactory().createEntityManager();
+    try {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetMovieById")
+            .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
+            .setParameter("p_movie_id", movieId);
+        
+        List<Object[]> results = query.getResultList();
+        
+        if (results.isEmpty()) {
+            return null;
+        }
+        
+        Object[] row = results.get(0);
+        JSONObject movie = new JSONObject();
+        movie.put("movieId", row[0]);
+        movie.put("title", row[1]);
+        movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+        movie.put("releaseYear", row[3]);
+        movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
+        movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
+        movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
+        movie.put("averageRating", row[7]);
+        movie.put("genres", row[8] != null ? row[8] : "");
+        
+        return movie;
+    } catch (Exception e) {
+        throw new RuntimeException("Hiba a film lekérdezésekor ID alapján: " + movieId, e);
     } finally {
         if (em != null && em.isOpen()) {
             em.close();
