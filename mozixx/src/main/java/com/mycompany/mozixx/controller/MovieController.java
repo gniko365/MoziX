@@ -28,25 +28,15 @@ public class MovieController {
     @GET
 @Path("/all")
 @Produces(MediaType.APPLICATION_JSON)
-public Response getMoviesWithDetails() {
+public Response GetMovies() {
     try {
-        JSONArray movies = movieService.getMoviesWithDetails();
-        
-        JSONObject response = new JSONObject();
-        response.put("status", "success");
-        response.put("count", movies.length());
-        response.put("movies", movies);
-        
-        return Response.ok(response.toString()).build();
+        List<Movies> movies = movieService.getMovies();
+        JSONArray jsonArray = new JSONArray(movies);  // Direct konverzió List -> JSON
+        return Response.ok(jsonArray.toString()).build();
     } catch (Exception e) {
-        JSONObject error = new JSONObject();
-        error.put("status", "error");
-        error.put("message", "Failed to fetch movies");
-        error.put("details", e.getMessage());
-        
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity(error.toString())
-                     .build();
+                      .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                      .build();
     }
 }
     @GET
