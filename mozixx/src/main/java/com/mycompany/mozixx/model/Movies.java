@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlTransient;
+import org.json.JSONArray;
 
 @Entity
 @Table(name = "movies")
@@ -186,17 +190,39 @@ public class Movies implements Serializable {
         return "com.mycompany.mozixx.model.Movies[ movieId=" + movieId + " ]";
     }
 
-    public static ArrayList<Movies> getMovies() {
-        EntityManager em = null;
-        try {
-            em = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT").createEntityManager();
-            StoredProcedureQuery spq = em.createStoredProcedureQuery("GetMovies", Movies.class);
-            spq.execute();
-            return new ArrayList<>(spq.getResultList());
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+    public static ArrayList<Map<String, Object>> getMoviesWithDetails() {
+    EntityManager em = null;
+    try {
+        em = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT").createEntityManager();
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("GetMoviesWithDetails");
+        spq.execute();
+        
+        List<Object[]> results = spq.getResultList();
+        ArrayList<Map<String, Object>> movies = new ArrayList<>();
+        
+        for (Object[] row : results) {
+            Map<String, Object> movie = new HashMap<>();
+            movie.put("movieId", row[0]);
+            movie.put("title", row[1]);
+            movie.put("cover", row[2]);
+            movie.put("releaseYear", row[3]);
+            movie.put("length", row[4]);
+            movie.put("description", row[5]);
+            movie.put("trailerLink", row[6]);
+            movie.put("averageRating", row[7]);
+            movie.put("directors", row[8]);
+            movie.put("actors", row[9]);
+            movie.put("genres", row[10]);
+            movies.add(movie);
+        }
+        return movies;
+    } catch (Exception e) {
+        throw new RuntimeException("Error fetching movies with details", e);
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
         }
     }
 }
+}
+    

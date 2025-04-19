@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 18, 2025 at 06:12 PM
+-- Generation Time: Apr 19, 2025 at 12:12 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -237,7 +237,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetLatestReleases` ()   BEGIN
     LIMIT 8;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovies` ()   SELECT * FROM movies$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovieById` (IN `p_movie_id` INT)   BEGIN
+    SELECT 
+        m.movie_id,
+        m.movie_name AS title,
+        m.cover,
+        m.release_year,
+        m.length,
+        m.description,
+        m.trailer_link,
+        COALESCE(AVG(r.rating), 0) AS average_rating,
+        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
+    FROM 
+        movies m
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
+    LEFT JOIN
+        movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN
+        genres g ON mg.genre_id = g.genre_id
+    WHERE 
+        m.movie_id = p_movie_id
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover, m.release_year, m.length, m.description, m.trailer_link;
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getMoviesByActor` (IN `actor_name` VARCHAR(255))   BEGIN
     SELECT m.movie_name, m.release_year
@@ -318,6 +341,32 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_ro
     ORDER BY 
         exact_average DESC, rating_count DESC;
 END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesWithDetails` ()   SELECT 
+        m.movie_id,
+        m.movie_name,
+        m.cover,
+        m.release_year,
+        m.length,
+        m.description,
+        m.trailer_link,
+        ROUND(COALESCE(AVG(r.rating), 0), 1) AS average_rating,
+        GROUP_CONCAT(DISTINCT d.name SEPARATOR ', ') AS directors,
+        GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS actors,
+        GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres
+    FROM 
+        movies m
+    LEFT JOIN ratings r ON m.movie_id = r.movie_id
+    LEFT JOIN movie_directors md ON m.movie_id = md.movie_id
+    LEFT JOIN directors d ON md.director_id = d.director_id
+    LEFT JOIN movie_actors ma ON m.movie_id = ma.movie_id
+    LEFT JOIN actors a ON ma.actor_id = a.actor_id
+    LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.genre_id
+    GROUP BY 
+        m.movie_id, m.movie_name, m.cover, m.release_year, 
+        m.length, m.description, m.trailer_link
+    ORDER BY m.movie_id$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRandomMovies` ()   BEGIN
     SELECT 
@@ -666,7 +715,9 @@ INSERT INTO `actors` (`actor_id`, `name`, `birth_date`, `actor_image`) VALUES
 (152, 'Keresztes Tamás', '1978-03-24', 'https://media.port.hu/images/000/661/960.jpg'),
 (153, 'Szabó Kimmel Tamás', '1984-10-09', 'https://radnotiszinhaz.hu/wp-content/uploads/2016/12/szabokimmel_tamas-493x739.jpg'),
 (154, 'Kerekes Vica', '1981-03-28', 'https://i0.wp.com/www.artsillustratedstudios.pro/wp-content/uploads/2019/06/ArtsIllustratedStudios-pro_KerekesVica_1206.jpg?fit=1100%2C1653&ssl=1'),
-(155, 'Gyabronka József', '1953-05-14', 'https://radnotiszinhaz.hu/wp-content/uploads/2017/01/GyabronkaJozsef-493x739.jpg');
+(155, 'Gyabronka József', '1953-05-14', 'https://radnotiszinhaz.hu/wp-content/uploads/2017/01/GyabronkaJozsef-493x739.jpg'),
+(156, 'Sinkovits László', '1940-03-18', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Sink%C3%B3_L%C3%A1szl%C3%B3_fortepan_148084.jpg/250px-Sink%C3%B3_L%C3%A1szl%C3%B3_fortepan_148084.jpg'),
+(157, 'Benedek Miklós', '1946-09-28', 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Benedek_Mikl%C3%B3s.jpg/250px-Benedek_Mikl%C3%B3s.jpg');
 
 -- --------------------------------------------------------
 
@@ -928,6 +979,7 @@ INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
 (110, 52),
 (110, 53),
 (111, 54),
+(106, 55),
 (111, 55),
 (111, 56),
 (111, 57),
@@ -972,7 +1024,10 @@ INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
 (147, 99),
 (127, 100),
 (140, 100),
+(128, 101),
+(128, 102),
 (133, 102),
+(128, 103),
 (129, 104),
 (129, 105),
 (129, 106),
@@ -1027,7 +1082,9 @@ INSERT INTO `movie_actors` (`movie_id`, `actor_id`) VALUES
 (149, 152),
 (150, 153),
 (150, 154),
-(150, 155);
+(150, 155),
+(106, 156),
+(106, 157);
 
 -- --------------------------------------------------------
 
@@ -1435,7 +1492,7 @@ ALTER TABLE `user_favorites`
 -- AUTO_INCREMENT for table `actors`
 --
 ALTER TABLE `actors`
-  MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
+  MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
 -- AUTO_INCREMENT for table `directors`
