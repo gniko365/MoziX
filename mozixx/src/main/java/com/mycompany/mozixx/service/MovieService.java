@@ -1,8 +1,10 @@
 package com.mycompany.mozixx.service;
 
 import com.mycompany.mozixx.model.Movies;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -55,15 +57,35 @@ public class MovieService {
     }
 }
     
-    public ArrayList<Movies> getMovies() {
-        ArrayList<Movies> movieList = new ArrayList<>(); 
-        try {
-            movieList = new Movies().getMovies();
-        } catch (Exception e) {
-            System.err.println("Error fetching movies: " + e.getMessage());
+    public JSONArray getMoviesWithDetails() {
+    ArrayList<Map<String, Object>> movieList = new ArrayList<>(); 
+    JSONArray jsonArray = new JSONArray();
+    
+    try {
+        movieList = Movies.getMoviesWithDetails();
+        
+        for (Map<String, Object> movie : movieList) {
+            JSONObject jsonMovie = new JSONObject();
+            jsonMovie.put("movieId", movie.get("movieId"));
+            jsonMovie.put("title", movie.get("title"));
+            jsonMovie.put("cover", movie.get("cover"));
+            jsonMovie.put("releaseYear", movie.get("releaseYear"));
+            jsonMovie.put("length", movie.get("length"));
+            jsonMovie.put("description", movie.get("description"));
+            jsonMovie.put("trailerLink", movie.get("trailerLink"));
+            jsonMovie.put("averageRating", movie.get("averageRating"));
+            jsonMovie.put("directors", movie.get("directors"));
+            jsonMovie.put("actors", movie.get("actors"));
+            jsonMovie.put("genres", movie.get("genres"));
+            jsonArray.put(jsonMovie);
         }
-        return movieList;
+    } catch (Exception e) {
+        System.err.println("Error fetching movies: " + e.getMessage());
+        e.printStackTrace();
     }
+    
+    return jsonArray;
+}
     
     public List<Movies> getLatestReleases() {
         EntityManager em = getEntityManagerFactory().createEntityManager();
