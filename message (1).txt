@@ -1,0 +1,211 @@
+<app-navbar></app-navbar>
+
+<section>
+<div class="container-fluid">
+
+
+  
+      <div class="carousel-container">
+        <div class="carousel">
+            <div *ngFor="let movie of randomMovies" class="carousel-slide active" >
+              <a (click)="showMovieDetails(movie.movieId)">
+                <img [src]="movie.cover"  class="carousel-item">
+              </a>
+            </div>
+            <div *ngFor="let movie of randomMovies" class="carousel-slide">
+              <a (click)="showMovieDetails(movie.movieId)">
+              <img [src]="movie.cover"  class="carousel-item">
+              </a>
+            </div>
+            <div *ngFor="let movie of randomMovies" class="carousel-slide">
+              <a (click)="showMovieDetails(movie.movieId)">
+              <img [src]="movie.cover"  class="carousel-item">
+              </a>
+            </div>
+            
+          </div>
+          
+          <button class="prev" (click)="moveSlide(-1)">&#10094;</button>
+            <button class="next" (click)="moveSlide(1)">&#10095;</button>
+
+    </div> 
+    <div class="film-container">
+      <div class="films">
+        <div *ngFor="let movie of randomMovies" class="film-component" (click)="showMovieDetails(movie.movieId)">
+          <img [src]="movie.cover" class="poster">
+          <div class="text-content">
+            <h1>{{ movie.title }}</h1>
+            <p class="time">{{ movie.length }} perc</p>
+          
+          <p class="description">{{ movie.description }}</p>
+    
+          </div>
+          <p class="rating-container">
+            <img src="assets/STAR.png" class="rating">
+            <span class="rating-number">{{ movie.averageRating }}</span>
+          </p>
+        </div> 
+      </div>      
+    </div> 
+</div>
+</section>
+
+<br/>
+<br/>
+<section>
+  
+  <div class="component">
+    <div class="title-container">
+      <h2 class="second-row-title">Összes Film</h2>
+    </div>
+    <div class="films">
+      <div *ngFor="let movie of movies" class="film-box" (click)="showMovieDetails(movie.movieId)">
+        <img [src]="movie.cover" class="posters">
+        <p class="film-title">{{ movie.title }}</p>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+</section>
+
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()">&times;</button>
+    <br>
+    <div class="poster-container2">
+      <img [src]="selectedMovie.cover" class="modal-poster" id="overlay">
+      <div class="bookmark-icon" (click)="toggleBookmark()">
+        <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
+        <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
+      </div>
+    </div>
+      <h2>{{ selectedMovie.title }}</h2>
+      <div>
+        <p class="rating-container">
+          <img src="assets/STAR.png" class="rating">
+          <span class="rating-number">{{ selectedMovie.averageRating }}</span>
+        </p>
+      <p class="modal-time">{{ selectedMovie.length }} perc</p>
+      <p class="modal-description">{{ selectedMovie.description }}</p>
+      <p class="modal-description">{{ selectedMovie.genres.name }}</p>
+
+      <div *ngIf="selectedMovie.trailerLink">
+        <iframe 
+  [src]="sanitizedTrailerLink"
+  frameborder="0" 
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+  allowfullscreen
+  class="video">
+</iframe>
+      </div>
+
+
+      <div class="Kategoriak">
+        <div class="category-component" (click)="toggleSidebar('Szereplők')">
+            <p class="category-item">Szereplők</p>
+        </div>
+        <div class="category-component" (click)="toggleSidebar('Értékelés')">
+            <p class="category-item">Értékelés</p>
+        </div>
+        <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
+            <p class="category-item">Hasonló filmek</p>
+        </div>
+    </div>
+
+<!-- Alsó sidebar -->
+<div class="sidebar" *ngIf="isSidebarOpen">
+  <div class="sidebar-content">
+      <span class="close" (click)="toggleSidebar()">&times;</span>
+
+      <!-- sidebar tartalma -->
+
+      <div *ngIf="selectedCategory === 'Szereplők'">
+          
+<br>
+          <div class="actor-director-container">
+              <div>
+
+                  <h3>Szereplők:</h3>
+                  
+                  <div class="szereplo-container">
+                      <img src="selectedMovie.actors.image" class="szereplo-kep">
+                      <p class="actor-name">{{ selectedMovie.actors.name }}</p>
+                  </div>
+                  
+              </div>
+
+              <div>
+                  <h3>Rendezők:</h3>
+                  
+                  <div class="szereplo-container" >
+                      <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                      <p class="actor-name">{{ selectedMovie.directors.name }}</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div *ngIf="selectedCategory === 'Értékelés'">
+            <br/>
+        <div class="rateing-container2">
+            <div class="rating-txt2">
+        <span class="rating-number2">Értékelés: {{ selectedMovie.averageRating }} </span>
+                <img src="assets/STAR.png" class="rating">
+            </div>
+        <div class="star-container">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+        </div>
+        </div>
+
+    </div>
+
+
+
+
+    <div *ngIf="selectedCategory === 'Hasonló filmek'">
+      <br>
+      <br>
+      <div class="films2">
+          <div class="film-box2" *ngFor="let movie of movies" (click)="showMovieDetails(movie.movieId)">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+          <div class="film-box2">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+          <div class="film-box2">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+          <div class="film-box2">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+          <div class="film-box2">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+          <div class="film-box2">
+              <img src="assets/FILMPOSTER.jpg" class="poszter2">
+              <p class="film-title">FILM</p>
+          </div>
+      </div>
+  </div>
+
+
+
+  </div>
+</div>
+
+

@@ -206,8 +206,11 @@ public class RatingService {
             movie.put("movieId", row[0]);
             movie.put("title", row[1]);
             movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-            movie.put("exactAverage", row[3]);
-            movie.put("ratingCount", row[4]);
+            movie.put("description", row[3] != null ? row[3] : JSONObject.NULL);
+            movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
+            movie.put("releaseYear", row[5] != null ? row[5] : JSONObject.NULL);
+            movie.put("exactAverage", row[6]);
+            movie.put("ratingCount", row[7]);
             movie.put("roundedRating", roundedRating);
             movies.put(movie);
         }

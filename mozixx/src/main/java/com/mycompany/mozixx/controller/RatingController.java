@@ -168,21 +168,39 @@ private Response buildErrorResponse(Response.Status status, String message) {
 @Produces(MediaType.APPLICATION_JSON)
 public Response getMoviesByRoundedRating(
         @PathParam("rating") int rating,
-        @QueryParam("minVotes") @DefaultValue("1") int minVotes) {
+        @QueryParam("minVotes") @DefaultValue("1") int minVotes,
+        @QueryParam("minYear") @DefaultValue("1900") int minYear,
+        @QueryParam("maxYear") @DefaultValue("2100") int maxYear,
+        @QueryParam("minLength") @DefaultValue("0") int minLength,
+        @QueryParam("maxLength") @DefaultValue("999") int maxLength) {
     
     try {
-        // Értékhatárok ellenőrzése (1-5)
+        // Értékhatárok ellenőrzése
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        if (minYear > maxYear) {
+            throw new IllegalArgumentException("minYear cannot be greater than maxYear");
+        }
+        if (minLength > maxLength) {
+            throw new IllegalArgumentException("minLength cannot be greater than maxLength");
         }
         
         JSONArray movies = ratingService.getMoviesByRoundedRating(rating);
         
-        // Szűrés minimum értékelésszám alapján
+        // Szűrés paraméterek alapján
         JSONArray filteredMovies = new JSONArray();
         for (int i = 0; i < movies.length(); i++) {
             JSONObject movie = movies.getJSONObject(i);
-            if (movie.getInt("ratingCount") >= minVotes) {
+            int ratingCount = movie.getInt("ratingCount");
+            int releaseYear = movie.has("releaseYear") ? movie.getInt("releaseYear") : 0;
+            int length = movie.has("length") ? movie.getInt("length") : 0;
+            
+            if (ratingCount >= minVotes && 
+                releaseYear >= minYear && 
+                releaseYear <= maxYear &&
+                length >= minLength && 
+                length <= maxLength) {
                 filteredMovies.put(movie);
             }
         }

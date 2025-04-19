@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 19, 2025 at 01:45 PM
+-- Generation Time: Apr 19, 2025 at 05:13 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -370,14 +370,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_ro
         m.movie_id,
         m.movie_name AS title,
         m.cover,
-        ROUND(AVG(r.rating), 1) AS exact_average,
+        m.description,
+        m.length,
+        m.release_year,
+        ROUND(AVG(r.rating)) AS exact_average,
         COUNT(r.rating_id) AS rating_count
     FROM 
         movies m
     LEFT JOIN 
         ratings r ON m.movie_id = r.movie_id
     GROUP BY 
-        m.movie_id, m.movie_name, m.cover
+        m.movie_id, m.movie_name, m.cover, m.description, m.length, m.release_year
     HAVING 
         ROUND(AVG(r.rating)) = p_rounded_rating
     ORDER BY 
