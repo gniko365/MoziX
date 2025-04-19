@@ -13,7 +13,6 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -129,38 +128,6 @@ public Response searchMoviesByName(@QueryParam("q") String searchTerm) {
         JSONObject error = new JSONObject();
         error.put("status", "error");
         error.put("message", "Hiba történt a filmek keresése közben");
-        error.put("details", e.getMessage());
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity(error.toString())
-                     .build();
-    }
-}
-@GET
-@Path("/{id}")
-@Produces(MediaType.APPLICATION_JSON)
-public Response getMovieById(@PathParam("id") int movieId) {
-    try {
-        JSONObject movie = movieService.getMovieById(movieId);
-        
-        if (movie == null) {
-            JSONObject error = new JSONObject();
-            error.put("status", "error");
-            error.put("message", "Film nem található");
-            return Response.status(Response.Status.NOT_FOUND)
-                         .entity(error.toString())
-                         .build();
-        }
-        
-        JSONObject response = new JSONObject();
-        response.put("status", "success");
-        response.put("movie", movie);
-        
-        return Response.ok(response.toString()).build();
-        
-    } catch (Exception e) {
-        JSONObject error = new JSONObject();
-        error.put("status", "error");
-        error.put("message", "Hiba történt a film lekérdezése közben");
         error.put("details", e.getMessage());
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                      .entity(error.toString())

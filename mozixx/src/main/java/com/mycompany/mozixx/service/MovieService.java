@@ -137,38 +137,4 @@ public class MovieService {
         }
     }
 }
-    public JSONObject getMovieById(int movieId) {
-    EntityManager em = getEntityManagerFactory().createEntityManager();
-    try {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetMovieById")
-            .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
-            .setParameter("p_movie_id", movieId);
-        
-        List<Object[]> results = query.getResultList();
-        
-        if (results.isEmpty()) {
-            return null;
-        }
-        
-        Object[] row = results.get(0);
-        JSONObject movie = new JSONObject();
-        movie.put("movieId", row[0]);
-        movie.put("title", row[1]);
-        movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-        movie.put("releaseYear", row[3]);
-        movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
-        movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
-        movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
-        movie.put("averageRating", row[7]);
-        movie.put("genres", row[8] != null ? row[8] : "");
-        
-        return movie;
-    } catch (Exception e) {
-        throw new RuntimeException("Hiba a film lekérdezésekor ID alapján: " + movieId, e);
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
-        }
-    }
-}
 }
