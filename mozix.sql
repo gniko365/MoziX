@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 19, 2025 at 01:26 PM
+-- Generation Time: Apr 19, 2025 at 01:45 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -227,14 +227,56 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetLatestReleases` ()   BEGIN
     SELECT 
-    movie_id, 
-        movie_name AS title, 
-        Length, 
-        cover, 
-        trailer_link
-    FROM movies
-    ORDER BY movies.release_year DESC
-    LIMIT 8;
+        m.movie_id AS movieId,
+        m.movie_name AS title,
+        m.cover,
+        m.release_year AS releaseYear,
+        m.length,
+        m.description,
+        m.trailer_link AS trailerLink,
+        ROUND(COALESCE(AVG(r.rating), 0), 1) AS averageRating,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(d.director_id, ':', d.name, ':', 
+                CASE 
+                    WHEN d.director_image IS NULL OR d.director_image = 'https' THEN ''
+                    ELSE d.director_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_directors md
+            JOIN directors d ON md.director_id = d.director_id
+            WHERE md.movie_id = m.movie_id
+        ) AS directors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(a.actor_id, ':', a.name, ':', 
+                CASE 
+                    WHEN a.actor_image IS NULL OR a.actor_image = 'https' THEN ''
+                    ELSE a.actor_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_actors ma
+            JOIN actors a ON ma.actor_id = a.actor_id
+            WHERE ma.movie_id = m.movie_id
+        ) AS actors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(g.genre_id, ':', g.name) 
+                SEPARATOR '|'
+            )
+            FROM movie_genres mg
+            JOIN genres g ON mg.genre_id = g.genre_id
+            WHERE mg.movie_id = m.movie_id
+        ) AS genres
+    FROM 
+        movies m
+    LEFT JOIN ratings r ON m.movie_id = r.movie_id
+    GROUP BY 
+        m.movie_id, m.movie_name, m.cover, m.release_year, 
+        m.length, m.description, m.trailer_link
+    ORDER BY m.release_year DESC;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMovieById` (IN `p_movie_id` INT)   BEGIN

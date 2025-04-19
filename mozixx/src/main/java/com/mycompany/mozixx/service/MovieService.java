@@ -3,6 +3,7 @@ package com.mycompany.mozixx.service;
 import com.mycompany.mozixx.model.Movies;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
@@ -118,45 +119,95 @@ public class MovieService {
     return jsonArray;
 }
     
-    public List<Movies> getLatestReleases() {
-        EntityManager em = getEntityManagerFactory().createEntityManager();
-        try {
-            StoredProcedureQuery query = em.createStoredProcedureQuery("GetLatestReleases");
-            List<Object[]> resultList = query.getResultList();
-            List<Movies> movies = new ArrayList<>();
+    public List<Map<String, Object>> getLatestReleases() {
+    EntityManager em = getEntityManagerFactory().createEntityManager();
+    try {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("GetLatestReleases");
+        query.execute();
+        List<Object[]> resultList = query.getResultList();
+        List<Map<String, Object>> movies = new ArrayList<>();
+        
+        for (Object[] row : resultList) {
+            Map<String, Object> movie = new HashMap<>();
+            movie.put("movieId", parseInt(row[0]));
+            movie.put("title", toString(row[1]));
+            movie.put("cover", toString(row[2]));
+            movie.put("releaseYear", parseInt(row[3]));
+            movie.put("length", parseInt(row[4]));
+            movie.put("description", toString(row[5]));
+            movie.put("trailerLink", toString(row[6]));
+            movie.put("averageRating", row[7] != null ? ((Number)row[7]).doubleValue() : null);
             
-            for (Object[] row : resultList) {
-                Movies movie = new Movies();
-                movie.setMovieId(parseInt(row[0]));
-                movie.setMovieName(toString(row[1]));
-                movie.setLength(parseInt(row[2]));
-                movie.setCover(toString(row[3]));
-                movie.setTrailerLink(toString(row[4]));
-                movies.add(movie);
-            }
-            return movies;
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
+            // Rendezők feldolgozása
+            movie.put("directors", parsePeopleInfo(toString(row[8]), "director"));
+            
+            // Színészek feldolgozása
+            movie.put("actors", parsePeopleInfo(toString(row[9]), "actor"));
+            
+            // Műfajok feldolgozása
+            movie.put("genres", parseGenresInfo(toString(row[10])));
+            
+            movies.add(movie);
+        }
+        return movies;
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
+        }
+    }
+}
+
+private List<Map<String, Object>> parsePeopleInfo(String info, String type) {
+    List<Map<String, Object>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] people = info.split("\\|");
+        for (String person : people) {
+            String[] parts = person.split(":", 3); // Korlátozzuk 3 részre a URL miatt
+            if (parts.length == 3) {
+                Map<String, Object> personMap = new HashMap<>();
+                personMap.put("id", parseInt(parts[0]));
+                personMap.put("name", parts[1]);
+                personMap.put("image", parts[2].isEmpty() ? null : parts[2]);
+                personMap.put("type", type);
+                result.add(personMap);
             }
         }
     }
-    
-    private Integer parseInt(Object value) {
-        if (value == null) return null;
-        try {
-            if (value instanceof Number) {
-                return ((Number) value).intValue();
+    return result;
+}
+
+private List<Map<String, Object>> parseGenresInfo(String info) {
+    List<Map<String, Object>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] genres = info.split("\\|");
+        for (String genre : genres) {
+            String[] parts = genre.split(":");
+            if (parts.length >= 2) {
+                Map<String, Object> genreMap = new HashMap<>();
+                genreMap.put("id", parseInt(parts[0]));
+                genreMap.put("name", parts[1]);
+                result.add(genreMap);
             }
-            return Integer.parseInt(value.toString());
-        } catch (NumberFormatException e) {
-            return null;
         }
     }
-    
-    private String toString(Object value) {
-        return value != null ? value.toString() : null;
+    return result;
+}
+
+private Integer parseInt(Object value) {
+    if (value == null) return null;
+    try {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return Integer.parseInt(value.toString());
+    } catch (NumberFormatException e) {
+        return null;
     }
+}
+
+private String toString(Object value) {
+    return value != null ? value.toString() : null;
+}
     
     public JSONArray searchMoviesByName(String searchTerm) {
     EntityManager em = getEntityManagerFactory().createEntityManager();

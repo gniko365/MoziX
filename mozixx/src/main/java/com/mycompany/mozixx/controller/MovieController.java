@@ -6,7 +6,9 @@ package com.mycompany.mozixx.controller;
 
 import com.mycompany.mozixx.model.Movies;
 import com.mycompany.mozixx.service.MovieService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
@@ -98,18 +100,20 @@ private double calculateOverallAverage(JSONArray movies) {
 }
     
     @GET
-    @Path("/latest")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getLatestReleases() {
-        try {
-            List<Movies> movies = movieService.getLatestReleases();
-            return Response.ok(movies).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                         .entity("{\"error\":\"" + e.getMessage() + "\"}")
-                         .build();
-        }
+@Path("/latest")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getLatestReleases() {
+    try {
+        List<Map<String, Object>> movies = movieService.getLatestReleases();
+        return Response.ok(movies).build();
+    } catch (Exception e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", e.getMessage());
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity(error)
+                     .build();
     }
+}
     
     @GET
 @Path("/search")
