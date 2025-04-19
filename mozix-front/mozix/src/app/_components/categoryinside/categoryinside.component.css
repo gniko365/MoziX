@@ -1,0 +1,341 @@
+h1 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 50px;
+    color: #333;
+}
+
+.film-component {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: space-evenly; 
+    height: max-content;
+    background-color: #333;
+    margin-left: 5%;
+    margin-right: 5%;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    padding: 50px;
+}
+
+.films {
+    display: flex;
+    gap: 80px; 
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.poster {
+    height: 400px;
+    width: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+.film-box {
+    background-color: white; 
+    border-radius: 10px; 
+    padding: 10px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center; 
+    width: 300px; 
+    cursor: pointer;
+}
+
+.film-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+
+@media (min-width: 650px) and (max-width: 768px) {
+    .poster {
+        height: 130px;
+        width: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .film-box {
+        background-color: white; 
+        padding: 5px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        text-align: center; 
+        width: 100px; 
+        cursor: pointer;
+    }
+
+    .films {
+        display: flex;
+        gap: 20px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .film-title {
+        font-size: 10px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+    }    
+    
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 30px;
+        color: #333;
+    }
+
+    .rating {
+        height: 30px;
+    }
+    
+    .rating-number {
+        font-size: 35px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 2px;
+    }
+}
+
+@media (min-width: 1600px) and (max-width: 2000px) {
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 50px;
+        color: #333;
+    }
+    
+    .film-component {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: space-evenly;
+        height: max-content;
+        background-color: #333;
+        margin-left: 5%;
+        margin-right: 5%;
+        border-radius: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        padding: 50px;
+    }
+    
+    .films {
+        display: flex;
+        gap: 80px; 
+        justify-content: center;
+        flex-wrap: wrap; 
+    }
+    
+    .poster {
+        height: 350px;
+        width: auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    
+    
+    
+    
+    .film-box {
+        background-color: white; 
+        border-radius: 10px; 
+        padding: 10px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+        text-align: center; 
+        width: 260px; 
+        cursor: pointer;
+    }
+    
+    .film-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+    }
+    
+    .rating {
+        height: 50px;
+    }
+    
+    .rating-number {
+        font-size: 50px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 10px;
+    }
+    
+    .rating-container {
+        display: flex;
+        align-items: center;  
+        justify-content: center;  
+        gap: 5px;  
+    }
+    
+    .rateing-container{
+        background-color: #333;
+        margin-top: 1%;
+        width: 30%;
+        margin-left: 34%;
+        border-radius: 25px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+}
+
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .poster {
+        height: 300px;
+        width: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .film-box {
+        background-color: white; 
+        padding: 10px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        text-align: center; 
+        width: 230px; 
+        cursor: pointer;
+    }
+
+    .films {
+        display: flex;
+        gap: 50px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .film-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+        padding-top: 5px;
+    }    
+    
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 40px;
+        color: #333;
+    }
+
+    .rating {
+        height: 40px;
+    }
+    
+    .rating-number {
+        font-size: 40px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 2px;
+    }
+}
+
+@media (min-width: 1000px) and (max-width: 1399px) {
+    .poster {
+        height: 200px;
+        width: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .film-box {
+        background-color: white; 
+        padding: 10px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        text-align: center; 
+        width: 160px; 
+        cursor: pointer;
+    }
+
+    .films {
+        display: flex;
+        gap: 50px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .film-title {
+        font-size: 13px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+        padding-top: 5px;
+    }    
+    
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 40px;
+        color: #333;
+    }
+
+    .rating {
+        height: 40px;
+    }
+    
+    .rating-number {
+        font-size: 40px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 2px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 999px) {
+    .poster {
+        height: 140px;
+        width: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .film-box {
+        background-color: white; 
+        padding: 5px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        text-align: center; 
+        width: 110px; 
+        cursor: pointer;
+    }
+
+    .films {
+        display: flex;
+        gap: 50px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .film-title {
+        font-size: 10px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+        padding-top: 5px;
+    }    
+    
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: 40px;
+        color: #333;
+    }
+
+    .rating {
+        height: 40px;
+    }
+    
+    .rating-number {
+        font-size: 40px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 2px;
+    }
+}

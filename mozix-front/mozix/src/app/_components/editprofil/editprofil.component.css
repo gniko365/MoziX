@@ -1,0 +1,501 @@
+.profile-component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%; /* Ensure full width */
+    margin: 0; /* Remove default margins */
+    background-color: #404040;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.profile-pic-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 20px 0; /* Add spacing if needed */
+    margin-left: 40%;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.profile-pic-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.profile-pic-container:hover .profile-pic-overlay {
+    opacity: 1;
+}
+
+
+
+.username-component {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Az egész sor középre igazítása */
+    width: 100%; /* Teljes szélesség */
+    border-top: #979797 1px solid;
+    border-bottom: #979797 1px solid;
+    width: 30%;
+    margin-left: 35%;
+    margin-top: 2%;
+    margin-bottom: 3%;
+}
+
+h2 {
+    font-weight: bold;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #333;
+    margin: 0; /* Eltávolítja a margókat */ 
+}
+
+#pencil-icon {
+    background-color: whitesmoke;
+    padding: 5px;
+    margin-left: 10px; /* Térköz az ikon és a h2 között */
+    color: #333;
+    border: 2px #333 solid;
+    border-radius: 10px;
+    font-size: 30px;
+    text-align: center;
+    cursor: pointer;
+    
+}
+
+#pencil-icon:hover {
+    background-color: #663ab2;
+    transform: scale(1.1);
+    
+}
+
+.btn-design {
+    background-color: #ff3030;
+    color: whitesmoke;
+    padding: 10px;
+    width: 400px;
+    text-align: center;
+    border-radius: 20px;
+    border: #333 2px solid;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+    font-size: 40px;
+}
+
+.delete-component {
+    margin-left: 40%;
+}
+
+
+
+
+
+
+
+@media (min-width: 769px) and (max-width: 999px) {
+    .profile-pic-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 20px 0; /* Add spacing if needed */
+        margin-left: 35%;
+        align-items: center;
+    }
+
+    .btn-design {
+        background-color: #ff3030;
+        color: whitesmoke;
+        padding: 10px;
+        width: 300px;
+        text-align: center;
+        border-radius: 20px;
+        border: #333 2px solid;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+    .delete-component {
+        margin-left: 35%;
+    }
+
+    .username-component {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Az egész sor középre igazítása */
+       
+        border-top: #979797 1px solid;
+        border-bottom: #979797 1px solid;
+        width: 300px;
+        
+        margin-top: 2%;
+        margin-bottom: 3%;
+    }
+    
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #333;
+        margin: 0; /* Eltávolítja a margókat */ 
+        font-size: 30px;
+    }
+    
+    #pencil-icon {
+        background-color: whitesmoke;
+        padding: 5px;
+        margin-left: 10px; /* Térköz az ikon és a h2 között */
+        color: #333;
+        border: 2px #333 solid;
+        border-radius: 10px;
+        font-size: 25px;
+        text-align: center;
+        cursor: pointer;
+        
+    }
+}
+
+@media (min-width: 1000px) and (max-width: 1399px) {
+    .profile-pic-container {
+        position: relative;
+        width: 350px;
+        height: 350px;
+        margin: 20px 0; /* Add spacing if needed */
+        margin-left: 33%;
+        align-items: center;
+    }
+
+    .btn-design {
+        background-color: #ff3030;
+        color: whitesmoke;
+        padding: 10px;
+        width: 300px;
+        text-align: center;
+        border-radius: 20px;
+        border: #333 2px solid;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 25px;
+        margin-left: -8%;
+    }
+
+    .delete-component {
+        align-items: center;
+    }
+
+    .username-component {
+        display: flex;
+        align-items: center;
+        
+       
+        border-top: #979797 1px solid;
+        border-bottom: #979797 1px solid;
+        width: 300px;
+        
+        margin-top: 2%;
+        margin-bottom: 3%;
+    }
+    
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #333;
+        margin: 0; /* Eltávolítja a margókat */ 
+        font-size: 30px;
+    }
+    
+    #pencil-icon {
+        background-color: whitesmoke;
+        padding: 5px;
+        margin-left: 10px; /* Térköz az ikon és a h2 között */
+        color: #333;
+        border: 2px #333 solid;
+        border-radius: 10px;
+        font-size: 25px;
+        text-align: center;
+        cursor: pointer;
+        
+    }
+}
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .profile-pic-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin: 20px 0; /* Add spacing if needed */
+        margin-left: 35%;
+        align-items: center;
+    }
+
+    .btn-design {
+        background-color: #ff3030;
+        color: whitesmoke;
+        padding: 10px;
+        width: 400px;
+        text-align: center;
+        border-radius: 20px;
+        border: #333 2px solid;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 25px;
+        margin-left: -8%;
+    }
+
+    .delete-component {
+        align-items: center;
+    }
+
+    .username-component {
+        display: flex;
+        align-items: center;
+        
+       
+        border-top: #979797 1px solid;
+        border-bottom: #979797 1px solid;
+        width: 400px;
+        
+        margin-top: 2%;
+        margin-bottom: 3%;
+    }
+    
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #333;
+        margin: 0; /* Eltávolítja a margókat */ 
+        font-size: 30px;
+    }
+    
+    #pencil-icon {
+        background-color: whitesmoke;
+        padding: 5px;
+        margin-left: 10px; /* Térköz az ikon és a h2 között */
+        color: #333;
+        border: 2px #333 solid;
+        border-radius: 10px;
+        font-size: 25px;
+        text-align: center;
+        cursor: pointer;
+        
+    }
+}
+    
+@media (min-width: 1600px) and (max-width: 2000px) {
+    .profile-component {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        width: 100%; /* Ensure full width */
+        margin: 0; /* Remove default margins */
+        background-color: #404040;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .profile-pic-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin: 20px 0; /* Add spacing if needed */
+        margin-left: 38%;
+    }
+    
+    .profile-pic {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .profile-pic-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        cursor: pointer;
+    }
+    
+    .profile-pic-container:hover .profile-pic-overlay {
+        opacity: 1;
+    }
+    
+    
+    
+    .username-component {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Az egész sor középre igazítása */
+        width: 100%; /* Teljes szélesség */
+        border-top: #979797 1px solid;
+        border-bottom: #979797 1px solid;
+        width: 30%;
+        
+        margin-top: 2%;
+        margin-bottom: 3%;
+    }
+    
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #333;
+        margin: 0; /* Eltávolítja a margókat */ 
+    }
+    
+    #pencil-icon {
+        background-color: whitesmoke;
+        padding: 5px;
+        margin-left: 10px; /* Térköz az ikon és a h2 között */
+        color: #333;
+        border: 2px #333 solid;
+        border-radius: 10px;
+        font-size: 30px;
+        text-align: center;
+        cursor: pointer;
+        
+    }
+    
+    #pencil-icon:hover {
+        background-color: #663ab2;
+        transform: scale(1.1);
+        
+    }
+    
+    .btn-design {
+        background-color: #ff3030;
+        color: whitesmoke;
+        padding: 10px;
+        width: 400px;
+        text-align: center;
+        border-radius: 20px;
+        border: #333 2px solid;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 30px;
+        margin-left: -2.5%;
+    }
+    
+    .delete-component {
+        margin-left: 40%;
+    }
+}
+    
+@media (min-width: 650px) and (max-width: 768px) {
+    .profile-pic-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 20px 0; /* Add spacing if needed */
+        margin-left: 35%;
+    }
+
+    .btn-design {
+        background-color: #ff3030;
+        color: whitesmoke;
+        padding: 10px;
+        width: 300px;
+        text-align: center;
+        border-radius: 20px;
+        border: #333 2px solid;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+    .delete-component {
+        margin-left: 35%;
+    }
+
+    .username-component {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Az egész sor középre igazítása */
+        width: 100%; /* Teljes szélesség */
+        border-top: #979797 1px solid;
+        border-bottom: #979797 1px solid;
+        width: 30%;
+        margin-left: 40%;
+        margin-top: 2%;
+        margin-bottom: 3%;
+    }
+    
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #333;
+        margin: 0; /* Eltávolítja a margókat */ 
+        font-size: 30px;
+    }
+    
+    #pencil-icon {
+        background-color: whitesmoke;
+        padding: 5px;
+        margin-left: 10px; /* Térköz az ikon és a h2 között */
+        color: #333;
+        border: 2px #333 solid;
+        border-radius: 10px;
+        font-size: 25px;
+        text-align: center;
+        cursor: pointer;
+        
+    }
+}

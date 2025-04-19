@@ -1,0 +1,516 @@
+.profile-component {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    background-color: #404040;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.username {
+    color: whitesmoke;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+    font-size: 50px;
+    margin-top: 4%;
+    margin-left: 2%;
+}
+
+.profile-pic-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 27%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.profile-pic {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.profile-pic-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300PX;
+    height: 300PX;
+    background: rgba(0, 0, 0, 0.5); /* Fekete, 50%-os átlátszóság */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50%;
+    opacity: 0; /* Alapból láthatatlan */
+    transition: opacity 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.profile-pic-container:hover .profile-pic-overlay {
+    opacity: 1; /* Hoverre láthatóvá válik */
+}
+
+.right-component {
+    margin-left: 1%;
+    margin-top: 4%;
+    display: flex;
+    flex-direction: column;
+}
+
+.number-container {
+    display: flex; /* Hozzászólások egymás mellé kerülnek */
+    gap: 20px; /* Kisebb térköz a dobozok között */
+    margin-top: 10%;
+}
+
+.number-component {
+    color: whitesmoke;
+    background-color: #333;
+    text-align: center;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 150px;
+    width: 250px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    position: relative; /* Az overlay pozicionálásához */
+    overflow: hidden; /* Az overlay ne lógjon ki */
+}
+
+.number-component::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2); /* Fehér overlay 20%-os átlátszósággal */
+    opacity: 0; /* Alapból láthatatlan */
+    transition: opacity 0.3s ease-in-out;
+}
+
+.number-component:hover::after {
+    opacity: 1; /* Hover esetén megjelenik */
+}
+
+.counter {
+    padding-top: 1%;
+    font-size: 25px;
+}
+
+.settings-icon {
+    position: absolute;
+    font-size: 40px;
+    color: whitesmoke;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    margin-left: 97%;
+}
+
+.settings-icon:hover {
+    transform: rotate(90deg); 
+    color: #663ab2;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.saved-component {
+    margin-left: 15%;
+}
+
+h3 {
+    font-size: 40px;
+    font-weight: bold;
+    color: #333;
+}
+
+.small-poster-design {
+    height: 300px;
+    width: auto;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.small-poster-component {
+    display: flex; /* Hogy a képek egymás mellett legyenek */
+    flex-wrap: wrap; /* Ha nem férnek el, akkor törjenek új sorba */
+    gap: 30px; /* 30px távolság a képek között */
+    margin-left: 15%;
+}
+
+.browse-component {
+    background-color: #333;
+    width: 300px;
+    height: 80px;
+    border-radius: 40px;
+    margin-top: 7%; 
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    position: relative; /* Needed for overlay */
+    overflow: hidden; /* Prevents overlay from overflowing */
+}
+
+.browse-component::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2); /* Fehér overlay 20%-os átlátszósággal */
+    opacity: 0; /* Alapból láthatatlan */
+    transition: opacity 0.3s ease-in-out;
+}
+
+.browse-component:hover::after {
+    opacity: 1; /* Hover esetén megjelenik */
+}
+
+.browse-text {
+    color: whitesmoke;
+    margin-top: 9%;
+    margin-left: 10%;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+h2 {
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+
+@media (max-width: 768px) {
+    .profile-pic-container {
+        position: relative;
+        display: inline-block;
+        margin-left: 20%;
+        margin-top: 2%;
+        margin-bottom: 2%;
+    }
+    
+    .profile-pic {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .profile-pic-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 180PX;
+        height: 180PX;
+        background: rgba(0, 0, 0, 0.5); /* Fekete, 50%-os átlátszóság */
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 50%;
+        opacity: 0; /* Alapból láthatatlan */
+        transition: opacity 0.3s ease-in-out;
+        cursor: pointer;
+    }
+
+    .username {
+        color: whitesmoke;
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 25px;
+        margin-top: 4%;
+        margin-left: 2%;
+    }
+
+    .number-component {
+        color: whitesmoke;
+        background-color: #333;
+        text-align: center;
+        font-size: 10px;
+        padding: 5px;
+        border-radius: 10px;
+        width: 150px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        position: relative; /* Az overlay pozicionálásához */
+        overflow: hidden; /* Az overlay ne lógjon ki */
+    }
+
+    h2 {
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-size: 15px;
+    }
+
+    .counter {
+        padding-top: 1%;
+        font-size: 15px;
+    }
+
+    .settings-icon {
+        position: absolute;
+        font-size: 25px;
+        color: whitesmoke;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+        margin-left: 96%;
+    }
+
+    h3 {
+        font-size: 25px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .small-poster-design {
+        height: 150px;
+        width: auto;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .small-poster-component {
+        display: flex; /* Hogy a képek egymás mellett legyenek */
+        flex-wrap: wrap; /* Ha nem férnek el, akkor törjenek új sorba */
+        gap: 15px; /* 30px távolság a képek között */
+        margin-left: 15%;
+    }
+
+    .browse-component {
+        background-color: #333;
+        width: 150px;
+        height: 40px;
+        border-radius: 40px;
+        margin-top: 9%; 
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        position: relative; /* Needed for overlay */
+        overflow: hidden; /* Prevents overlay from overflowing */
+    }
+
+    .browse-text {
+        color: whitesmoke;
+        margin-top: 9%;
+        margin-left: 10%;
+        font-weight: bold;
+        font-size: 10px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .profile-component {
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+        background-color: #404040;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .username {
+        color: whitesmoke;
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        font-size: 50px;
+        margin-top: 4%;
+        margin-left: 2%;
+    }
+    
+    .profile-pic-container {
+        position: relative;
+        display: inline-block;
+        margin-left: 27%;
+        margin-top: 2%;
+        margin-bottom: 2%;
+    }
+    
+    .profile-pic {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .profile-pic-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 300PX;
+        height: 300PX;
+        background: rgba(0, 0, 0, 0.5); /* Fekete, 50%-os átlátszóság */
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        border-radius: 50%;
+        opacity: 0; /* Alapból láthatatlan */
+        transition: opacity 0.3s ease-in-out;
+        cursor: pointer;
+    }
+    
+    .profile-pic-container:hover .profile-pic-overlay {
+        opacity: 1; /* Hoverre láthatóvá válik */
+    }
+    
+    .right-component {
+        margin-left: 1%;
+        margin-top: 4%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .number-container {
+        display: flex; /* Hozzászólások egymás mellé kerülnek */
+        gap: 20px; /* Kisebb térköz a dobozok között */
+        margin-top: 10%;
+    }
+    
+    .number-component {
+        color: whitesmoke;
+        background-color: #333;
+        text-align: center;
+        font-size: 20px;
+        padding: 10px;
+        border-radius: 10px;
+        min-width: 150px;
+        width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        position: relative; /* Az overlay pozicionálásához */
+        overflow: hidden; /* Az overlay ne lógjon ki */
+    }
+    
+    .number-component::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2); /* Fehér overlay 20%-os átlátszósággal */
+        opacity: 0; /* Alapból láthatatlan */
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .number-component:hover::after {
+        opacity: 1; /* Hover esetén megjelenik */
+    }
+    
+    .counter {
+        padding-top: 1%;
+        font-size: 25px;
+    }
+    
+    .settings-icon {
+        position: absolute;
+        font-size: 40px;
+        color: whitesmoke;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+        margin-left: 97%;
+    }
+    
+    .settings-icon:hover {
+        transform: rotate(90deg); 
+        color: #663ab2;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    
+    .saved-component {
+        margin-left: 15%;
+    }
+    
+    h3 {
+        font-size: 40px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .small-poster-design {
+        height: 300px;
+        width: auto;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+    
+    .small-poster-component {
+        display: flex; /* Hogy a képek egymás mellett legyenek */
+        flex-wrap: wrap; /* Ha nem férnek el, akkor törjenek új sorba */
+        gap: 30px; /* 30px távolság a képek között */
+        margin-left: 15%;
+    }
+    
+    .browse-component {
+        background-color: #333;
+        width: 300px;
+        height: 80px;
+        border-radius: 40px;
+        margin-top: 7%; 
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        position: relative; /* Needed for overlay */
+        overflow: hidden; /* Prevents overlay from overflowing */
+    }
+    
+    .browse-component::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2); /* Fehér overlay 20%-os átlátszósággal */
+        opacity: 0; /* Alapból láthatatlan */
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .browse-component:hover::after {
+        opacity: 1; /* Hover esetén megjelenik */
+    }
+    
+    .browse-text {
+        color: whitesmoke;
+        margin-top: 9%;
+        margin-left: 10%;
+        font-weight: bold;
+        font-size: 20px;
+    }
+    
+    h2 {
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+}
+
+
+
+@media (min-width: 769px) and (max-width: 999px) {
+
+}
+
+@media (min-width: 1000px) and (max-width: 1399px) {
+
+}
+    
+@media (min-width: 1400px) and (max-width: 1599px) {
+
+}
+    
+@media (min-width: 1600px) and (max-width: 2000px) {
+
+}
+    
+@media (min-width: 650px) and (max-width: 768px) {
+    
+}
+
+
+    

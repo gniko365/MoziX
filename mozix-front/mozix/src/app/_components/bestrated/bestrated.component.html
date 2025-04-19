@@ -1,0 +1,192 @@
+<app-navbar></app-navbar>
+
+
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie?.roundedRating }}</span>
+            </p>
+            <p class="title">{{ mainMovie?.title }}</p>
+            <br/>
+            <p class="description">{{ mainMovie?.description }}</p>
+            
+            
+
+           
+        <br/>
+            <p class="descrp">{{ mainMovie?.length }} perc</p>
+        <br/>
+            <p class="descrp">{{ mainMovie?.releaseYear }}</p>
+        </div>
+
+        
+        <div class="poster-gallery">
+            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '5star'}" class="overlay">
+                <span class="overlay-text">Több</span>
+            </div>
+            <img *ngFor="let movie of galleryMovies; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster">
+        </div>
+
+
+    </div>
+</section>
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie2?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie2?.roundedRating }}</span>
+            </p>
+            <p class="title">{{ mainMovie2?.title }}</p>
+            <br/>
+            <p class="description">{{ mainMovie2?.description }}</p>
+            
+            
+
+           
+        <br/>
+            <p class="descrp">{{ mainMovie2?.length }} perc</p>
+        <br/>
+            <p class="descrp">{{ mainMovie2?.releaseYear }}</p>
+        </div>
+
+        
+        <div class="poster-gallery">
+            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '4star'}" class="overlay">
+                <span class="overlay-text">Több</span>
+            </div>
+            <img *ngFor="let movie of galleryMovies2; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster">
+        </div>
+
+
+    </div>
+</section>
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie3?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie3?.roundedRating }}</span>
+            </p>
+            <p class="title">{{ mainMovie3?.title }}</p>
+            <br/>
+            <p class="description">{{ mainMovie3?.description }}</p>
+            
+            
+
+           
+        <br/>
+            <p class="descrp">{{ mainMovie3?.length }} perc</p>
+        <br/>
+            <p class="descrp">{{ mainMovie3?.releaseYear }}</p>
+        </div>
+
+        
+        <div class="poster-gallery">
+            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '3star'}" class="overlay">
+                <span class="overlay-text">Több</span>
+            </div>
+            <img *ngFor="let movie of galleryMovies3; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster">
+        </div>
+
+
+    </div>
+</section>
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie4?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie4?.roundedRating }}</span>
+            </p>
+            <p class="title">{{ mainMovie4?.title }}</p>
+            <br/>
+            <p class="description">{{ mainMovie4?.description }}</p>
+            
+            
+
+           
+        <br/>
+            <p class="descrp">{{ mainMovie4?.length }} perc</p>
+        <br/>
+            <p class="descrp">{{ mainMovie4?.releaseYear }}</p>
+        </div>
+
+        
+        <div class="poster-gallery">
+            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '2star'}" class="overlay">
+                <span class="overlay-text">Több</span>
+            </div>
+            <img *ngFor="let movie of galleryMovies4; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster">
+        </div>
+
+
+    </div>
+</section>
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie5?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie5?.roundedRating }}</span>
+            </p>
+            <p class="title">{{ mainMovie5?.title }}</p>
+            <br/>
+            <p class="description">{{ mainMovie5?.description }}</p>
+            
+            
+
+           
+        <br/>
+            <p class="descrp">{{ mainMovie5?.length }} perc</p>
+        <br/>
+            <p class="descrp">{{ mainMovie5?.releaseYear }}</p>
+        </div>
+
+        
+        <div class="poster-gallery">
+            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '1star'}" class="overlay">
+                <span class="overlay-text">Több</span>
+            </div>
+            <img *ngFor="let movie of galleryMovies5; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster">
+        </div>
+
+
+    </div>
+</section>

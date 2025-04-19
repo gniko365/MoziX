@@ -1,0 +1,96 @@
+<app-navbar></app-navbar>
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <h1 class="genre">{{ mainMovie?.genre }}</h1>
+            <p class="title">{{ mainMovie?.title }}</p>
+            <p class="description">{{ mainMovie?.description }}</p>   
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie?.averageRating }}</span>
+            </p>
+            <p>{{ mainMovie?.length }} perc</p>
+            <p>{{ mainMovie?.releaseYear }}</p>
+        </div>
+
+        <div class="poster-gallery">
+            <div [routerLink]="['/comedy']" class="overlay">
+                <span class="overlay-text">Több</span>
+              </div>
+            <img *ngFor="let movie of galleryMovies; let i = index" 
+     [src]="movie.cover" 
+     class="small-poster"
+     [id]="i >= galleryMovies.length - 2 ? 'pooster-' + (i + 1) : null">
+        </div>
+    </div>
+</section>
+
+
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie2?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <h1 class="genre">{{ mainMovie2?.genre }}</h1>
+            <p class="title">{{ mainMovie2?.title }}</p>
+            <p class="description">{{ mainMovie2?.description }}</p>   
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie2?.averageRating }}</span>
+            </p>
+            <p>{{ mainMovie2?.length }} perc</p>
+            <p>{{ mainMovie2?.releaseYear }}</p>
+        </div>
+
+        <div class="poster-gallery">
+            <div [routerLink]="['/drama']" class="overlay">
+                <span class="overlay-text">Több</span>
+              </div>
+            <img *ngFor="let movie2 of galleryMovies2; let i = index" 
+     [src]="movie2.cover" 
+     class="small-poster"
+     [id]="i >= galleryMovies2.length - 2 ? 'pooster-' + (i + 1) : null">
+        </div>
+    </div>
+</section>
+
+
+
+
+<section>
+    <div class="film-component">
+    <a [routerLink]="['/toldi']">
+        <img [src]="mainMovie3?.cover" class="poster">
+    </a>
+        <div class="text-content">
+            <h1 class="genre">{{ mainMovie3?.genre }}</h1>
+            <p class="title">{{ mainMovie3?.title }}</p>
+            <p class="description">{{ mainMovie3?.description }}</p>   
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ mainMovie3?.averageRating }}</span>
+            </p>
+            <p>{{ mainMovie3?.length }} perc</p>
+            <p>{{ mainMovie3?.releaseYear }}</p>
+        </div>
+
+        <div class="poster-gallery">
+            <div [routerLink]="['/historical']" class="overlay">
+                <span class="overlay-text">Több</span>
+              </div>
+            <img *ngFor="let movie3 of galleryMovies3; let i = index" 
+     [src]="movie3.cover" 
+     class="small-poster"
+     [id]="i >= galleryMovies3.length - 2 ? 'pooster-' + (i + 1) : null">
+        </div>
+    </div>
+</section>
+
+
+

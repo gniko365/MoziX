@@ -1,0 +1,192 @@
+<app-navbar></app-navbar>
+<h1>Toldi</h1>
+<section class="content">
+    <div class="poster-container">
+        <img src="assets/TOLDI2.jpg" class="poster" alt="Toldi Poster">
+        <div class="top-left" (click)="toggleBookmark()">
+          </div>
+          <div class="top-left" (click)="toggleBookmark()">
+            <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
+            <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
+        </div>
+    </div>
+    <div class="right-container">
+    <div class="video-container">
+        <div class="description-container">
+        <video class="video" controls>
+            <source src="assets/TOLDI – Trailer.mp4" type="video/mp4" class="video">
+        </video>
+        
+        <h2 class="film-leiras">Film leírás</h2>
+        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. A animi doloribus autem perspiciatis vero, nulla aut obcaecati pariatur tenetur laborum incidunt unde ad architecto debitis exercitationem sequi dignissimos. A, consectetur.</p>
+        </div>
+    </div>
+</div>
+</section>
+<br/>
+<div class="Kategoriak">
+    <div class="category-component" (click)="toggleSidebar('Szereplők')">
+        <p class="category-item">Szereplők</p>
+    </div>
+    <div class="category-component" (click)="toggleSidebar('Értékelés')">
+        <p class="category-item">Értékelés</p>
+    </div>
+    <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
+        <p class="category-item">Hasonló filmek</p>
+    </div>
+</div>
+<br/>
+
+<!-- Alsó sidebar -->
+<div class="sidebar" *ngIf="isSidebarOpen">
+    <div class="sidebar-content">
+        <span class="close" (click)="toggleSidebar()">&times;</span>
+
+        <!-- sidebar tartalma -->
+
+        <div *ngIf="selectedCategory === 'Szereplők'">
+            <br/>
+            <br />
+            <br />
+            <br />
+            <br />
+            <h1 class="sidebar-title">Szereplők és Rendezők</h1>
+            <br />
+            <div class="actor-director-container">
+                <div>
+                    <h3>Szereplők:</h3>
+                    <br />
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Nagy Balázs</p>
+                    </div>
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Nagy Balázs</p>
+                    </div>
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Nagy Balázs</p>
+                    </div>
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Nagy Balázs</p>
+                    </div>
+                </div>
+        
+                <div>
+                    <h3>Rendezők:</h3>
+                    <br />
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Kenez Bence</p>
+                    </div>
+                    <div class="szereplo-container">
+                        <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                        <p class="actor-name">Kenez Bence</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div *ngIf="selectedCategory === 'Értékelés'">
+            <br/>
+            <br />
+            <br />
+            <br />
+            <br />
+            <h1 class="sidebar-title">Értékelés</h1>
+            <br/>
+        <div class="rateing-container">
+            <div class="rating-txt">
+        <span class="rating-number">Átlagos értékelés: 5</span>
+                <img src="assets/STAR.png" class="rating">
+            </div>
+        <div class="star-container">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+            <img src="assets/STAR.png" class="rate">
+        </div>
+        </div>
+            <br/>
+            <br/>
+            <div class="comments">
+            <div class="comment-section">  
+                <input placeholder="Kommentelj öcsi:" class="comment-bar">
+                <button class="submit-btn">Küldés</button>
+            </div>
+            <br/>
+            <div class="comment-sent">
+                <p class="comment-name">Gazsi Erik</p>
+                <p>ahogy, ahogy megtörtént a szívem megtörték
+                    ez egy végtelen paradoxon
+                    ahogy, ahogy elszöktél, a rögöt feltörték
+                    de én józan maradok 
+                    mert nem akarom látni őt mással (nem)
+                    betakarom az elmém csárral (be)
+                    bezsibbad a szívem babe
+                    tűzzel olvassz fel ne a jéggel </p>
+            </div>  
+        </div>
+    </div>
+
+        <div *ngIf="selectedCategory === 'Hasonló filmek'">
+            <br/>
+            <br />
+            <br />
+            <br />
+            <br />
+            <h1 class="sidebar-title">Hasonló filmek</h1>
+            <br/>
+            <div class="film-component">
+            <div class="films">
+            <div class="films">
+         
+                <div class="film-box" [routerLink]="['/toldi']">
+                    <img src="assets/FILMPOSTER.jpg" class="poszter">
+                    <p class="film-title">FILM</p>
+                </div>
+              
+                <div class="film-box">
+                    <img src="assets/FILMPOSTER.jpg" class="poszter">
+                    <p class="film-title">FILM</p>
+                </div>
+             
+                <div class="film-box">
+                    <img src="assets/FILMPOSTER.jpg" class="poszter">
+                    <p class="film-title">FILM</p>
+                </div>
+        
+                <div class="film-box">
+                    <img src="assets/FILMPOSTER.jpg" class="poszter">
+                    <p class="film-title">FILM</p>
+                </div>
+                <div class="films">
+                   
+                    <div class="film-box">
+                        <img src="assets/FILMPOSTER.jpg" class="poszter">
+                        <p class="film-title">FILM</p>
+                    </div>
+                   
+                    <div class="film-box">
+                        <img src="assets/FILMPOSTER.jpg" class="poszter">
+                        <p class="film-title">FILM</p>
+                    </div>
+                </div>
+                </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+
+  
+    
+
+  <!-- display hogy a konténer megjelenjen ha rákattintok és eltűnjön ha újra -->
