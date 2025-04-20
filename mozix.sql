@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 19, 2025 at 05:13 PM
+-- Generation Time: Apr 20, 2025 at 07:23 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -339,30 +339,61 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByGenre` (IN `genre_name` 
     WHERE g.name LIKE genre_name;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByGenreId` (IN `p_genre_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByGenreIdWithDetails` (IN `p_genre_id` INT)   BEGIN
     SELECT 
         m.movie_id,
-        m.movie_name AS title,
+        m.movie_name,
         m.cover,
         m.release_year,
-        g.name AS genre,
         m.length,
         m.description,
-        COALESCE(AVG(r.rating), 0) AS average_rating
+        m.trailer_link,
+        ROUND(COALESCE(AVG(r.rating), 0), 1) AS average_rating,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(d.director_id, ':', d.name, ':', 
+                CASE 
+                    WHEN d.director_image IS NULL THEN ''
+                    ELSE d.director_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_directors md
+            JOIN directors d ON md.director_id = d.director_id
+            WHERE md.movie_id = m.movie_id
+        ) AS directors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(a.actor_id, ':', a.name, ':', 
+                CASE 
+                    WHEN a.actor_image IS NULL THEN ''
+                    ELSE a.actor_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_actors ma
+            JOIN actors a ON ma.actor_id = a.actor_id
+            WHERE ma.movie_id = m.movie_id
+        ) AS actors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(g.genre_id, ':', g.name) 
+                SEPARATOR '|'
+            )
+            FROM movie_genres mg
+            JOIN genres g ON mg.genre_id = g.genre_id
+            WHERE mg.movie_id = m.movie_id
+        ) AS genres
     FROM 
         movies m
-    JOIN 
-        movie_genres mg ON m.movie_id = mg.movie_id
-    JOIN 
-        genres g ON mg.genre_id = g.genre_id
-    LEFT JOIN
-        ratings r ON m.movie_id = r.movie_id
+    JOIN movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN ratings r ON m.movie_id = r.movie_id
     WHERE 
-        g.genre_id = p_genre_id
-    GROUP BY
-        m.movie_id, m.movie_name, m.cover, m.release_year, g.name, m.length, m.description
-    ORDER BY 
-        m.movie_name;
+        mg.genre_id = p_genre_id
+    GROUP BY 
+        m.movie_id, m.movie_name, m.cover, m.release_year, 
+        m.length, m.description, m.trailer_link
+    ORDER BY m.movie_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_rounded_rating` INT)   BEGIN
@@ -374,13 +405,49 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetMoviesByRoundedRating` (IN `p_ro
         m.length,
         m.release_year,
         ROUND(AVG(r.rating)) AS exact_average,
-        COUNT(r.rating_id) AS rating_count
+        COUNT(r.rating_id) AS rating_count,
+        m.trailer_link,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(d.director_id, ':', d.name, ':', 
+                CASE 
+                    WHEN d.director_image IS NULL THEN ''
+                    ELSE d.director_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_directors md
+            JOIN directors d ON md.director_id = d.director_id
+            WHERE md.movie_id = m.movie_id
+        ) AS directors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(a.actor_id, ':', a.name, ':', 
+                CASE 
+                    WHEN a.actor_image IS NULL THEN ''
+                    ELSE a.actor_image
+                END) 
+                SEPARATOR '|'
+            )
+            FROM movie_actors ma
+            JOIN actors a ON ma.actor_id = a.actor_id
+            WHERE ma.movie_id = m.movie_id
+        ) AS actors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(g.genre_id, ':', g.name) 
+                SEPARATOR '|'
+            )
+            FROM movie_genres mg
+            JOIN genres g ON mg.genre_id = g.genre_id
+            WHERE mg.movie_id = m.movie_id
+        ) AS genres
     FROM 
         movies m
     LEFT JOIN 
         ratings r ON m.movie_id = r.movie_id
     GROUP BY 
-        m.movie_id, m.movie_name, m.cover, m.description, m.length, m.release_year
+        m.movie_id, m.movie_name, m.cover, m.description, m.length, m.release_year, m.trailer_link
     HAVING 
         ROUND(AVG(r.rating)) = p_rounded_rating
     ORDER BY 

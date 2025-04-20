@@ -129,41 +129,6 @@ private Response buildErrorResponse(Response.Status status, String message) {
     }
 
     @GET
-    @Path("/by-rating/{ratingValue}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMoviesByAverageRating(
-            @PathParam("ratingValue") double ratingValue,
-            @QueryParam("minVotes") @DefaultValue("1") int minVotes) {
-        
-        try {
-            JSONArray movies = ratingService.getMoviesByAverageRating(ratingValue);
-            
-            // Opcionális szűrés minimum szavazatszám alapján
-            JSONArray filteredMovies = new JSONArray();
-            for (int i = 0; i < movies.length(); i++) {
-                JSONObject movie = movies.getJSONObject(i);
-                if (movie.getInt("ratingCount") >= minVotes) {
-                    filteredMovies.put(movie);
-                }
-            }
-            
-            JSONObject response = new JSONObject();
-            response.put("status", "success");
-            response.put("ratingValue", ratingValue);
-            response.put("count", filteredMovies.length());
-            response.put("movies", filteredMovies);
-            
-            return Response.ok(response.toString()).build();
-        } catch (Exception e) {
-            JSONObject error = new JSONObject();
-            error.put("status", "error");
-            error.put("message", "Failed to fetch movies by rating");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                         .entity(error.toString())
-                         .build();
-        }
-    }
-    @GET
 @Path("/by-rounded-rating/{rating}")
 @Produces(MediaType.APPLICATION_JSON)
 public Response getMoviesByRoundedRating(
@@ -175,7 +140,7 @@ public Response getMoviesByRoundedRating(
         @QueryParam("maxLength") @DefaultValue("999") int maxLength) {
     
     try {
-        // Értékhatárok ellenőrzése
+        // Validate parameters
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
@@ -188,7 +153,7 @@ public Response getMoviesByRoundedRating(
         
         JSONArray movies = ratingService.getMoviesByRoundedRating(rating);
         
-        // Szűrés paraméterek alapján
+        // Filter based on parameters
         JSONArray filteredMovies = new JSONArray();
         for (int i = 0; i < movies.length(); i++) {
             JSONObject movie = movies.getJSONObject(i);
@@ -213,12 +178,19 @@ public Response getMoviesByRoundedRating(
         
         return Response.ok(response.toString()).build();
     } catch (IllegalArgumentException e) {
+        JSONObject error = new JSONObject();
+        error.put("status", "error");
+        error.put("message", e.getMessage());
         return Response.status(Response.Status.BAD_REQUEST)
-                     .entity("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}")
+                     .entity(error.toString())
                      .build();
     } catch (Exception e) {
+        JSONObject error = new JSONObject();
+        error.put("status", "error");
+        error.put("message", "Failed to fetch movies");
+        error.put("details", e.getMessage());
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity("{\"status\":\"error\",\"message\":\"Failed to fetch movies\"}")
+                     .entity(error.toString())
                      .build();
     }
 }

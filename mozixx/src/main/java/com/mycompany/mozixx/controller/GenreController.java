@@ -19,34 +19,30 @@ public class GenreController {
     private GenreService genreService = new GenreService();
     
     @GET
-    @Path("/{genreId}/movies")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMoviesByGenreId(@PathParam("genreId") int genreId) {
-        try {
-            JSONArray movies = genreService.getMoviesByGenreId(genreId);
-            
-            // Átlag értékelés kiszámolása a műfaj összes filmjére
-            double genreAverage = calculateGenreAverage(movies);
-            
-            JSONObject response = new JSONObject();
-            response.put("status", "success");
-            response.put("genreId", genreId);
-            response.put("count", movies.length());
-            response.put("genreAverageRating", genreAverage);
-            response.put("movies", movies);
-            
-            return Response.ok(response.toString()).build();
-        } catch (Exception e) {
-            JSONObject errorResponse = new JSONObject();
-            errorResponse.put("status", "error");
-            errorResponse.put("message", "Failed to fetch movies by genre ID");
-            errorResponse.put("details", e.getMessage());
-            
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                         .entity(errorResponse.toString())
-                         .build();
-        }
+@Path("/{genreId}/movies-with-details")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getMoviesByGenreIdWithDetails(@PathParam("genreId") int genreId) {
+    try {
+        JSONArray movies = genreService.getMoviesByGenreIdWithDetails(genreId);
+        
+        JSONObject response = new JSONObject();
+        response.put("status", "success");
+        response.put("genreId", genreId);
+        response.put("count", movies.length());
+        response.put("movies", movies);
+        
+        return Response.ok(response.toString()).build();
+    } catch (Exception e) {
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", "Failed to fetch movies by genre ID with details");
+        errorResponse.put("details", e.getMessage());
+        
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity(errorResponse.toString())
+                     .build();
     }
+}
     
     private double calculateGenreAverage(JSONArray movies) {
         if (movies.length() == 0) return 0.0;

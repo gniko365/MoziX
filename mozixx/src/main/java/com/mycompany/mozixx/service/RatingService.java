@@ -5,7 +5,10 @@ import static com.mysql.cj.conf.PropertyKey.logger;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.activation.DataSource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -194,6 +197,7 @@ public class RatingService {
     public JSONArray getMoviesByRoundedRating(int roundedRating) {
     JSONArray movies = new JSONArray();
     EntityManager em = emf.createEntityManager();
+    
     try {
         StoredProcedureQuery query = em.createStoredProcedureQuery("GetMoviesByRoundedRating")
             .registerStoredProcedureParameter("p_rounded_rating", Integer.class, ParameterMode.IN)
@@ -203,15 +207,53 @@ public class RatingService {
         
         for (Object[] row : results) {
             JSONObject movie = new JSONObject();
+            // Basic movie info
             movie.put("movieId", row[0]);
             movie.put("title", row[1]);
-            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+            movie.put("cover", row[2]);
             movie.put("description", row[3] != null ? row[3] : JSONObject.NULL);
             movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
             movie.put("releaseYear", row[5] != null ? row[5] : JSONObject.NULL);
             movie.put("exactAverage", row[6]);
             movie.put("ratingCount", row[7]);
+            movie.put("trailerLink", row[8] != null ? row[8] : JSONObject.NULL);
             movie.put("roundedRating", roundedRating);
+            
+            // Process directors
+            JSONArray directorsArray = new JSONArray();
+            String directorsInfo = row[9] != null ? row[9].toString() : "";
+            for (Map<String, String> director : parsePeopleInfo(directorsInfo, "director")) {
+                JSONObject directorJson = new JSONObject();
+                directorJson.put("id", director.get("id"));
+                directorJson.put("name", director.get("name"));
+                directorJson.put("image", director.get("image"));
+                directorsArray.put(directorJson);
+            }
+            movie.put("directors", directorsArray);
+            
+            // Process actors
+            JSONArray actorsArray = new JSONArray();
+            String actorsInfo = row[10] != null ? row[10].toString() : "";
+            for (Map<String, String> actor : parsePeopleInfo(actorsInfo, "actor")) {
+                JSONObject actorJson = new JSONObject();
+                actorJson.put("id", actor.get("id"));
+                actorJson.put("name", actor.get("name"));
+                actorJson.put("image", actor.get("image"));
+                actorsArray.put(actorJson);
+            }
+            movie.put("actors", actorsArray);
+            
+            // Process genres
+            JSONArray genresArray = new JSONArray();
+            String genresInfo = row[11] != null ? row[11].toString() : "";
+            for (Map<String, String> genre : parseGenresInfo(genresInfo)) {
+                JSONObject genreJson = new JSONObject();
+                genreJson.put("id", genre.get("id"));
+                genreJson.put("name", genre.get("name"));
+                genresArray.put(genreJson);
+            }
+            movie.put("genres", genresArray);
+            
             movies.put(movie);
         }
     } finally {
@@ -220,5 +262,42 @@ public class RatingService {
         }
     }
     return movies;
+}
+
+// Reuse these helper methods from your existing code
+private List<Map<String, String>> parsePeopleInfo(String info, String type) {
+    List<Map<String, String>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] people = info.split("\\|");
+        for (String person : people) {
+            String[] parts = person.split(":", 3);
+            if (parts.length == 3) {
+                Map<String, String> personMap = new HashMap<>();
+                personMap.put("id", parts[0]);
+                personMap.put("name", parts[1]);
+                personMap.put("image", parts[2].isEmpty() ? null : parts[2]);
+                personMap.put("type", type);
+                result.add(personMap);
+            }
+        }
+    }
+    return result;
+}
+
+private List<Map<String, String>> parseGenresInfo(String info) {
+    List<Map<String, String>> result = new ArrayList<>();
+    if (info != null && !info.trim().isEmpty()) {
+        String[] genres = info.split("\\|");
+        for (String genre : genres) {
+            String[] parts = genre.split(":");
+            if (parts.length >= 2) {
+                Map<String, String> genreMap = new HashMap<>();
+                genreMap.put("id", parts[0]);
+                genreMap.put("name", parts[1]);
+                result.add(genreMap);
+            }
+        }
+    }
+    return result;
 }
 }
