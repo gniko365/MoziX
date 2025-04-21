@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 21, 2025 at 05:27 PM
+-- Generation Time: Apr 21, 2025 at 06:12 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -568,6 +568,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserRatings` (IN `p_user_id` INT
         r.rating_date DESC;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getYoutubeLinks` ()   SELECT movies.trailer_link
+FROM movies$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `emailIN` VARCHAR(255), IN `passwordIN` VARCHAR(255))   BEGIN
     SELECT * FROM users WHERE email = emailIN AND password = passwordIN;
 END$$
@@ -994,51 +997,51 @@ INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `
 (103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110, 'https://upload.wikimedia.org/wikipedia/hu/b/b5/A_tan%C3%BA_filmplak%C3%A1t.png', 'https://www.youtube.com/embed/B696W2Gwvmk'),
 (104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109, 'https://www.pannonia-entertainment.hu/wp-content/uploads/2024/08/Tizedes-meg-a-tobbiek-2.jpg', 'https://www.youtube.com/embed/8bhb4eeJB7o'),
 (105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96, 'https://m.media-amazon.com/images/M/MV5BMDMzYWQwNTYtYzY3YS00ODQ0LTg2MTQtNzIxNDMxNjQ2ZWIwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/lgkicEevbSA'),
-(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96, 'https://upload.wikimedia.org/wikipedia/hu/6/6a/Macskafog%C3%B3_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=6WJxaSfAFXY'),
-(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98, 'https://upload.wikimedia.org/wikipedia/hu/1/11/Kopasz-kutya_plak%C3%A1t.png', 'https://www.youtube.com/watch?v=RVRiEwmwNd8'),
-(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120, 'https://upload.wikimedia.org/wikipedia/hu/a/ae/Egri_csillagok_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=04CZI0A0Vgw'),
-(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102, 'https://filmio.hu/sb/image/11954662', 'https://www.youtube.com/watch?v=d8STQElOASA'),
-(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94, 'https://m.blog.hu/36/365nap365film/image/csillagosok_katonak_01.jpg', 'https://www.youtube.com/watch?v=xTnJ74KeTfs'),
-(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85, 'https://m.blog.hu/36/365nap365film/image/8iefelrh4mjdfiqhwnwvqxnsycg.jpg', 'https://www.youtube.com/watch?v=tH6uX1_1_yg'),
-(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/front_movie/s3/film/plakat/mv5bmzu1odq2zdmtotexoc00njjkltkxmdmtotcznme3ymizy2fixkeyxkfqcgdeqxvyndk0mdg4ndk._v1_sy1000_cr006461000_al_.jpg.webp?itok=uAxu0WiI', 'https://www.youtube.com/watch?v=nw4ch5oG3fg'),
-(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95, 'https://upload.wikimedia.org/wikipedia/hu/8/84/Az_%C3%A9n_XX._sz%C3%A1zadom.png', 'https://www.youtube.com/watch?v=CCdXnsxON_A'),
-(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95, 'https://m.media-amazon.com/images/M/MV5BNThmMTA4MjQtZTMzMS00NGM1LWJmZmItNTUzNjk3NGViZmNlXkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/watch?v=N1gQ3eZCH8w'),
-(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105, 'https://m.media-amazon.com/images/M/MV5BMjA3Nzk5MTE4Nl5BMl5BanBnXkFtZTcwMzEwODgyMQ@@._V1_.jpg', 'https://www.youtube.com/watch?v=qultfnaMP50'),
-(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91, 'https://m.media-amazon.com/images/M/MV5BMTM1OTU5NjAzMl5BMl5BanBnXkFtZTcwNDQ3NjA3Mg@@._V1_.jpg', 'https://www.youtube.com/watch?v=xeQqwG3D0l4'),
-(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100, 'https://nfi.hu/file/slides/4/45487/a_hidember_plakat.jpg', 'https://www.youtube.com/watch?v=JB-UW1oLl6A'),
-(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75, 'https://m.media-amazon.com/images/M/MV5BMTg2NDQ3NjE2NF5BMl5BanBnXkFtZTcwNzM3ODkyMQ@@._V1_.jpg', 'https://www.youtube.com/watch?v=o-n6exBvK3E'),
-(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90, 'https://m.media-amazon.com/images/M/MV5BMTM5MjUxYmUtMjlmZC00YmJkLWI5MGItZDAyYzk5MDcyMmYwXkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/watch?v=wNmcEAeV3OM'),
-(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95, 'https://upload.wikimedia.org/wikipedia/hu/3/38/A_P%C3%A1l_utcai_fi%C3%BAk_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=cyuWNiQBpZs'),
-(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101, 'https://upload.wikimedia.org/wikipedia/hu/c/ce/Moszkva_t%C3%A9r_plak%C3%A1t.png', 'https://www.youtube.com/watch?v=yIQmwb9pgiI'),
-(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98, 'https://www.mafab.hu/static/2017/84/13/292833_1490526467.5818.jpg', 'https://www.youtube.com/watch?v=HZSTvEVz87I'),
-(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103, 'https://m.media-amazon.com/images/M/MV5BOGQxNzZiNzAtZDA3YS00NDU5LWExOTgtYWY4YzU5ZDlmNTA0XkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/watch?v=k3NIwJEzdyY'),
-(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95, 'https://www.mafab.hu/static/profiles/2014/293/13/54590_45.jpg', 'https://www.youtube.com/watch?v=HXh4TNoLyF4'),
-(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/26_eszkimo_img_1057.jpg.webp?itok=PVdwzOzL', 'https://www.youtube.com/watch?v=-ENx0weqhhk'),
-(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, 'https://nfi.hu/file/slides/4/45481/magyar_vandor_plakat.jpg', 'https://www.youtube.com/watch?v=HEMHUpUzeFY'),
-(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, 'https://upload.wikimedia.org/wikipedia/hu/thumb/8/8a/Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg/1200px-Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg', 'https://www.youtube.com/watch?v=pnYts52GaiA'),
-(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, 'https://media.port.hu/images/000/608/142.jpg', 'https://www.youtube.com/watch?v=seflzYctPI8'),
+(106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96, 'https://upload.wikimedia.org/wikipedia/hu/6/6a/Macskafog%C3%B3_filmplak%C3%A1t.png', 'https://www.youtube.com/embed/6WJxaSfAFXY'),
+(107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98, 'https://upload.wikimedia.org/wikipedia/hu/1/11/Kopasz-kutya_plak%C3%A1t.png', 'https://www.youtube.com/embed/RVRiEwmwNd8'),
+(108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120, 'https://upload.wikimedia.org/wikipedia/hu/a/ae/Egri_csillagok_filmplak%C3%A1t.png', 'https://www.youtube.com/embed/04CZI0A0Vgw'),
+(109, 1976, 'Egy filozófiai dráma az emberi erkölcsről.', 'Az ötödik pecsét', 102, 'https://filmio.hu/sb/image/11954662', 'https://www.youtube.com/embed/d8STQElOASA'),
+(110, 1967, 'Egy csoport katona története az orosz forradalom idején.', 'Csillagosok, katonák', 94, 'https://m.blog.hu/36/365nap365film/image/csillagosok_katonak_01.jpg', 'https://www.youtube.com/embed/xTnJ74KeTfs'),
+(111, 1979, 'Egy humoros történet egy falusi bakter életéről.', 'Indul a bakterház', 85, 'https://m.blog.hu/36/365nap365film/image/8iefelrh4mjdfiqhwnwvqxnsycg.jpg', 'https://www.youtube.com/embed/tH6uX1_1_yg'),
+(112, 1931, 'Egy újgazdag család és az elegáns lakáj története.', 'Hyppolit, a lakáj', 90, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/front_movie/s3/film/plakat/mv5bmzu1odq2zdmtotexoc00njjkltkxmdmtotcznme3ymizy2fixkeyxkfqcgdeqxvyndk0mdg4ndk._v1_sy1000_cr006461000_al_.jpg.webp?itok=uAxu0WiI', 'https://www.youtube.com/embed/nw4ch5oG3fg'),
+(113, 1989, 'Két nővérek élete a 20. század elején.', 'Az én XX. századom', 95, 'https://upload.wikimedia.org/wikipedia/hu/8/84/Az_%C3%A9n_XX._sz%C3%A1zadom.png', 'https://www.youtube.com/embed/CCdXnsxON_A'),
+(114, 2015, 'Egy fiatal nő szerelmi története, némi misztikummal.', 'Liza, a rókatündér', 95, 'https://m.media-amazon.com/images/M/MV5BNThmMTA4MjQtZTMzMS00NGM1LWJmZmItNTUzNjk3NGViZmNlXkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/embed/N1gQ3eZCH8w'),
+(115, 2003, 'Egy metróellenőr mindennapjai és kihívásai.', 'Kontroll', 105, 'https://m.media-amazon.com/images/M/MV5BMjA3Nzk5MTE4Nl5BMl5BanBnXkFtZTcwMzEwODgyMQ@@._V1_.jpg', 'https://www.youtube.com/embed/qultfnaMP50'),
+(116, 2006, 'Egy szürreális családi történet több generáción keresztül.', 'Taxidermia', 91, 'https://m.media-amazon.com/images/M/MV5BMTM1OTU5NjAzMl5BMl5BanBnXkFtZTcwNDQ3NjA3Mg@@._V1_.jpg', 'https://www.youtube.com/embed/xeQqwG3D0l4'),
+(117, 2002, 'Széchenyi István életének drámai ábrázolása.', 'Hídember', 100, 'https://nfi.hu/file/slides/4/45487/a_hidember_plakat.jpg', 'https://www.youtube.com/embed/JB-UW1oLl6A'),
+(118, 2002, 'Egy falusi közösség csendes története a mindennapokról.', 'Hukkle', 75, 'https://m.media-amazon.com/images/M/MV5BMTg2NDQ3NjE2NF5BMl5BanBnXkFtZTcwNzM3ODkyMQ@@._V1_.jpg', 'https://www.youtube.com/embed/o-n6exBvK3E'),
+(119, 1966, 'Egy fiú és az apja kapcsolata a múlt árnyékában.', 'Apa', 90, 'https://m.media-amazon.com/images/M/MV5BMTM5MjUxYmUtMjlmZC00YmJkLWI5MGItZDAyYzk5MDcyMmYwXkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/embed/wNmcEAeV3OM'),
+(120, 1969, 'Egy fiúcsapat barátságának története.', 'Pál utcai fiúk', 95, 'https://upload.wikimedia.org/wikipedia/hu/3/38/A_P%C3%A1l_utcai_fi%C3%BAk_filmplak%C3%A1t.png', 'https://www.youtube.com/embed/cyuWNiQBpZs'),
+(121, 2001, 'A rendszerváltás idején játszódó fiatalos történet.', 'Moszkva tér', 101, 'https://upload.wikimedia.org/wikipedia/hu/c/ce/Moszkva_t%C3%A9r_plak%C3%A1t.png', 'https://www.youtube.com/embed/yIQmwb9pgiI'),
+(122, 2018, 'Egy nő túlélési története egy szovjet munkatáborban.', 'Örök tél', 98, 'https://www.mafab.hu/static/2017/84/13/292833_1490526467.5818.jpg', 'https://www.youtube.com/embed/HZSTvEVz87I'),
+(123, 2006, 'Az 1956-os forradalom története és annak hatásai.', 'Szabadság, szerelem', 103, 'https://m.media-amazon.com/images/M/MV5BOGQxNzZiNzAtZDA3YS00NDU5LWExOTgtYWY4YzU5ZDlmNTA0XkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/embed/k3NIwJEzdyY'),
+(124, 1991, 'Egy humoros történet a rendszerváltás idejéről.', 'Csapd le csacsi!', 95, 'https://www.mafab.hu/static/profiles/2014/293/13/54590_45.jpg', 'https://www.youtube.com/embed/HXh4TNoLyF4'),
+(125, 1984, 'Egy szürreális szerelmi történet.', 'Eszkimó asszony fázik', 92, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/26_eszkimo_img_1057.jpg.webp?itok=PVdwzOzL', 'https://www.youtube.com/embed/-ENx0weqhhk'),
+(126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, 'https://nfi.hu/file/slides/4/45481/magyar_vandor_plakat.jpg', 'https://www.youtube.com/embed/HEMHUpUzeFY'),
+(127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, 'https://upload.wikimedia.org/wikipedia/hu/thumb/8/8a/Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg/1200px-Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg', 'https://www.youtube.com/embed/pnYts52GaiA'),
+(128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, 'https://media.port.hu/images/000/608/142.jpg', 'https://www.youtube.com/embed/seflzYctPI8'),
 (129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98, 'https://m.media-amazon.com/images/M/MV5BNDUwNzY4NzAtOTVlYi00MDJlLTg0NTEtNzUwNGZhZDFkNTFjXkEyXkFqcGc@._V1_.jpg', NULL),
-(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, 'https://m.media-amazon.com/images/M/MV5BNjEwYmJiYTYtYzMxMS00NGFmLWFjNTMtZTU5ZjUwMDI1NTdhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/watch?v=rJsGF1nOmRY'),
-(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, 'https://nfi.hu/files/slide/image/2397/a-nagy-fuzet-2013-online_1.jpg', 'https://www.youtube.com/watch?v=4MLJ09XmugA'),
-(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, 'https://nfi.hu/files/slide/image/2004/fe_400_570_VAN.jpg', 'https://www.youtube.com/watch?v=rbyOcZHGjZc'),
-(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107, 'https://upload.wikimedia.org/wikipedia/hu/4/44/Saul_fia_plak%C3%A1t.jpg', 'https://www.youtube.com/watch?v=5V5TZkFa5AM'),
-(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145, 'https://nfi.hu/file/slides/4/45488/werckmeister_harmoniak_plakat.jpg', 'https://www.youtube.com/watch?v=-tJVdq_G_Go'),
-(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/a_torinoi_lo_poszter.jpg.webp?itok=69ox9fs8', 'https://www.youtube.com/watch?v=zk41BR72csI'),
-(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121, 'https://nfi.hu/files/slide/image/2380/unnamed-717x1024.jpg', 'https://www.youtube.com/watch?v=HIYxv_aQH_0'),
-(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96, 'https://media.port.hu/images/000/860/025.jpg', 'https://www.youtube.com/watch?v=y6Xt3f2Mg48'),
-(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95, 'https://upload.wikimedia.org/wikipedia/hu/6/63/K%C3%BAt.jpg', 'https://www.youtube.com/watch?v=lwGQ6yr7rns'),
-(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/az_ajto_b1.jpg.webp?itok=LDQ40QME', 'https://www.youtube.com/watch?v=c_45YrzoO9A'),
-(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107, 'https://m.media-amazon.com/images/M/MV5BNWE5MTliYTYtMjBkYS00MGIyLWE4MWQtNTNiODFjYzA3NjliXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/watch?v=9CrLIEwkN7w'),
-(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132, 'https://snitt.hu/system/covers/big/covers_9665.jpg?1617128406', 'https://www.youtube.com/watch?v=Kln8t-5RYxw'),
-(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91, 'https://media.port.hu/images/000/680/356.jpg', 'https://www.youtube.com/watch?v=fS9tD-RlHBI'),
-(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89, 'https://upload.wikimedia.org/wikipedia/hu/thumb/e/e8/A_vizsga_%282011%29.jpg/640px-A_vizsga_%282011%29.jpg', 'https://www.youtube.com/watch?v=eQXXuC9eaYQ'),
-(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98, 'https://filmtett.ro/uploads/wp-content/uploads/2021/03/enkisfalumplakat.jpg', 'https://www.youtube.com/watch?v=sRkYEYKQjsg'),
-(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100, 'https://www.filmtett.ro/uploads/2024/09/simon-magus.jpg', 'https://www.youtube.com/watch?v=H0Ubj7RlJsY'),
-(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97, 'https://m.media-amazon.com/images/M/MV5BYjUwZDBjY2MtNWYxNS00ZWVhLTkxZWMtZTBlY2M2NGE5NGZhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/watch?v=XDzU5UsLxRo'),
-(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104, 'https://www.mafab.hu/static/profiles/2014/293/15/60535_48.jpg', 'https://www.youtube.com/watch?v=7-H9UQb2EqM'),
-(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100, 'https://nfi.hu/file/slides/4/45491/fehertenyer.jpg', 'https://www.youtube.com/watch?v=Dh8czRR25X4'),
-(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100, 'https://nfi.hu/files/slide/image/1995/istenimuszak_korhatarosposzter.jpg', 'https://www.youtube.com/watch?v=iIfYbQjuIWM'),
-(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112, 'https://media.port.hu/images/001/121/316.jpg', 'https://www.youtube.com/watch?v=MwBolbr8g0s');
+(130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, 'https://m.media-amazon.com/images/M/MV5BNjEwYmJiYTYtYzMxMS00NGFmLWFjNTMtZTU5ZjUwMDI1NTdhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/rJsGF1nOmRY'),
+(131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, 'https://nfi.hu/files/slide/image/2397/a-nagy-fuzet-2013-online_1.jpg', 'https://www.youtube.com/embed/4MLJ09XmugA'),
+(132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, 'https://nfi.hu/files/slide/image/2004/fe_400_570_VAN.jpg', 'https://www.youtube.com/embed/rbyOcZHGjZc'),
+(133, 2015, '1944. október 7-8-án játszódik Auschwitz-Birkenauban a Sonderkommandók lázadása idején.', 'Saul fia', 107, 'https://upload.wikimedia.org/wikipedia/hu/4/44/Saul_fia_plak%C3%A1t.jpg', 'https://www.youtube.com/embed/5V5TZkFa5AM'),
+(134, 2000, 'Egy kisváros lakóit egy vándorcirkusz tartja félelemben.', 'Werckmeister harmóniák', 145, 'https://nfi.hu/file/slides/4/45488/werckmeister_harmoniak_plakat.jpg', 'https://www.youtube.com/embed/-tJVdq_G_Go'),
+(135, 2011, 'Egy öreg paraszt és lánya monoton, sötét hétköznapjait követjük.', 'A torinói ló', 146, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/a_torinoi_lo_poszter.jpg.webp?itok=69ox9fs8', 'https://www.youtube.com/embed/zk41BR72csI'),
+(136, 2016, 'Egy sorozatgyilkos tartja rettegésben az 1950-es évek végének Magyarországát.', 'A martfűi rém', 121, 'https://nfi.hu/files/slide/image/2380/unnamed-717x1024.jpg', 'https://www.youtube.com/embed/HIYxv_aQH_0'),
+(137, 1978, 'Egy fiatal ápolónő szembesül a rendszer manipulációjával és saját erkölcsi dilemmáival.', 'Angi Vera', 96, 'https://media.port.hu/images/000/860/025.jpg', 'https://www.youtube.com/embed/y6Xt3f2Mg48'),
+(138, 2016, 'Egy benzinkútnál összetalálkozik egy öreg benzinkutas és egy fiatal fiú egy veszélyes helyzettel.', 'Kút', 95, 'https://upload.wikimedia.org/wikipedia/hu/6/63/K%C3%BAt.jpg', 'https://www.youtube.com/embed/lwGQ6yr7rns'),
+(139, 2012, 'Egy írónő és a házvezetőnője közötti titokzatos kapcsolat története.', 'Az ajtó', 98, 'https://dp8ij3ml0f16h.cloudfront.net/s3_files/styles/facebook/s3/film/plakat/az_ajto_b1.jpg.webp?itok=LDQ40QME', 'https://www.youtube.com/embed/c_45YrzoO9A'),
+(140, 2008, 'Egy patológus egy gyilkossági ügyben válik kulcsszereplővé.', 'A nyomozó', 107, 'https://m.media-amazon.com/images/M/MV5BNWE5MTliYTYtMjBkYS00MGIyLWE4MWQtNTNiODFjYzA3NjliXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/9CrLIEwkN7w'),
+(141, 2007, 'Egy vasúti őr tanúja lesz egy bűnténynek és a pénz csábításának.', 'A londoni férfi', 132, 'https://snitt.hu/system/covers/big/covers_9665.jpg?1617128406', 'https://www.youtube.com/embed/Kln8t-5RYxw'),
+(142, 2014, 'Egy afrikai focista Magyarországra kerül, ahol rabszolgaságba esik.', 'Délibáb', 91, 'https://media.port.hu/images/000/680/356.jpg', 'https://www.youtube.com/embed/fS9tD-RlHBI'),
+(143, 2011, 'Az 1950-es években egy fiatal titkos ügynök próbára van téve.', 'A vizsga', 89, 'https://upload.wikimedia.org/wikipedia/hu/thumb/e/e8/A_vizsga_%282011%29.jpg/640px-A_vizsga_%282011%29.jpg', 'https://www.youtube.com/embed/eQXXuC9eaYQ'),
+(144, 1985, 'Egy kis falu lakóinak mindennapjait bemutató történet.', 'Az én kis falum', 98, 'https://filmtett.ro/uploads/wp-content/uploads/2021/03/enkisfalumplakat.jpg', 'https://www.youtube.com/embed/sRkYEYKQjsg'),
+(145, 1999, 'Egy magyar mentalista segít a rendőrségnek egy rejtélyes ügyben.', 'Simon mágus', 100, 'https://www.filmtett.ro/uploads/2024/09/simon-magus.jpg', 'https://www.youtube.com/embed/H0Ubj7RlJsY'),
+(146, 1985, 'Egy baráti társaság életének és álmainak története.', 'A nagy generáció', 97, 'https://m.media-amazon.com/images/M/MV5BYjUwZDBjY2MtNWYxNS00ZWVhLTkxZWMtZTBlY2M2NGE5NGZhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/XDzU5UsLxRo'),
+(147, 2008, 'Egy szélhámos kiforgatja a gazdag nőket a vagyonukból.', 'Kaméleon', 104, 'https://www.mafab.hu/static/profiles/2014/293/15/60535_48.jpg', 'https://www.youtube.com/embed/7-H9UQb2EqM'),
+(148, 2006, 'Egy tornász élete a fegyelemről és a múlt árnyékairól.', 'Fehér tenyér', 100, 'https://nfi.hu/file/slides/4/45491/fehertenyer.jpg', 'https://www.youtube.com/embed/Dh8czRR25X4'),
+(149, 2013, 'Egy mentős különös módon pénzt keres a halottakkal.', 'Isteni műszak', 100, 'https://nfi.hu/files/slide/image/1995/istenimuszak_korhatarosposzter.jpg', 'https://www.youtube.com/embed/iIfYbQjuIWM'),
+(150, 2019, 'Egy szélhámos menekülés közben egy özvegy életébe csöppen.', 'Apró mesék', 112, 'https://media.port.hu/images/001/121/316.jpg', 'https://www.youtube.com/embed/MwBolbr8g0s');
 
 -- --------------------------------------------------------
 
