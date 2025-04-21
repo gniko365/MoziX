@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 20, 2025 at 07:23 PM
+-- Generation Time: Apr 21, 2025 at 05:27 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -989,11 +989,11 @@ CREATE TABLE `movies` (
 --
 
 INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `Length`, `cover`, `trailer_link`) VALUES
-(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100, 'https://m.blog.hu/36/365nap365film/image/valahol_europaban_02_1.jpg', 'https://www.youtube.com/watch?v=gwhE9A6Pzso'),
-(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144, 'https://upload.wikimedia.org/wikipedia/hu/1/17/Mephisto_plak%C3%A1t.png', 'https://www.youtube.com/watch?v=EbpCuStwXz4'),
-(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110, 'https://upload.wikimedia.org/wikipedia/hu/b/b5/A_tan%C3%BA_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=B696W2Gwvmk'),
-(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109, 'https://www.pannonia-entertainment.hu/wp-content/uploads/2024/08/Tizedes-meg-a-tobbiek-2.jpg', 'https://www.youtube.com/watch?v=8bhb4eeJB7o'),
-(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96, 'https://m.media-amazon.com/images/M/MV5BMDMzYWQwNTYtYzY3YS00ODQ0LTg2MTQtNzIxNDMxNjQ2ZWIwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/watch?v=lgkicEevbSA'),
+(101, 1948, 'Egy háború utáni történet gyermekekről, akik a túlélésért küzdenek.', 'Valahol Európában', 100, 'https://m.blog.hu/36/365nap365film/image/valahol_europaban_02_1.jpg', 'https://www.youtube.com/embed/gwhE9A6Pzso'),
+(102, 1981, 'Egy színész, aki kompromisszumokat köt a karrierjéért.', 'Mephisto', 144, 'https://upload.wikimedia.org/wikipedia/hu/1/17/Mephisto_plak%C3%A1t.png', 'https://www.youtube.com/embed/EbpCuStwXz4'),
+(103, 1969, 'Egy férfi szürreális tapasztalatai a kommunista rezsim alatt.', 'A tanú', 110, 'https://upload.wikimedia.org/wikipedia/hu/b/b5/A_tan%C3%BA_filmplak%C3%A1t.png', 'https://www.youtube.com/embed/B696W2Gwvmk'),
+(104, 1965, 'Egy katona humoros kalandjai a második világháború alatt.', 'Tizedes meg a többiek', 109, 'https://www.pannonia-entertainment.hu/wp-content/uploads/2024/08/Tizedes-meg-a-tobbiek-2.jpg', 'https://www.youtube.com/embed/8bhb4eeJB7o'),
+(105, 1971, 'Egy szerelmi történet a politikai elnyomás árnyékában.', 'Szerelem', 96, 'https://m.media-amazon.com/images/M/MV5BMDMzYWQwNTYtYzY3YS00ODQ0LTg2MTQtNzIxNDMxNjQ2ZWIwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/lgkicEevbSA'),
 (106, 1986, 'Egy humoros animációs történet a macskák és egerek harcáról.', 'Macskafogó', 96, 'https://upload.wikimedia.org/wikipedia/hu/6/6a/Macskafog%C3%B3_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=6WJxaSfAFXY'),
 (107, 1981, 'Egy zenekar tagjainak küzdelmei a rendszer ellen.', 'Kopaszkutya', 98, 'https://upload.wikimedia.org/wikipedia/hu/1/11/Kopasz-kutya_plak%C3%A1t.png', 'https://www.youtube.com/watch?v=RVRiEwmwNd8'),
 (108, 1968, 'A magyar történelem egyik legnagyobb csatája.', 'Egri csillagok', 120, 'https://upload.wikimedia.org/wikipedia/hu/a/ae/Egri_csillagok_filmplak%C3%A1t.png', 'https://www.youtube.com/watch?v=04CZI0A0Vgw'),
