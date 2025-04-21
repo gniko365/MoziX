@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 21, 2025 at 06:12 PM
+-- Generation Time: Apr 21, 2025 at 06:25 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -1020,7 +1020,7 @@ INSERT INTO `movies` (`movie_id`, `release_year`, `description`, `movie_name`, `
 (126, 2004, 'Egy humoros történet a magyar történelem jelentős eseményeiről.', 'Magyar vándor', 116, 'https://nfi.hu/file/slides/4/45481/magyar_vandor_plakat.jpg', 'https://www.youtube.com/embed/HEMHUpUzeFY'),
 (127, 2017, 'Két lélek különös kapcsolata egy vágóhídon.', 'Testről és lélekről', 116, 'https://upload.wikimedia.org/wikipedia/hu/thumb/8/8a/Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg/1200px-Testr%C5%91l_%C3%A9s_l%C3%A9lekr%C5%91l_plak%C3%A1t_-_Aranymedve.jpg', 'https://www.youtube.com/embed/pnYts52GaiA'),
 (128, 2014, 'Egy kóbor kutya története a modern társadalomban.', 'Fehér isten', 119, 'https://media.port.hu/images/000/608/142.jpg', 'https://www.youtube.com/embed/seflzYctPI8'),
-(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98, 'https://m.media-amazon.com/images/M/MV5BNDUwNzY4NzAtOTVlYi00MDJlLTg0NTEtNzUwNGZhZDFkNTFjXkEyXkFqcGc@._V1_.jpg', NULL),
+(129, 1918, 'Egy klasszikus Jókai Mór regény adaptációja.', 'Aranyember', 98, 'https://m.media-amazon.com/images/M/MV5BNDUwNzY4NzAtOTVlYi00MDJlLTg0NTEtNzUwNGZhZDFkNTFjXkEyXkFqcGc@._V1_.jpg', 'https://www.youtube.com/embed/YCB6HlvZCik'),
 (130, 1993, 'Egy humoros és nosztalgikus történet az életről.', 'Sose halunk meg', 107, 'https://m.media-amazon.com/images/M/MV5BNjEwYmJiYTYtYzMxMS00NGFmLWFjNTMtZTU5ZjUwMDI1NTdhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg', 'https://www.youtube.com/embed/rJsGF1nOmRY'),
 (131, 2013, 'A film középpontjában álló ikerpárt édesanyjuk egy határszéli faluba küldi nagymamájukhoz, hogy ott vészeljék át a háború végét.', 'A Nagy Füzet', 109, 'https://nfi.hu/files/slide/image/2397/a-nagy-fuzet-2013-online_1.jpg', 'https://www.youtube.com/embed/4MLJ09XmugA'),
 (132, 2014, 'Szentesi Áron egy 20-as évei végén járó budapesti fiú, aki munkanélküliként éli mindennapjait, de az egyik nap barátnője, Eszter elhagyja.', 'VAN valami furcsa és megmagyarázhatatlan', 90, 'https://nfi.hu/files/slide/image/2004/fe_400_570_VAN.jpg', 'https://www.youtube.com/embed/rbyOcZHGjZc'),
