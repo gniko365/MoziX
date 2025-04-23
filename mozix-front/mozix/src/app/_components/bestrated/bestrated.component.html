@@ -1,3 +1,4 @@
+
 <app-navbar></app-navbar>
 
 
@@ -5,9 +6,9 @@
 
 <section>
     <div class="film-component">
-    <a [routerLink]="['/toldi']">
-        <img [src]="mainMovie?.cover" class="poster">
-    </a>
+        <a href="javascript:void(0)" (click)="showMovieDetails(mainMovie?.movieId); $event.preventDefault()">
+            <img [src]="mainMovie?.cover" class="poster">
+        </a>
         <div class="text-content">
             <p class="rating-container">
                 <img src="assets/STAR.png" class="rating">
@@ -28,7 +29,7 @@
 
         
         <div class="poster-gallery">
-            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '5star'}" class="overlay">
+            <div [routerLink]="['/best-rated/5']" class="overlay">
                 <span class="overlay-text">Több</span>
             </div>
             <img *ngFor="let movie of galleryMovies; let i = index" 
@@ -43,9 +44,9 @@
 
 <section>
     <div class="film-component">
-    <a [routerLink]="['/toldi']">
-        <img [src]="mainMovie2?.cover" class="poster">
-    </a>
+        <a href="javascript:void(0)" (click)="showMovieDetails2(mainMovie2?.movieId); $event.preventDefault()">
+            <img [src]="mainMovie2?.cover" class="poster">
+        </a>
         <div class="text-content">
             <p class="rating-container">
                 <img src="assets/STAR.png" class="rating">
@@ -66,7 +67,7 @@
 
         
         <div class="poster-gallery">
-            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '4star'}" class="overlay">
+            <div [routerLink]="['/best-rated/4']" class="overlay">
                 <span class="overlay-text">Több</span>
             </div>
             <img *ngFor="let movie of galleryMovies2; let i = index" 
@@ -80,9 +81,9 @@
 
 <section>
     <div class="film-component">
-    <a [routerLink]="['/toldi']">
-        <img [src]="mainMovie3?.cover" class="poster">
-    </a>
+        <a href="javascript:void(0)" (click)="showMovieDetails3(mainMovie3?.movieId); $event.preventDefault()">
+            <img [src]="mainMovie3?.cover" class="poster">
+        </a>
         <div class="text-content">
             <p class="rating-container">
                 <img src="assets/STAR.png" class="rating">
@@ -103,7 +104,7 @@
 
         
         <div class="poster-gallery">
-            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '3star'}" class="overlay">
+            <div [routerLink]="['/best-rated/3']" class="overlay">
                 <span class="overlay-text">Több</span>
             </div>
             <img *ngFor="let movie of galleryMovies3; let i = index" 
@@ -118,9 +119,9 @@
 
 <section>
     <div class="film-component">
-    <a [routerLink]="['/toldi']">
-        <img [src]="mainMovie4?.cover" class="poster">
-    </a>
+        <a href="javascript:void(0)" (click)="showMovieDetails4(mainMovie4?.movieId); $event.preventDefault()">
+            <img [src]="mainMovie4?.cover" class="poster">
+        </a>
         <div class="text-content">
             <p class="rating-container">
                 <img src="assets/STAR.png" class="rating">
@@ -141,7 +142,7 @@
 
         
         <div class="poster-gallery">
-            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '2star'}" class="overlay">
+            <div [routerLink]="['/best-rated/2']" class="overlay">
                 <span class="overlay-text">Több</span>
             </div>
             <img *ngFor="let movie of galleryMovies4; let i = index" 
@@ -156,9 +157,9 @@
 
 <section>
     <div class="film-component">
-    <a [routerLink]="['/toldi']">
-        <img [src]="mainMovie5?.cover" class="poster">
-    </a>
+        <a href="javascript:void(0)" (click)="showMovieDetails5(mainMovie5?.movieId); $event.preventDefault()">
+            <img [src]="mainMovie5?.cover" class="poster">
+        </a>
         <div class="text-content">
             <p class="rating-container">
                 <img src="assets/STAR.png" class="rating">
@@ -179,7 +180,7 @@
 
         
         <div class="poster-gallery">
-            <div [routerLink]="['/categoryinside']" [queryParams]="{name: '1star'}" class="overlay">
+            <div [routerLink]="['/best-rated/1']" class="overlay">
                 <span class="overlay-text">Több</span>
             </div>
             <img *ngFor="let movie of galleryMovies5; let i = index" 
@@ -190,3 +191,110 @@
 
     </div>
 </section>
+
+
+
+
+
+
+<!-- Keep ONLY this single modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+      <br>
+      <div class="poster-container2">
+        <img [src]="(selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.cover" class="modal-poster" id="overlay">
+        <div class="bookmark-icon" (click)="toggleBookmark()">
+          <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
+          <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
+        </div>
+      </div>
+      <h2>{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.title }}</h2>
+      <div>
+        <p class="rating-container">
+          <img src="assets/STAR.png" class="rating">
+          <span class="rating-number">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.roundedRating }}</span>
+        </p>
+        <p class="modal-time">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.length }} perc</p>
+        <p class="modal-description">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.description }}</p>
+        <p class="modal-description">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.genres?.name }}</p>
+  
+        <div *ngIf="(selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.trailerLink">
+          <iframe width="735" height="350" 
+            [src]="sanitizedTrailerLink"
+            frameborder="0" 
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            class="video">
+          </iframe>
+        </div>
+  
+        <div class="Kategoriak">
+          <div class="category-component" (click)="toggleSidebar('Szereplők')">
+            <p class="category-item">Szereplők</p>
+          </div>
+          <div class="category-component" (click)="toggleSidebar('Értékelés')">
+            <p class="category-item">Értékelés</p>
+          </div>
+          <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
+            <p class="category-item">Hasonló filmek</p>
+          </div>
+        </div>
+  
+        <div class="sidebar" *ngIf="isSidebarOpen">
+          <div class="sidebar-content">
+            <span class="close" (click)="toggleSidebar()">&times;</span>
+  
+            <div *ngIf="selectedCategory === 'Szereplők'">
+              <br>
+              <div class="actor-director-container">
+                <div>
+                  <h3>Szereplők:</h3>
+                  <div class="szereplo-container">
+                    <img [src]="(selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.actors?.image" class="szereplo-kep">
+                    <p class="actor-name">{{ (selectedMovie || selectedMovie2)?.actors?.name }}</p>
+                  </div>
+                </div>
+                <div>
+                  <h3>Rendezők:</h3>
+                  <div class="szereplo-container">
+                    <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
+                    <p class="actor-name">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.directors?.name }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div *ngIf="selectedCategory === 'Értékelés'">
+              <br/>
+              <div class="rateing-container2">
+                <div class="rating-txt2">
+                  <span class="rating-number2">Értékelés: {{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.averageRating }} </span>
+                  <img src="assets/STAR.png" class="rating">
+                </div>
+                <div class="star-container">
+                  <img src="assets/STAR.png" class="rate">
+                  <img src="assets/STAR.png" class="rate">
+                  <img src="assets/STAR.png" class="rate">
+                  <img src="assets/STAR.png" class="rate">
+                  <img src="assets/STAR.png" class="rate">
+                </div>
+              </div>
+            </div>
+  
+            <div *ngIf="selectedCategory === 'Hasonló filmek'">
+              <br>
+              <div class="films2">
+                <div class="film-box2" 
+                     *ngFor="let movie of (selectedMovie ? movies : movies2)" 
+                     (click)="selectedMovie ? showMovieDetails(movie.movieId) : showMovieDetails2(movie.movieId)">
+                  <img [src]="movie.cover" class="poszter2">
+                  <p class="film-title">{{ movie.title }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

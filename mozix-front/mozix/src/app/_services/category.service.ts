@@ -2,73 +2,62 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators'; // Add this import
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
-  private apiUrl = 'http://localhost:8080/mozixx/resources/genres/3/movies';
-  private apiUrl2 = 'http://localhost:8080/mozixx/resources/genres/1/movies';
-  private apiUrl3 = 'http://localhost:8080/mozixx/resources/genres/6/movies';
-  private apiUrl4 = 'http://localhost:8080/mozixx/resources/genres/19/movies';
+  private baseUrl = 'http://localhost:8080/mozixx/resources/genres';
 
   constructor(private http: HttpClient) { }
 
   getMovies(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
-      map(response => response.movies) // Adjust 'movies' based on the actual API response structure
+    return this.http.get<any>(`${this.baseUrl}/3/movies-with-details`).pipe(
+      map(response => response.movies)
     );
   }
 
-
   getMovies2(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl2).pipe(
-      map(response => response.movies) // Adjust 'movies' based on the actual API response structure
+    return this.http.get<any>(`${this.baseUrl}/1/movies-with-details`).pipe(
+      map(response => response.movies)
     );
   }
 
   getMovies3(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl3).pipe(
-      map(response => response.movies) // Adjust 'movies' based on the actual API response structure
+    return this.http.get<any>(`${this.baseUrl}/19/movies-with-details`).pipe(
+      map(response => response.movies)
     );
   }
 
-  getComedyMovies(): Observable<any[]> {
-    // Verify the API endpoint is correct
-    return this.http.get<any>('http://localhost:8080/mozixx/resources/genres/3/movies')
-      .pipe(
-        map(response => {
-          console.log('API Response:', response); // Add this for debugging
-          return response.movies || [];
-        }),
-        )
-      ;
+  getVígjátékMovies(): Observable<any[]> {
+    console.log('CategoryService.getvígjátékMovies() meghívva');
+    return this.http.get<any>(`${this.baseUrl}/3/movies-with-details`).pipe(
+      map(response => {
+        console.log('CategoryService.getvígjátékMovies() válasz:', response);
+        return response.movies || [];
+      })
+    );
   }
 
-  getDramaMovies(): Observable<any[]> {
-    // Verify the API endpoint is correct
-    return this.http.get<any>('http://localhost:8080/mozixx/resources/genres/3/movies')
-      .pipe(
-        map(response => {
-          console.log('API Response:', response); // Add this for debugging
-          return response.movies || [];
-        }),
-        )
-      ;
+  getDrámaMovies(): Observable<any[]> {
+    return this.http.get<any>(`${this.baseUrl}/1/movies-with-details`).pipe(
+      map(response => response.movies || [])
+    );
   }
 
-  getHistoricalMovies(): Observable<any[]> {
-    // Verify the API endpoint is correct
-    return this.http.get<any>('http://localhost:8080/mozixx/resources/genres/3/movies')
-      .pipe(
-        map(response => {
-          console.log('API Response:', response); // Add this for debugging
-          return response.movies || [];
-        }),
-        )
-      ;
+  getHáborúsMovies(): Observable<any[]> {
+    return this.http.get<any>(`${this.baseUrl}/6/movies-with-details`).pipe(
+      map(response => response.movies || [])
+    );
+  }
+
+  getWarMovies(): Observable<any[]> {
+    return this.http.get<any>(`${this.baseUrl}/19/movies-with-details`).pipe(
+      map(response => response.movies || [])
+    );
   }
 
   
+
 }

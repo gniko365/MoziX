@@ -454,6 +454,234 @@
     
     
     
+
+
+
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001;
+      }
+      
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        max-height: 900px;
+        overflow-y: auto;
+      }
+      
+      .modal-poster {
+        width: 100%;
+        max-height: 950px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      
+      .close-btn {
+        position: absolute;      
+        top: 0;
+        right: 1.5rem;
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 20px;
+        rotate: 90deg;
+        z-index: 1000;           
+    }
+      
+      .modal-time {
+        color: #666;
+        font-size: 0.9em;
+        margin: 10px 0;
+      }
+      
+      .modal-description {
+        line-height: 1.6;
+        color: #444;
+      }
+
+      .Kategoriak {
+        display: flex;
+        justify-content: space-between; /* egyenlő térköz */
+        gap: 1rem; /* ha szeretnél némi távolságot is */
+        padding: 1rem;
+    }
+    
+    .category-component {
+        flex: 1;
+        text-align: center;
+        background-color: #333;
+        padding: 1rem;
+        border-radius: 8px;
+        color: whitesmoke;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .category-component:hover {
+        background-color: #646464;
+    }
+    
+    .category-item {
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .actor-director-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        padding: 1rem 0;
+    }
+    
+    .actor-director-container > div {
+        flex: 1;
+    }
+    
+    .szereplo-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+    
+    .szereplo-kep {
+        width: 130px;
+        height: 130px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    
+    .actor-name {
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .close {
+        position: absolute;
+        right: 1rem;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #333;
+        z-index: 1000;
+    }
+
+    .star-container {
+        text-align: center;
+    }
+
+    .rate {
+        height: 100px;
+    }
+
+    .rating-number2 {
+        color: rgb(255, 187, 0);
+        font-weight: bold;
+    }
+
+    .rateing-container2 {
+        text-align: center;
+    }
+    
+    .film-box:hover {
+        transform: scale(1.05);
+    }
+    
+    .films2 {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+        background-color: #333; /* a képen sötétszürke háttér volt */
+        border-radius: 20px;
+    }
+    
+    .film-box2 {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        width: 180px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
+    }
+    
+    .poszter2 {
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+    
+    .film-title2 {
+        font-weight: bold;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .poster-container2 {
+        position: relative;
+        width: 100%;
+      }
+      
+      .bookmark-icon {
+        position: absolute;
+        top: 0;
+        right: 0px;
+        cursor: pointer;
+        color: #fff;
+      }
+      
+      .bookmark {
+        width: 100px;
+        height: 100px;
+        background-color: #333;
+        padding-bottom: 10px;
+        padding-top: 5px;
+        border-radius: 10px;
+        border: 2px solid #fff;
+      }
+
+      .bookmark-filled {
+        width: 100px;
+        height: 100px;
+        background-color: #333;
+        padding-bottom: 10px;
+        padding-top: 5px;
+        border-radius: 10px;
+        border: 2px solid #fff;
+      }
+      
+
+
+
+
+
+
+
+
+
+
+
+
     
     
     

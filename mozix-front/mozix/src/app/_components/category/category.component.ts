@@ -3,6 +3,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../_services/category.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-category',
@@ -24,80 +25,186 @@ export class CategoryComponent implements OnInit {
   galleryMovies3: any[] = [];
     movies3: any[] = [];
 
-    constructor(private categoryService: CategoryService) {} // Konzisztens név
 
-    ngOnInit(): void {
-        this.loadMovies();
-        this.loadMovies2();
-        this.loadMovies3();
+        selectedMovie: any = null;
+        selectedMovie2: any = null;
+        selectedMovie3: any = null;
+      showModal = false;
+      sanitizedTrailerLink: SafeResourceUrl | null = null;
+      isSidebarOpen = false;
+      selectedCategory = '';
+      isBookmarked = false;
+
+      constructor(private categoryService: CategoryService, private sanitizer: DomSanitizer) {} // Konzisztens név
+
+      ngOnInit(): void {
+          this.loadMovies();
+          this.loadMovies2();
+          this.loadMovies3();
+      }
+      
+  
+      loadMovies(): void {
+        this.categoryService.getMovies().subscribe({
+          next: (data) => {
+            if (!Array.isArray(data)) {
+              console.error('Data is not an array:', data);
+              return;
+            }
+            this.movies = data;
+            this.selectMovies();
+          },
+          error: (err) => console.error('Error loading movies: ', err)
+        });
+      }
+  
+  
+      loadMovies2(): void {
+        this.categoryService.getMovies2().subscribe({
+          next: (data) => {
+            if (!Array.isArray(data)) {
+              console.error('Data is not an array:', data);
+              return;
+            }
+            this.movies2 = data;
+            this.selectMovies2();
+          },
+          error: (err) => console.error('Error loading movies: ', err)
+        });
+      }
+  
+  
+      loadMovies3(): void {
+        this.categoryService.getMovies3().subscribe({
+          next: (data) => {
+            if (!Array.isArray(data)) {
+              console.error('Data is not an array:', data);
+              return;
+            }
+            this.movies3 = data;
+            this.selectMovies3();
+          },
+          error: (err) => console.error('Error loading movies: ', err)
+        });
+      }
+  
+      private selectMovies(): void {
+        const shuffled = [...this.movies].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 7); // Get first 6 movies
+        this.mainMovie = selected[0];
+        this.galleryMovies = selected.slice(1, 7); // Get movies 2-6
     }
+  
+  private selectMovies2(): void {
+    const shuffled = [...this.movies2].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 7); // Get first 6 movies
+    this.mainMovie2 = selected[0];
+    this.galleryMovies2 = selected.slice(1, 7); // Get movies 2-6
+  }
+  
+  private selectMovies3(): void {
+    const shuffled = [...this.movies3].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 7); // Get first 6 movies
+    this.mainMovie3 = selected[0];
+    this.galleryMovies3 = selected.slice(1, 7); // Get movies 2-6
+  }
+   
+  
+  
+  
+ 
+
+
+  showMovieDetails(movieId: number): void {
+    console.log('Attempting to show details for movie ID:', movieId);
+    const foundMovie = this.movies.find(m => m.movieId === movieId);
+    console.log('Found movie:', foundMovie);
     
-
-    loadMovies(): void {
-      this.categoryService.getMovies().subscribe({
-        next: (data) => {
-          if (!Array.isArray(data)) {
-            console.error('Data is not an array:', data);
-            return;
-          }
-          this.movies = data;
-          this.selectMovies();
-        },
-        error: (err) => console.error('Error loading movies: ', err)
-      });
+    if (foundMovie) {
+      this.selectedMovie = foundMovie;
+      this.selectedMovie2 = null; // Clear other movie type
+      
+      if (this.selectedMovie.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie.trailerLink
+        );
+      }
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
     }
-
-
-    loadMovies2(): void {
-      this.categoryService.getMovies2().subscribe({
-        next: (data) => {
-          if (!Array.isArray(data)) {
-            console.error('Data is not an array:', data);
-            return;
-          }
-          this.movies2 = data;
-          this.selectMovies2();
-        },
-        error: (err) => console.error('Error loading movies: ', err)
-      });
-    }
-
-
-    loadMovies3(): void {
-      this.categoryService.getMovies3().subscribe({
-        next: (data) => {
-          if (!Array.isArray(data)) {
-            console.error('Data is not an array:', data);
-            return;
-          }
-          this.movies3 = data;
-          this.selectMovies3();
-        },
-        error: (err) => console.error('Error loading movies: ', err)
-      });
-    }
-
-    private selectMovies(): void {
-      const shuffled = [...this.movies].sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, 7); // Get first 6 movies
-      this.mainMovie = selected[0];
-      this.galleryMovies = selected.slice(1, 7); // Get movies 2-6
   }
 
-private selectMovies2(): void {
-  const shuffled = [...this.movies2].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 7); // Get first 6 movies
-  this.mainMovie2 = selected[0];
-  this.galleryMovies2 = selected.slice(1, 7); // Get movies 2-6
+  showMovieDetails2(movieId: number): void {
+    console.log('Attempting to show details for movie2 ID:', movieId);
+    const foundMovie = this.movies2.find(m => m.movieId === movieId);
+    console.log('Found movie2:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie2 = foundMovie;
+      this.selectedMovie = null; // Clear other movie type
+      
+      if (this.selectedMovie2.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie2.trailerLink
+        );
+      }
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+  showMovieDetails3(movieId: number): void {
+    console.log('Attempting to show details for movie3 ID:', movieId);
+    const foundMovie = this.movies3.find(m => m.movieId === movieId);
+    console.log('Found movie3:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie3 = foundMovie;
+      this.selectedMovie = null;
+      this.selectedMovie2 = null;
+      
+      if (this.selectedMovie3.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie3.trailerLink
+        );
+      }
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+  
+
+
+
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedMovie = null;
+    this.selectedMovie2 = null;
+    this.selectedMovie3 = null; // Add this line
+    this.sanitizedTrailerLink = null;
+  }
+
+
+
+
+
+
+
+
+
+
+
+toggleSidebar(category: string = ''): void {
+  this.selectedCategory = category;
+  this.isSidebarOpen = !!category;
 }
 
-private selectMovies3(): void {
-  const shuffled = [...this.movies3].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 7); // Get first 6 movies
-  this.mainMovie3 = selected[0];
-  this.galleryMovies3 = selected.slice(1, 7); // Get movies 2-6
+toggleBookmark() {
+  this.isBookmarked = !this.isBookmarked;
 }
- 
 
 
 }

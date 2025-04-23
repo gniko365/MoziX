@@ -3,6 +3,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BestratedService } from '../../_services/bestrated.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-bestrated',
@@ -32,7 +33,21 @@ export class BestratedComponent implements OnInit {
   galleryMovies5: any[] = [];
     movies5: any[] = [];
 
-    constructor(private bestratedService: BestratedService) {} // Konzisztens név
+
+    selectedMovie: any = null;
+    selectedMovie2: any = null;
+    selectedMovie3: any = null;
+    selectedMovie4: any = null;
+    selectedMovie5: any = null;
+  showModal = false;
+  sanitizedTrailerLink: SafeResourceUrl | null = null;
+  isSidebarOpen = false;
+  selectedCategory = '';
+  isBookmarked = false;
+
+  
+
+    constructor(private bestratedService: BestratedService, private sanitizer: DomSanitizer) {} // Konzisztens név
 
     ngOnInit(): void {
         this.loadMovies();
@@ -147,4 +162,162 @@ export class BestratedComponent implements OnInit {
     this.mainMovie5 = selected[0];
     this.galleryMovies5 = selected.slice(1, 5); // Get movies 2-6
   }
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  showMovieDetails(movieId: number): void {
+    console.log('Attempting to show details for movie ID:', movieId);
+    const foundMovie = this.movies.find(m => m.movieId === movieId);
+    console.log('Found movie:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie = foundMovie;
+      this.selectedMovie2 = null; // Clear other movie type
+      
+      if (this.selectedMovie.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie.trailerLink
+        );
+      }
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+
+
+
+
+
+
+  showMovieDetails2(movieId: number): void {
+    console.log('Attempting to show details for movie2 ID:', movieId);
+    const foundMovie = this.movies2.find(m => m.movieId === movieId);
+    console.log('Found movie2:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie2 = foundMovie;
+      this.selectedMovie = null; // Clear other movie type
+      
+      if (this.selectedMovie2.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie2.trailerLink
+        );
+      }
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+  showMovieDetails3(movieId: number): void {
+    console.log('Attempting to show details for movie3 ID:', movieId);
+    const foundMovie = this.movies3.find(m => m.movieId === movieId);
+    console.log('Found movie3:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie3 = foundMovie;
+      this.selectedMovie = null;
+      this.selectedMovie2 = null;
+      
+      if (this.selectedMovie3.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie3.trailerLink
+        );
+      }
+
+      
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+  showMovieDetails4(movieId: number): void {
+    console.log('Attempting to show details for movie4 ID:', movieId);
+    const foundMovie = this.movies4.find(m => m.movieId === movieId);
+    console.log('Found movie4:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie4 = foundMovie;
+      this.selectedMovie3 = null;
+      this.selectedMovie = null;
+      this.selectedMovie2 = null;
+      
+      if (this.selectedMovie4.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie4.trailerLink
+        );
+      }
+
+      
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+  showMovieDetails5(movieId: number): void {
+    console.log('Attempting to show details for movie5 ID:', movieId);
+    const foundMovie = this.movies5.find(m => m.movieId === movieId);
+    console.log('Found movie5:', foundMovie);
+    
+    if (foundMovie) {
+      this.selectedMovie5 = foundMovie;
+      this.selectedMovie4 = null;
+      this.selectedMovie3 = null;
+      this.selectedMovie = null;
+      this.selectedMovie2 = null;
+      
+      if (this.selectedMovie5.trailerLink) {
+        this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.selectedMovie5.trailerLink
+        );
+      }
+
+      
+      
+      this.showModal = true;
+      console.log('Modal should be visible now');
+    }
+  }
+
+
+
+
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedMovie = null;
+  }
+
+
+  
+
+
+
+
+
+  toggleSidebar(category: string = ''): void {
+    this.selectedCategory = category;
+    this.isSidebarOpen = !!category;
+  }
+  
+  toggleBookmark() {
+    this.isBookmarked = !this.isBookmarked;
 }
+}
+

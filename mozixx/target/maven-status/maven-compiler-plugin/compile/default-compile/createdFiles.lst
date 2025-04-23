@@ -8,6 +8,7 @@ com\mycompany\mozixx\model\Genres.class
 com\mycompany\mozixx\service\FavoriteService.class
 com\mycompany\mozixx\model\MovieGenres.class
 com\mycompany\mozixx\model\Movies.class
+FavoriteService.class
 com\mycompany\mozixx\service\MovieService$1.class
 filters\CORSFilter.class
 com\mycompany\mozixx\controller\ActorController.class

@@ -1,34 +1,35 @@
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\UserFavorites.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\GenreController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\exception\ExceptionLogger.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieGenresPK.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\MovieService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\utils\PasswordValidator.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Ratings.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\JAXRSConfiguration.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\FavoriteService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\DirectorController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectorsPK.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Directors.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectors.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\config\JWT.java
-D:\ae\mozix\mozixx\src\main\java\filters\CORSFilter.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\ApplicationConfig.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\FavoriteController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Actors.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Movies.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Users.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieGenres.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\resources\JavaEE8Resource.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieActors.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\RatingService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Genres.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\RatingController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\UserController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\MovieActorsPK.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\GenreService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\DirectorService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\MovieController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\ActorController.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\UserService.java
-D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\service\ActorService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\RatingController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\ActorController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\JAXRSConfiguration.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\UserController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\config\JWT.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\ApplicationConfig.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\RatingService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\DirectorController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\MovieController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieGenresPK.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\utils\PasswordValidator.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\UserFavorites.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieActors.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\resources\JavaEE8Resource.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\FavoriteController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieGenres.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectorsPK.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\GenreService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieActorsPK.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Movies.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\ActorService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\exception\ExceptionLogger.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Directors.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\filters\CORSFilter.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Users.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\controller\GenreController.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Ratings.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Actors.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\MovieDirectors.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\model\Genres.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\FavoriteService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\FavoriteService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\MovieService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\DirectorService.java
+C:\SUSU\MOZIX MINDEN\MoziXdd\mozixx\src\main\java\com\mycompany\mozixx\service\UserService.java
