@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 21, 2025 at 06:25 PM
+-- Generation Time: Apr 24, 2025 at 07:47 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -578,9 +578,29 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `movieTitles` ()   SELECT movie_name
 FROM movies$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `register_user` (IN `p_username` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
-    INSERT INTO users (username, email, password, registration_date, role)
-    VALUES (p_username, p_email, p_password, CURDATE(), 'user');
+CREATE DEFINER=`root`@`localhost` PROCEDURE `register_user` (IN `p_username` VARCHAR(50), IN `p_email` VARCHAR(100), IN `p_password` VARCHAR(255), OUT `p_error_code` INT, OUT `p_error_msg` VARCHAR(255))   BEGIN
+    DECLARE username_exists INT DEFAULT 0;
+    DECLARE email_exists INT DEFAULT 0;
+    
+    -- Alapértelmezett értékek
+    SET p_error_code = 0;
+    SET p_error_msg = '';
+    
+    -- Ellenőrzések
+    SELECT COUNT(*) INTO username_exists FROM users WHERE username = p_username;
+    SELECT COUNT(*) INTO email_exists FROM users WHERE email = p_email;
+    
+    IF username_exists > 0 THEN
+        SET p_error_code = 1;
+        SET p_error_msg = 'A felhasználónév már foglalt';
+    ELSEIF email_exists > 0 THEN
+        SET p_error_code = 2;
+        SET p_error_msg = 'Az email cím már regisztrálva van';
+    ELSE
+        -- Beszúrás ha nincs hiba
+        INSERT INTO users (username, email, password, registration_date, role)
+        VALUES (p_username, p_email, p_password, CURDATE(), 'user');
+    END IF;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchMoviesByName` (IN `p_search_term` VARCHAR(255))   BEGIN
@@ -1552,7 +1572,13 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (53, 'tesztfelhasználó', 'teszt@example.com', 'titkosjelszó', '2023-10-01', 'user'),
 (56, 'ákoskaa', 'faszm@gmail.com', 'igeniskapitány0123!', '2025-03-13', 'user'),
 (57, 'trallala', 'trallalero@gmail.com', '$2a$10$CKf62aHNooKglXM4PN0APuU4srVeLMScYUXle8zbAIoy3sK9K3rG.', '2025-03-13', 'user'),
-(59, 'waawaa', 'madness@gmail.com', 'Porquedillo4!', '2025-03-29', 'user');
+(59, 'waawaa', 'madness@gmail.com', 'Porquedillo4!', '2025-03-29', 'user'),
+(61, '000', 'zsanett@gml.com', 'zsanett', '2025-04-23', 'user'),
+(63, 'nignog', 'cacafu', 'Por', '2025-04-24', 'user'),
+(65, 'utaloma', 'cacafufff@gmail.com', '$2a$10$CWAQlZtQ3jkCfVMdO0DiBeLsc8UXFvjiP9INCR1GJSB8kZJ9a6Pba', '2025-04-24', 'user'),
+(67, 'utalomaaa', 'cacafufffff@gmail.com', '$2a$10$.JZoa76U.qKGuiLKazkp3Oin789x8j3KORmQutiwaF4FkpjbF2Fiu', '2025-04-24', 'user'),
+(68, 'utalomaassa', 'cacafufssffff@gmail.com', '$2a$10$UpqSq7kG2XEy5.rOwSy1Ju9onuHG.0oyzM.K3Bra3u3Ex8vNmuFoS', '2025-04-24', 'user'),
+(69, 'automoso', 'vaovoavovaova@gmail.com', 'Porprosdfsdfsdfoo0!', '2025-04-24', 'user');
 
 -- --------------------------------------------------------
 
@@ -1688,7 +1714,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `user_favorites`
