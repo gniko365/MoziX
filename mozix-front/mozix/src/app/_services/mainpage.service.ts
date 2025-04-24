@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class MainpageService {
-  private apiUrl = 'http://localhost:8080/mozixx/resources/movies/all';
+  private apiUrl = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/movies/all';
   private apiUrl2 = 'http://localhost:8080/mozixx/resources/movies/random';
   private apiUrl3 = 'http://localhost:8080/mozixx/resources/movies';
 

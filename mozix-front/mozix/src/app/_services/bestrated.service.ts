@@ -20,11 +20,11 @@ interface Movie {
   providedIn: 'root'
 })
 export class BestratedService {
-  private apiUrl = 'http://localhost:8080/mozixx/resources/ratings/by-rounded-rating/5';
-  private apiUrl2 = 'http://localhost:8080/mozixx/resources/ratings/by-rounded-rating/4';
-  private apiUrl3 = 'http://localhost:8080/mozixx/resources/ratings/by-rounded-rating/3';
-  private apiUrl4 = 'http://localhost:8080/mozixx/resources/ratings/by-rounded-rating/2';
-  private apiUrl5 = 'http://localhost:8080/mozixx/resources/ratings/by-rounded-rating/1';
+  private apiUrl = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/ratings/by-rounded-rating/5';
+  private apiUrl2 = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/ratings/by-rounded-rating/4';
+  private apiUrl3 = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/ratings/by-rounded-rating/3';
+  private apiUrl4 = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/ratings/by-rounded-rating/2';
+  private apiUrl5 = 'http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/ratings/by-rounded-rating/1';
 
   constructor(private http: HttpClient) { }
 
@@ -59,6 +59,6 @@ export class BestratedService {
   }
 
   getMovieById(id: number): Observable<any> {
-    return this.http.get<any>(`http://localhost:8080/mozixx/resources/movies/${id}`);
+    return this.http.get<any>(`http://localhost:8080/mozixx-1.0-SNAPSHOT/resources/movies/${id}`);
   }
 }

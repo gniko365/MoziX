@@ -154,37 +154,59 @@ public class UserService {
 
     public JSONObject registerUser(Users user) {
     JSONObject response = new JSONObject();
+    EntityTransaction transaction = null;
+    
     try {
-        beginTransaction();
-        
-        if (isEmailAlreadyRegistered(user.getEmail())) {
-            response.put("status", "conflict");
-            response.put("statusCode", 409);
-            response.put("message", "Email already registered");
+        transaction = em.getTransaction();
+        transaction.begin();
+
+        // 1. Előzetes validációk
+        List<String> passwordErrors = isValidPassword(user.getPassword());
+        if (!passwordErrors.isEmpty()) {
+            response.put("status", "error");
+            response.put("statusCode", 400);
+            response.put("errors", passwordErrors);
             return response;
         }
+
+        // 2. Tárolt eljárás hívása
+        StoredProcedureQuery query = em.createStoredProcedureQuery("register_user")
+            .registerStoredProcedureParameter("p_username", String.class, ParameterMode.IN)
+            .registerStoredProcedureParameter("p_email", String.class, ParameterMode.IN)
+            .registerStoredProcedureParameter("p_password", String.class, ParameterMode.IN)
+            .registerStoredProcedureParameter("p_error_code", Integer.class, ParameterMode.OUT)
+            .registerStoredProcedureParameter("p_error_msg", String.class, ParameterMode.OUT)
+            .setParameter("p_username", user.getUsername())
+            .setParameter("p_email", user.getEmail())
+            .setParameter("p_password", user.getPassword());
+
+        query.execute();
         
-        if (isUsernameAlreadyTaken(user.getUsername())) {
-            response.put("status", "conflict");
-            response.put("statusCode", 409);
-            response.put("message", "Username already taken");
+        // 3. Hibakód lekérdezése
+        Integer errorCode = (Integer) query.getOutputParameterValue("p_error_code");
+        String errorMsg = (String) query.getOutputParameterValue("p_error_msg");
+
+        if (errorCode != null && errorCode != 0) {
+            transaction.rollback();
+            response.put("status", "error");
+            response.put("statusCode", 409); // Conflict
+            response.put("message", errorMsg);
             return response;
         }
-        
-        user.setRegistrationDate(new Date());
-        user.setRole(Users.Role.user);  // Changed to use enum
-        em.persist(user);
-        commitTransaction();
-        
+
+        transaction.commit();
         response.put("status", "success");
-        response.put("statusCode", 200);
-        response.put("message", "User registered successfully");
+        response.put("statusCode", 201);
+        
     } catch (Exception e) {
-        rollbackTransaction();
+        if (transaction != null && transaction.isActive()) {
+            transaction.rollback();
+        }
         response.put("status", "error");
         response.put("statusCode", 500);
-        response.put("message", e.getMessage());
+        response.put("message", "Szerverhiba: " + e.getMessage());
     }
+    
     return response;
 }
 

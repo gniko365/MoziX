@@ -4,6 +4,7 @@ import com.mycompany.mozixx.config.JWT;
 import com.mycompany.mozixx.model.Users;
 import com.mycompany.mozixx.service.UserService;
 import java.util.List;
+import javax.persistence.EntityTransaction;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -69,26 +70,55 @@ public class UserController {
     }
 
     @POST
-@Path("registerUser")
+@Path("/register")
 @Consumes(MediaType.APPLICATION_JSON)
-public Response registerUser(String bodyString) {
-    JSONObject body = new JSONObject(bodyString);
+@Produces(MediaType.APPLICATION_JSON)
+public Response registerUser(String jsonRequest) {
+    try {
+        JSONObject request = new JSONObject(jsonRequest);
+        
+        // Validációk
+        if (!request.has("email") || request.getString("email").isEmpty() ||
+            !request.has("username") || request.getString("username").isEmpty() ||
+            !request.has("password") || request.getString("password").isEmpty()) {
+            
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity(createErrorResponse(400, "Minden mező kitöltése kötelező").toString())
+                .build();
+        }
 
-    // Felhasználó létrehozása a kérésből
-    Users user = new Users(
-            body.getString("email"),
-            body.getString("username"),
-            body.getString("password")
-    );
+        Users user = new Users(
+            request.getString("email"),
+            request.getString("username"),
+            request.getString("password")
+        );
 
-    // Regisztráció meghívása a Service rétegben
-    JSONObject obj = layer.registerUser(user);
+        JSONObject result = userService.registerUser(user);
+        
+        // Explicit toString() hívás és Content-Type beállítás
+        return Response.status(result.getInt("statusCode"))
+            .entity(result.toString())
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+            
+    } catch (JSONException e) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity(createErrorResponse(400, "Érvénytelen JSON formátum").toString())
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity(createErrorResponse(500, "Szerverhiba: " + e.getMessage()).toString())
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+    }
+}
 
-    // Válasz visszaadása
-    return Response.status(obj.getInt("statusCode"))
-                  .entity(obj.toString())
-                  .type(MediaType.APPLICATION_JSON)
-                  .build();
+private JSONObject createErrorResponse(int statusCode, String message) {
+    return new JSONObject()
+        .put("status", "error")
+        .put("statusCode", statusCode)
+        .put("message", message);
 }
 
     @POST
