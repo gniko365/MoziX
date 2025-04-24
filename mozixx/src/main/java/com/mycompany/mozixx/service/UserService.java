@@ -120,37 +120,48 @@ public class UserService {
     }
     
     public JSONObject login(String email, String password) {
-        JSONObject response = new JSONObject();
+    JSONObject response = new JSONObject();
+    try {
+        beginTransaction();
+        
+        // 1. Ellenőrizzük, hogy létezik-e a felhasználó
+        TypedQuery<Users> userQuery = em.createQuery(
+            "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+        userQuery.setParameter("email", email);
+        
+        Users user;
         try {
-            beginTransaction();
-            TypedQuery<Users> query = em.createQuery(
-                "SELECT u FROM Users u WHERE u.email = :email AND u.password = :password", 
-                Users.class);
-            query.setParameter("email", email);
-            query.setParameter("password", password);
-            Users user = query.getSingleResult();
-            commitTransaction();
-            
-            if (user != null) {
-                response.put("status", "success");
-                response.put("statusCode", 200);
-                response.put("result", userToJSON(user));
-                response.put("jwt", JWT.createJWT(user));
-            } else {
-                response.put("status", "unauthorized");
-                response.put("statusCode", 401);
-            }
+            user = userQuery.getSingleResult();
         } catch (NoResultException e) {
-            response.put("status", "unauthorized");
-            response.put("statusCode", 401);
-        } catch (Exception e) {
-            rollbackTransaction();
             response.put("status", "error");
-            response.put("statusCode", 500);
-            response.put("message", e.getMessage());
+            response.put("statusCode", 401);
+            response.put("message", "Hibás email cím vagy jelszó");
+            return response;
         }
-        return response;
+
+        // 2. Jelszó ellenőrzése
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            response.put("status", "error");
+            response.put("statusCode", 401);
+            response.put("message", "Hibás email cím vagy jelszó");
+            return response;
+        }
+
+        // 3. Sikeres bejelentkezés
+        commitTransaction();
+        response.put("status", "success");
+        response.put("statusCode", 200);
+        response.put("result", userToJSON(user));
+        response.put("jwt", JWT.createJWT(user));
+        
+    } catch (Exception e) {
+        rollbackTransaction();
+        response.put("status", "error");
+        response.put("statusCode", 500);
+        response.put("message", "Szerverhiba történt");
     }
+    return response;
+}
 
     public JSONObject registerUser(Users user) {
     JSONObject response = new JSONObject();
@@ -160,43 +171,35 @@ public class UserService {
         transaction = em.getTransaction();
         transaction.begin();
 
-        // 1. Előzetes validációk
-        List<String> passwordErrors = isValidPassword(user.getPassword());
-        if (!passwordErrors.isEmpty()) {
+        // 1. Validációk
+        if (isEmailAlreadyRegistered(user.getEmail())) {
             response.put("status", "error");
-            response.put("statusCode", 400);
-            response.put("errors", passwordErrors);
-            return response;
-        }
-
-        // 2. Tárolt eljárás hívása
-        StoredProcedureQuery query = em.createStoredProcedureQuery("register_user")
-            .registerStoredProcedureParameter("p_username", String.class, ParameterMode.IN)
-            .registerStoredProcedureParameter("p_email", String.class, ParameterMode.IN)
-            .registerStoredProcedureParameter("p_password", String.class, ParameterMode.IN)
-            .registerStoredProcedureParameter("p_error_code", Integer.class, ParameterMode.OUT)
-            .registerStoredProcedureParameter("p_error_msg", String.class, ParameterMode.OUT)
-            .setParameter("p_username", user.getUsername())
-            .setParameter("p_email", user.getEmail())
-            .setParameter("p_password", user.getPassword());
-
-        query.execute();
-        
-        // 3. Hibakód lekérdezése
-        Integer errorCode = (Integer) query.getOutputParameterValue("p_error_code");
-        String errorMsg = (String) query.getOutputParameterValue("p_error_msg");
-
-        if (errorCode != null && errorCode != 0) {
+            response.put("statusCode", 409);
+            response.put("message", "Az email cím már regisztrálva van");
             transaction.rollback();
+            return response;
+        }
+        
+        if (isUsernameAlreadyTaken(user.getUsername())) {
             response.put("status", "error");
-            response.put("statusCode", 409); // Conflict
-            response.put("message", errorMsg);
+            response.put("statusCode", 409);
+            response.put("message", "A felhasználónév már foglalt");
+            transaction.rollback();
             return response;
         }
 
+        // 2. Jelszó hash-elés
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        user.setRegistrationDate(new Date());
+        user.setRole(Role.user);
+
+        // 3. Mentés
+        em.persist(user);
         transaction.commit();
+
         response.put("status", "success");
         response.put("statusCode", 201);
+        response.put("message", "Sikeres regisztráció");
         
     } catch (Exception e) {
         if (transaction != null && transaction.isActive()) {
@@ -204,7 +207,7 @@ public class UserService {
         }
         response.put("status", "error");
         response.put("statusCode", 500);
-        response.put("message", "Szerverhiba: " + e.getMessage());
+        response.put("message", "Szerverhiba történt: " + e.getMessage());
     }
     
     return response;
