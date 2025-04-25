@@ -31,89 +31,128 @@ public class FavoriteController {
     private final FavoriteService favoriteService = new FavoriteService();
 
     @POST
-@Path("/add")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public Response addFavorite(String requestBody) {
-    try {
-        JSONObject request = new JSONObject(requestBody);
+    @Path("/add")
+    public Response addToFavorites(
+        @HeaderParam("Authorization") String authHeader,
+        String jsonBody) {
         
-        if (!request.has("userId") || !request.has("movieId")) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                         .entity("{\"error\":\"Missing userId or movieId\"}")
-                         .build();
+        try {
+            // 1. Token kinyerése a headerből
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new JSONObject()
+                        .put("status", "error")
+                        .put("message", "Érvénytelen hitelesítési fejléc"))
+                    .build();
+            }
+            
+            String jwtToken = authHeader.substring("Bearer ".length());
+            JSONObject request = new JSONObject(jsonBody);
+            
+            // 2. Kötelező mezők ellenőrzése
+            if (!request.has("movieId")) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new JSONObject()
+                        .put("status", "error")
+                        .put("message", "Hiányzó movieId"))
+                    .build();
+            }
+            
+            int movieId = request.getInt("movieId");
+            
+            // 3. Service hívása
+            JSONObject result = favoriteService.addMovieToFavorites(jwtToken, movieId);
+            
+            return Response.status(result.getInt("statusCode"))
+                .entity(result.toString())
+                .build();
+                
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new JSONObject()
+                    .put("status", "error")
+                    .put("message", "Belső szerverhiba"))
+                .build();
+        }
+    }
+
+    @GET
+@Path("/list")
+@Produces(MediaType.APPLICATION_JSON)
+public Response getFavorites(@HeaderParam("Authorization") String authHeader) {
+    
+    try {
+        // Validate Authorization header
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return buildErrorResponse(Response.Status.UNAUTHORIZED, "Missing or invalid authorization token");
+        }
+        
+        String jwt = authHeader.substring("Bearer ".length());
+        
+        // Validate JWT
+        if (JWT.validateJWT(jwt) != 1) {
+            return buildErrorResponse(Response.Status.UNAUTHORIZED, "Invalid token");
         }
 
-        int userId = request.getInt("userId");
-        int movieId = request.getInt("movieId");
+        // Get favorites using just the JWT
+        JSONArray favorites = favoriteService.getUserFavorites(jwt);
         
-        JSONObject result = favoriteService.addFavorite(userId, movieId);
-        int status = result.getString("status").equals("success") ? 200 : 400;
+        // Return empty array if no favorites
+        return Response.ok(favorites.toString()).build();
         
-        return Response.status(status)
-                     .entity(result.toString())
-                     .build();
-    } catch (JSONException e) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                     .entity("{\"error\":\"Invalid request format\"}")
-                     .build();
     } catch (Exception e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity("{\"error\":\"Server error\"}")
-                     .build();
+        logger.error("API request failed", e);
+        return buildErrorResponse(
+            Response.Status.INTERNAL_SERVER_ERROR,
+            "Failed to retrieve favorites"
+        );
     }
 }
 
-    @GET
-    @Path("/list")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getFavorites(@QueryParam("userId") int userId) {
-        try {
-            // Input validation
-            if (userId <= 0) {
-                return buildErrorResponse(Response.Status.BAD_REQUEST, "Invalid user ID");
-            }
-
-            JSONArray favorites = favoriteService.getUserFavorites(userId);
-            
-            // Return empty array instead of error if no favorites
-            return Response.ok(favorites.toString()).build();
-            
-        } catch (IllegalArgumentException e) {
-            return buildErrorResponse(Response.Status.NOT_FOUND, e.getMessage());
-        } catch (Exception e) {
-            logger.error("API request failed", e);
-            return buildErrorResponse(
-                Response.Status.INTERNAL_SERVER_ERROR,
-                "Failed to retrieve favorites"
-            );
-        }
-    }
-
-    private Response buildErrorResponse(Response.Status status, String message) {
-        return Response.status(status)
-            .entity("{\"error\":\"" + message + "\"}")
-            .build();
-    }
+private Response buildErrorResponse(Response.Status status, String message) {
+    JSONObject error = new JSONObject();
+    error.put("error", message);
+    return Response.status(status)
+        .entity(error.toString())
+        .build();
+}
     
     @DELETE
 @Path("/remove")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public Response removeFavorite(String requestBody) {
+public Response removeFavorite(
+        @HeaderParam("Authorization") String authHeader,
+        String requestBody) {
+    
     try {
-        JSONObject request = new JSONObject(requestBody);
+        // Validate Authorization header
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                         .entity("{\"error\":\"Missing or invalid authorization token\"}")
+                         .build();
+        }
         
-        if (!request.has("userId") || !request.has("movieId")) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                         .entity("{\"error\":\"Missing userId or movieId\"}")
+        String jwt = authHeader.substring("Bearer ".length());
+        
+        // Validate JWT
+        if (JWT.validateJWT(jwt) != 1) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                         .entity("{\"error\":\"Invalid token\"}")
                          .build();
         }
 
-        int userId = request.getInt("userId");
+        JSONObject request = new JSONObject(requestBody);
+        
+        if (!request.has("movieId")) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                         .entity("{\"error\":\"Missing movieId\"}")
+                         .build();
+        }
+
         int movieId = request.getInt("movieId");
         
-        JSONObject result = favoriteService.deleteFavorite(userId, movieId);
+        JSONObject result = favoriteService.deleteFavorite(jwt, movieId);
         
         int status = result.getString("status").equals("success") 
             ? Response.Status.OK.getStatusCode() 
