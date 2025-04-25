@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
@@ -77,37 +78,36 @@ public class FavoriteController {
     }
 
     @GET
-@Path("/list")
-@Produces(MediaType.APPLICATION_JSON)
-public Response getFavorites(@HeaderParam("Authorization") String authHeader) {
-    
-    try {
-        // Validate Authorization header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return buildErrorResponse(Response.Status.UNAUTHORIZED, "Missing or invalid authorization token");
-        }
-        
-        String jwt = authHeader.substring("Bearer ".length());
-        
-        // Validate JWT
-        if (JWT.validateJWT(jwt) != 1) {
-            return buildErrorResponse(Response.Status.UNAUTHORIZED, "Invalid token");
-        }
+    @Path("/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFavoriteMovies(@HeaderParam("Authorization") String authHeader) {
+        try {
+            // 1. Token kinyerése a headerből
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity(new JSONObject()
+                                .put("status", "error")
+                                .put("message", "Érvénytelen hitelesítési fejléc"))
+                        .build();
+            }
 
-        // Get favorites using just the JWT
-        JSONArray favorites = favoriteService.getUserFavorites(jwt);
-        
-        // Return empty array if no favorites
-        return Response.ok(favorites.toString()).build();
-        
-    } catch (Exception e) {
-        logger.error("API request failed", e);
-        return buildErrorResponse(
-            Response.Status.INTERNAL_SERVER_ERROR,
-            "Failed to retrieve favorites"
-        );
+            String jwtToken = authHeader.substring("Bearer ".length());
+
+            // 2. Service hívása
+            JSONObject result = favoriteService.getFavoriteMovies(jwtToken);
+
+            return Response.status(result.getInt("statusCode"))
+                    .entity(result.toString())
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new JSONObject()
+                            .put("status", "error")
+                            .put("message", "Belső szerverhiba"))
+                    .build();
+        }
     }
-}
 
 private Response buildErrorResponse(Response.Status status, String message) {
     JSONObject error = new JSONObject();

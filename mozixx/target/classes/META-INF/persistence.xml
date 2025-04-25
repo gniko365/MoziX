@@ -15,6 +15,11 @@
     <class>com.mycompany.mozixx.model.MovieActorsPK</class>
     <class>com.mycompany.mozixx.model.MovieDirectors</class>
     <class>com.mycompany.mozixx.model.UserFavorites</class>
+    <class>com.example.entities.MovieEntity</class>
+    <class>com.example.entities.DirectorEntity</class>
+    <class>com.example.entities.MovieDirectorEntity</class>
+    <class>com.example.entities.ActorEntity</class>
+    <class>com.example.entities.MovieActorEntity</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mozix?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

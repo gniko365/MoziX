@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 24, 2025 at 07:47 PM
+-- Generation Time: Apr 25, 2025 at 10:21 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -27,6 +27,27 @@ DELIMITER $$
 --
 -- Procedures
 --
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddMovieToFavorites` (IN `p_user_id` INT, IN `p_movie_id` INT)   BEGIN
+    IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = p_user_id) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A megadott felhasználói azonosító nem létezik.';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM movies WHERE movie_id = p_movie_id) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A megadott film azonosító nem létezik.';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM user_favorites WHERE user_id = p_user_id AND movie_id = p_movie_id) THEN
+        -- Hozzáadjuk a filmet a felhasználó kedvenceihez
+        INSERT INTO user_favorites (user_id, movie_id, added_at)
+        VALUES (p_user_id, p_movie_id, NOW());
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A film már szerepel a felhasználó kedvencei között.';
+    END IF;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AddRating` (IN `p_user_id` INT, IN `p_movie_id` INT, IN `p_rating` INT, IN `p_review` VARCHAR(255))   BEGIN
     INSERT INTO ratings (user_id, movie_id, rating, review, rating_date)
     VALUES (p_user_id, p_movie_id, p_rating, p_review, NOW());
@@ -541,10 +562,61 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRatingsByMovie` (IN `movie_title
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserFavorites` (IN `userId` INT)   BEGIN
-    SELECT m.movie_id, m.movie_name, m.release_year, m.cover
-    FROM user_favorites uf 
-    JOIN movies m ON uf.movie_id = m.movie_id 
-    WHERE uf.user_id = userId
+    SELECT
+        m.movie_id AS movieId,
+        m.movie_name AS title,
+        m.cover,
+        m.release_year AS releaseYear,
+        m.length,
+        m.description,
+        m.trailer_link AS trailerLink,
+        ROUND(COALESCE(AVG(r.rating), 0), 1) AS averageRating,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(d.director_id, ':', d.name, ':',
+                CASE
+                    WHEN d.director_image IS NULL OR d.director_image = 'https' THEN ''
+                    ELSE d.director_image
+                END)
+                SEPARATOR '|'
+            )
+            FROM movie_directors md
+            JOIN directors d ON md.director_id = d.director_id
+            WHERE md.movie_id = m.movie_id
+        ) AS directors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(a.actor_id, ':', a.name, ':',
+                CASE
+                    WHEN a.actor_image IS NULL OR a.actor_image = 'https' THEN ''
+                    ELSE a.actor_image
+                END)
+                SEPARATOR '|'
+            )
+            FROM movie_actors ma
+            JOIN actors a ON ma.actor_id = a.actor_id
+            WHERE ma.movie_id = m.movie_id
+        ) AS actors,
+        (
+            SELECT GROUP_CONCAT(
+                CONCAT(g.genre_id, ':', g.name)
+                SEPARATOR '|'
+            )
+            FROM movie_genres mg
+            JOIN genres g ON mg.genre_id = g.genre_id
+            WHERE mg.movie_id = m.movie_id
+        ) AS genres
+    FROM
+        user_favorites uf
+    JOIN
+        movies m ON uf.movie_id = m.movie_id
+    LEFT JOIN
+        ratings r ON m.movie_id = r.movie_id
+    WHERE
+        uf.user_id = userId
+    GROUP BY
+        m.movie_id, m.movie_name, m.cover, m.release_year,
+        m.length, m.description, m.trailer_link
     ORDER BY uf.added_at DESC;
 END$$
 
@@ -571,8 +643,16 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getYoutubeLinks` ()   SELECT movies.trailer_link
 FROM movies$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `emailIN` VARCHAR(255), IN `passwordIN` VARCHAR(255))   BEGIN
-    SELECT * FROM users WHERE email = emailIN AND password = passwordIN;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `usernameIN` VARCHAR(100), IN `passwordIN` VARCHAR(255))   BEGIN
+    SELECT 
+        user_id,
+        username,
+        email,
+        password,
+        role,
+        registration_date
+    FROM users 
+    WHERE username = usernameIN AND password = passwordIN;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `movieTitles` ()   SELECT movie_name
@@ -1578,7 +1658,19 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (65, 'utaloma', 'cacafufff@gmail.com', '$2a$10$CWAQlZtQ3jkCfVMdO0DiBeLsc8UXFvjiP9INCR1GJSB8kZJ9a6Pba', '2025-04-24', 'user'),
 (67, 'utalomaaa', 'cacafufffff@gmail.com', '$2a$10$.JZoa76U.qKGuiLKazkp3Oin789x8j3KORmQutiwaF4FkpjbF2Fiu', '2025-04-24', 'user'),
 (68, 'utalomaassa', 'cacafufssffff@gmail.com', '$2a$10$UpqSq7kG2XEy5.rOwSy1Ju9onuHG.0oyzM.K3Bra3u3Ex8vNmuFoS', '2025-04-24', 'user'),
-(69, 'automoso', 'vaovoavovaova@gmail.com', 'Porprosdfsdfsdfoo0!', '2025-04-24', 'user');
+(69, 'automoso', 'vaovoavovaova@gmail.com', 'Porprosdfsdfsdfoo0!', '2025-04-24', 'user'),
+(70, 'automosasdo', 'vaovoavsdfsovaova@gmail.com', '$2a$10$gPnVuR414J84fpevqe39ie4/xKtwLlsTTjqFHRHsq7foXWa0HfoP2', '2025-04-24', 'user'),
+(71, 'szexelem', 'nagyb6600005@gmail.com', '$2a$10$huaKLPkC3h0kZI6mLdyZ7uCOAL/k5aXB2qqF.xIFAoin1iAt7jxwi', '2025-04-24', 'user'),
+(72, 'automsdfaosasdo', 'vaovoaasdfvsdfsovaova@gmail.com', '$2a$10$BNfO16CWBBJBegKDdOdRzOwWm2hZQJwIHThz7yVFpZIHhPXaJw3Sm', '2025-04-24', 'user'),
+(73, 'automsasdfdfaosasdo', 'vaovoaasdfvsdfsdfsovaova@gmail.com', '$2a$10$yT9sjtPIFc10inM8osnlb.GfwoptEwrT3jh9KBFJz0CX3jlcMM9hq', '2025-04-25', 'user'),
+(74, 'vao', 'vao', '$2a$10$x/bXN3Yg3.ZhTKfWse.pXOm3WTjd.KtReUDpFL5YkHmU4bOxrlnCC', '2025-04-25', 'user'),
+(75, 'teso', 'teso', '$2a$10$Z5nf8aEwuHaQ/FkBjnEz8eSUKxdGQRnCgxffNB.tT8IAAHlOxoJBe', '2025-04-25', 'user'),
+(76, 'faszom', 'faszom', '$2a$10$g0vBX747kZiXQVUw7O9eY.u3NsdXh6Z/v9iBU8uXSQyayKMRTyCVm', '2025-04-25', 'user'),
+(77, 'cigány', 'cigány', '$2a$10$APF1jdAEXyjzt1WUfSnaOOxUHzObZYi3Vw3rhp8FrCRd924Ds/SPS', '2025-04-25', 'user'),
+(78, 'automsaasdfsdfdfaosasdo', 'vaovoaasdfvsdfsdadsffsovaova@gmail.com', '$2a$10$ELEIpuTYHRchtmTw2/q4/OjzN3RrkoPnslVpMdNf1W8D7lUr1b9Gy', '2025-04-25', 'user'),
+(79, 'faa', 'faa', '$2a$10$xYJA4bIRJSfonKH3nzaY5.DoMkMPiJmjwcSfU2f1LDzlEiE9daS.u', '2025-04-25', 'user'),
+(80, 'rere', 'rere', '$2a$10$6wp3Co60PuhpmU1Q9v/bFOLVYoTx7q.aaR.bi/GhA9gEsOVfvyXe.', '2025-04-25', 'user'),
+(81, 'ref', 'ref', '$2a$10$pH2p2R94MOmZJVSCJdoqueQDUySSHftyrz3CipVEaVzL8yEUYEDMK', '2025-04-25', 'user');
 
 -- --------------------------------------------------------
 
@@ -1600,7 +1692,12 @@ CREATE TABLE `user_favorites` (
 INSERT INTO `user_favorites` (`favorite_id`, `user_id`, `movie_id`, `added_at`) VALUES
 (1, 56, 123, '2025-04-12 20:42:28'),
 (3, 56, 141, '2025-04-12 21:16:18'),
-(4, 56, 111, '2025-04-13 18:39:29');
+(4, 56, 111, '2025-04-13 18:39:29'),
+(5, 56, 144, '2025-04-24 21:32:26'),
+(6, 11, 133, '2025-04-24 21:38:56'),
+(7, 52, 144, '2025-04-24 23:13:17'),
+(11, 15, 115, '2025-04-25 20:46:17'),
+(12, 79, 101, '2025-04-25 21:42:16');
 
 --
 -- Indexes for dumped tables
@@ -1714,13 +1811,13 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `user_favorites`
 --
 ALTER TABLE `user_favorites`
-  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

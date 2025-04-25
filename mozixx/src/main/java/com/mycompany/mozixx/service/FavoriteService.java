@@ -5,11 +5,15 @@
 package com.mycompany.mozixx.service;
 
 import com.mycompany.mozixx.config.JWT;
+import com.mycompany.mozixx.model.Movies;
 import static com.mysql.cj.conf.PropertyKey.logger;
 import io.jsonwebtoken.Claims;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import org.slf4j.LoggerFactory;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -86,40 +90,117 @@ public class FavoriteService {
 }
 
 
-   public JSONArray getUserFavorites(String jwt) {
-    JSONArray favorites = new JSONArray();
-    EntityManager em = emf.createEntityManager();
-    
-    try {
-        // Get user ID from JWT
-        int userId = JWT.getUserIdByToken(jwt);
-        
-        // Call stored procedure
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetUserFavorites")
-            .registerStoredProcedureParameter("userId", Integer.class, ParameterMode.IN)
-            .setParameter("userId", userId);
-        
-        // Execute and process results
-        List<Object[]> results = query.getResultList();
-        
-        for (Object[] row : results) {
-            JSONObject movie = new JSONObject();
-            movie.put("movieId", row[0]);
-            movie.put("title", row[1] != null ? row[1] : "");
-            movie.put("releaseYear", row[2] != null ? row[2] : "");
-            movie.put("cover", row[3] != null ? row[3] : JSONObject.NULL);
-            favorites.put(movie);
+   private List<Map<String, Object>> parsePeopleInfo(String info, String type) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (info != null && !info.trim().isEmpty()) {
+            String[] people = info.split("\\|");
+            for (String person : people) {
+                String[] parts = person.split(":", 3); // Korlátozzuk 3 részre a URL miatt
+                if (parts.length == 3) {
+                    Map<String, Object> personMap = new HashMap<>();
+                    try {
+                        personMap.put("id", Integer.parseInt(parts[0].trim()));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Hiba a " + type + " ID parszolásakor: " + parts[0]);
+                        personMap.put("id", null); // Vagy valamilyen alapértelmezett érték
+                    }
+                    personMap.put("name", parts[1].trim());
+                    personMap.put("image", parts[2].trim().isEmpty() ? null : parts[2].trim());
+                    personMap.put("type", type);
+                    result.add(personMap);
+                } else {
+                    System.err.println("Rossz formátumú " + type + " adat: " + person);
+                }
+            }
         }
-    } catch (Exception e) {
-        logger.error("Error fetching favorites", e);
-        throw new RuntimeException("Failed to retrieve favorites");
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
-        }
+        return result;
     }
-    return favorites;
-}
+
+    private List<Map<String, Object>> parseGenresInfo(String info) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (info != null && !info.trim().isEmpty()) {
+            String[] genres = info.split("\\|");
+            for (String genre : genres) {
+                String[] parts = genre.split(":");
+                if (parts.length >= 2) {
+                    Map<String, Object> genreMap = new HashMap<>();
+                    try {
+                        genreMap.put("id", Integer.parseInt(parts[0].trim()));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Hiba a műfaj ID parszolásakor: " + parts[0]);
+                        genreMap.put("id", null); // Vagy valamilyen alapértelmezett érték
+                    }
+                    genreMap.put("name", parts[1].trim());
+                    result.add(genreMap);
+                } else {
+                    System.err.println("Rossz formátumú műfaj adat: " + genre);
+                }
+            }
+        }
+        return result;
+    }
+
+    public JSONObject getFavoriteMovies(String jwtToken) {
+        JSONObject response = new JSONObject();
+
+        
+        Integer userId = null;
+        int validationResult = JWT.validateJWT(jwtToken);
+        if (validationResult == 1) {
+            userId = JWT.getUserIdByToken(jwtToken);
+            System.out.println("Kinyert userId: " + userId); // Logoljuk ki a userId-t
+        } else {
+            response.put("status", "error");
+            response.put("statusCode", 401);
+            response.put("message", validationResult == 3 ? "Lejárt token" : "Érvénytelen token");
+            return response;
+        }
+
+        if (userId == null) {
+            response.put("status", "error");
+            response.put("statusCode", 401);
+            response.put("message", "Érvénytelen felhasználói azonosító a tokenben");
+            return response;
+        }
+
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("GetUserFavorites");
+            query.registerStoredProcedureParameter("userId", Integer.class, ParameterMode.IN);
+            query.setParameter("userId", userId);
+
+            List<Object[]> results = query.getResultList();
+            JSONArray favoriteMovies = new JSONArray();
+
+            for (Object[] result : results) {
+                JSONObject movieData = new JSONObject();
+                movieData.put("movieId", result[0]);
+                movieData.put("title", result[1]);
+                movieData.put("cover", result[2]);
+                movieData.put("releaseYear", result[3]);
+                movieData.put("length", result[4]);
+                movieData.put("description", result[5]);
+                movieData.put("trailerLink", result[6]);
+                movieData.put("averageRating", result[7]);
+                movieData.put("directors", new JSONArray(parsePeopleInfo((String) result[8], "director")));
+                movieData.put("actors", new JSONArray(parsePeopleInfo((String) result[9], "actor")));
+                movieData.put("genres", new JSONArray(parseGenresInfo((String) result[10])));
+
+                favoriteMovies.put(movieData);
+            }
+
+            response.put("status", "success");
+            response.put("statusCode", 200);
+            response.put("data", favoriteMovies);
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("statusCode", 500);
+            response.put("message", "Szerverhiba a kedvenc filmek lekérdezésekor: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return response;
+    }
    
    public JSONObject deleteFavorite(String jwt, int movieId) {
     JSONObject response = new JSONObject();
