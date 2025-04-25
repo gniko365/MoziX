@@ -4,10 +4,7 @@
  */
 package com.mycompany.mozixx.service;
 
-import com.mycompany.mozixx.config.JWT;
 import static com.mysql.cj.conf.PropertyKey.logger;
-import io.jsonwebtoken.Claims;
-import java.util.Date;
 import org.slf4j.LoggerFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -24,84 +21,82 @@ import org.json.JSONObject;
 public class FavoriteService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FavoriteService.class);
     private final EntityManagerFactory emf;
-    private final EntityManager em;
-
 
     public FavoriteService() {
         this.emf = Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
-        this.em = emf.createEntityManager();
     }
 
-    public JSONObject addMovieToFavorites(String jwtToken, int movieId) {
+    public JSONObject addFavorite(int userId, int movieId) {
     JSONObject response = new JSONObject();
-    EntityTransaction transaction = null;
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = null;
     
     try {
-        // 1. JWT token validálása
-        int validationResult = JWT.validateJWT(jwtToken);
-        if (validationResult != 1) {
+        tx = em.getTransaction();
+        tx.begin();
+
+        // 1. Ellenőrizzük, hogy létezik-e a film
+        boolean movieExists = ((Number) em.createNativeQuery(
+            "SELECT COUNT(*) FROM movies WHERE movie_id = ?")
+            .setParameter(1, movieId)
+            .getSingleResult()).intValue() > 0;
+        
+        if (!movieExists) {
             response.put("status", "error");
-            response.put("statusCode", 401);
-            response.put("message", validationResult == 3 ? "Lejárt token" : "Érvénytelen token");
+            response.put("message", "Movie not found");
             return response;
         }
 
-        // 2. Felhasználó ID kinyerése
-        Integer userId = JWT.getUserIdByToken(jwtToken);
-        if (userId == null) {
+        // 2. Ellenőrizzük, hogy létezik-e már a kedvenc
+        boolean alreadyFavorite = ((Number) em.createNativeQuery(
+            "SELECT COUNT(*) FROM user_favorites WHERE user_id = ? AND movie_id = ?")
+            .setParameter(1, userId)
+            .setParameter(2, movieId)
+            .getSingleResult()).intValue() > 0;
+        
+        if (alreadyFavorite) {
             response.put("status", "error");
-            response.put("statusCode", 401);
-            response.put("message", "Érvénytelen felhasználói azonosító a tokenben");
+            response.put("message", "Movie already in favorites");
             return response;
         }
 
-        transaction = em.getTransaction();
-        transaction.begin();
+        // 3. Új kedvenc hozzáadása
+        em.createNativeQuery(
+            "INSERT INTO user_favorites (user_id, movie_id) VALUES (?, ?)")
+            .setParameter(1, userId)
+            .setParameter(2, movieId)
+            .executeUpdate();
 
-        // 3. Tárolt eljárás hívása
-        StoredProcedureQuery query = em.createStoredProcedureQuery("AddMovieToFavorites")
-            .registerStoredProcedureParameter("p_user_id", Integer.class, ParameterMode.IN)
-            .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
-            .setParameter("p_user_id", userId)
-            .setParameter("p_movie_id", movieId);
-
-        query.execute();
-        transaction.commit();
-
+        tx.commit();
+        
         response.put("status", "success");
-        response.put("statusCode", 200);
-        response.put("message", "Film sikeresen hozzáadva a kedvencekhez");
-        
+        response.put("message", "Movie added to favorites");
     } catch (Exception e) {
-        if (transaction != null && transaction.isActive()) {
-            transaction.rollback();
-        }
-        
+        if (tx != null && tx.isActive()) tx.rollback();
         response.put("status", "error");
-        response.put("statusCode", 500);
-        response.put("message", "Szerverhiba: " + e.getMessage());
+        response.put("message", "Error: " + e.getMessage());
+        logger.error("Error adding favorite", e);
+    } finally {
+        em.close();
     }
-    
     return response;
 }
 
 
-   public JSONArray getUserFavorites(String jwt) {
+   public JSONArray getUserFavorites(int userId) {
     JSONArray favorites = new JSONArray();
     EntityManager em = emf.createEntityManager();
     
     try {
-        // Get user ID from JWT
-        int userId = JWT.getUserIdByToken(jwt);
-        
-        // Call stored procedure
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetUserFavorites")
-            .registerStoredProcedureParameter("userId", Integer.class, ParameterMode.IN)
-            .setParameter("userId", userId);
-        
-        // Execute and process results
-        List<Object[]> results = query.getResultList();
-        
+        // Use exact property names from Movies entity
+        List<Object[]> results = em.createQuery(
+            "SELECT m.movieId, m.movieName, m.releaseYear, m.cover " +
+            "FROM UserFavorites uf JOIN uf.movieId m " +
+            "WHERE uf.userId.userId = :userId " +
+            "ORDER BY uf.addedAt DESC", Object[].class)
+            .setParameter("userId", userId)
+            .getResultList();
+
         for (Object[] row : results) {
             JSONObject movie = new JSONObject();
             movie.put("movieId", row[0]);
@@ -121,19 +116,16 @@ public class FavoriteService {
     return favorites;
 }
    
-   public JSONObject deleteFavorite(String jwt, int movieId) {
+   public JSONObject deleteFavorite(int userId, int movieId) {
     JSONObject response = new JSONObject();
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = null;
     
     try {
-        // Get user ID from JWT
-        int userId = JWT.getUserIdByToken(jwt);
-        
         tx = em.getTransaction();
         tx.begin();
 
-        // Call stored procedure
+        // Tárolt eljárás meghívása
         StoredProcedureQuery query = em.createStoredProcedureQuery("DeleteUserFavorite")
             .registerStoredProcedureParameter("p_user_id", Integer.class, ParameterMode.IN)
             .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)

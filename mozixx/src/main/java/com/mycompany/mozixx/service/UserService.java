@@ -119,46 +119,49 @@ public class UserService {
         return toReturn;
     }
     
-    public JSONObject login(String username, String password) {
-        JSONObject response = new JSONObject();
+    public JSONObject login(String email, String password) {
+    JSONObject response = new JSONObject();
+    try {
+        beginTransaction();
+        
+        // 1. Ellenőrizzük, hogy létezik-e a felhasználó
+        TypedQuery<Users> userQuery = em.createQuery(
+            "SELECT u FROM Users u WHERE u.email = :email", Users.class);
+        userQuery.setParameter("email", email);
+        
+        Users user;
         try {
-            beginTransaction();
-            TypedQuery<Users> query = em.createQuery(
-                    "SELECT u FROM Users u WHERE u.username = :username",
-                    Users.class);
-            query.setParameter("username", username);
-            Users user = query.getSingleResult();
-            commitTransaction();
-
-            if (user != null) {
-                // Jelszó ellenőrzése a BCrypt segítségével
-                if (BCrypt.checkpw(password, user.getPassword())) {
-                    response.put("status", "success");
-                    response.put("statusCode", 200);
-                    response.put("result", userToJSON(user));
-                    response.put("jwt", JWT.createJWT(user));
-                } else {
-                    response.put("status", "unauthorized");
-                    response.put("statusCode", 401);
-                    response.put("message", "Hibás felhasználónév vagy jelszó");
-                }
-            } else {
-                response.put("status", "unauthorized");
-                response.put("statusCode", 401);
-                response.put("message", "Hibás felhasználónév vagy jelszó");
-            }
+            user = userQuery.getSingleResult();
         } catch (NoResultException e) {
-            response.put("status", "unauthorized");
-            response.put("statusCode", 401);
-            response.put("message", "Hibás felhasználónév vagy jelszó");
-        } catch (Exception e) {
-            rollbackTransaction();
             response.put("status", "error");
-            response.put("statusCode", 500);
-            response.put("message", e.getMessage());
+            response.put("statusCode", 401);
+            response.put("message", "Hibás email cím vagy jelszó");
+            return response;
         }
-        return response;
+
+        // 2. Jelszó ellenőrzése
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            response.put("status", "error");
+            response.put("statusCode", 401);
+            response.put("message", "Hibás email cím vagy jelszó");
+            return response;
+        }
+
+        // 3. Sikeres bejelentkezés
+        commitTransaction();
+        response.put("status", "success");
+        response.put("statusCode", 200);
+        response.put("result", userToJSON(user));
+        response.put("jwt", JWT.createJWT(user));
+        
+    } catch (Exception e) {
+        rollbackTransaction();
+        response.put("status", "error");
+        response.put("statusCode", 500);
+        response.put("message", "Szerverhiba történt");
     }
+    return response;
+}
 
     public JSONObject registerUser(Users user) {
     JSONObject response = new JSONObject();
