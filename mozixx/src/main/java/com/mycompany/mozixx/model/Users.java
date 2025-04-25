@@ -225,41 +225,6 @@ public class Users implements Serializable {
                ", role=" + role +
                '}';
     }
-
-    public Users loginUser(String email, String password) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            StoredProcedureQuery spq = em.createStoredProcedureQuery("login");
-            spq.registerStoredProcedureParameter("emailIN", String.class, ParameterMode.IN);
-            spq.registerStoredProcedureParameter("passwordIN", String.class, ParameterMode.IN);
-            spq.setParameter("emailIN", email);
-            spq.setParameter("passwordIN", password);
-            spq.execute();
-
-            List<Object[]> resultList = spq.getResultList();
-            if (resultList.isEmpty()) {
-                return null;
-            }
-
-            Object[] o = resultList.get(0);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            return new Users(
-                Integer.valueOf(o[0].toString()),
-                o[1].toString(),
-                o[2].toString(),
-                o[3].toString(),
-                Role.valueOf(o[4].toString()),
-                (o.length > 5 && o[5] != null) ? formatter.parse(o[5].toString()) : null
-            );
-
-        } catch (NumberFormatException | ParseException e) {
-            System.err.println("Hiba: " + e.getLocalizedMessage());
-            return null;
-        } finally {
-            em.close();
-        }
-    }
-
     // Other methods
     public Integer getId() {
         return userId;
