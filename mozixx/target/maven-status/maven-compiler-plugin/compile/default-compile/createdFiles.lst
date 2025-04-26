@@ -23,6 +23,7 @@ com\mycompany\mozixx\JAXRSConfiguration.class
 com\mycompany\mozixx\model\MovieActors.class
 com\mycompany\mozixx\model\UserFavorites.class
 com\mycompany\mozixx\model\Ratings.class
+com\mycompany\mozixx\FavoritesOptionsResource.class
 com\mycompany\mozixx\controller\RatingController.class
 com\mycompany\mozixx\controller\ApplicationConfig.class
 com\mycompany\mozixx\model\Users.class

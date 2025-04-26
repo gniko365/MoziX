@@ -11,9 +11,13 @@ import java.util.logging.Logger;
 @Provider
 public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
+    private final static Logger log = Logger.getLogger(CORSFilter.class.getName());
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        log.info("Filtering request context");
         if (isPreflightRequest(requestContext)) {
+            log.info("Preflight request detected, aborting with OK response");
             requestContext.abortWith(Response.ok().build());
         }
     }
@@ -24,20 +28,21 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, 
-                     ContainerResponseContext responseContext) {
+    public void filter(ContainerRequestContext requestContext,
+                       ContainerResponseContext responseContext) {
+        log.info("Filtering response context");
         responseContext.getHeaders().add(
-            "Access-Control-Allow-Origin", "*");
+                "Access-Control-Allow-Origin", "*");
         responseContext.getHeaders().add(
-            "Access-Control-Allow-Credentials", "true");
+                "Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add(
-            "Access-Control-Allow-Headers",
-            "origin, content-type, accept, authorization, x-requested-with");
+                "Access-Control-Allow-Headers",
+                "origin, content-type, accept, authorization, x-requested-with");
         responseContext.getHeaders().add(
-            "Access-Control-Allow-Methods",
-            "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+                "Access-Control-Allow-Methods",
+                "GET, POST, PUT, DELETE, OPTIONS, HEAD");
         responseContext.getHeaders().add(
-            "Access-Control-Expose-Headers",
-            "content-type, authorization");
+                "Access-Control-Expose-Headers",
+                "content-type, authorization");
     }
 }

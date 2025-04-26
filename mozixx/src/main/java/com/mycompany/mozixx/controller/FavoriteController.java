@@ -15,6 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -118,58 +119,44 @@ private Response buildErrorResponse(Response.Status status, String message) {
 }
     
     @DELETE
-@Path("/remove")
-@Consumes(MediaType.APPLICATION_JSON)
+@Path("/remove/{movieId}") // Az movieId bekerül az útvonalba
 @Produces(MediaType.APPLICATION_JSON)
 public Response removeFavorite(
         @HeaderParam("Authorization") String authHeader,
-        String requestBody) {
-    
+        @PathParam("movieId") int movieId) { // Az movieId-t az útvonalból olvassuk ki
+
     try {
         // Validate Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Response.status(Response.Status.UNAUTHORIZED)
-                         .entity("{\"error\":\"Missing or invalid authorization token\"}")
-                         .build();
+                           .entity("{\"error\":\"Missing or invalid authorization token\"}")
+                           .build();
         }
-        
+
         String jwt = authHeader.substring("Bearer ".length());
-        
+
         // Validate JWT
         if (JWT.validateJWT(jwt) != 1) {
             return Response.status(Response.Status.UNAUTHORIZED)
-                         .entity("{\"error\":\"Invalid token\"}")
-                         .build();
+                           .entity("{\"error\":\"Invalid token\"}")
+                           .build();
         }
 
-        JSONObject request = new JSONObject(requestBody);
-        
-        if (!request.has("movieId")) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                         .entity("{\"error\":\"Missing movieId\"}")
-                         .build();
-        }
-
-        int movieId = request.getInt("movieId");
-        
         JSONObject result = favoriteService.deleteFavorite(jwt, movieId);
-        
-        int status = result.getString("status").equals("success") 
-            ? Response.Status.OK.getStatusCode() 
-            : Response.Status.NOT_FOUND.getStatusCode();
-        
+
+        int status = result.getString("status").equals("success")
+                     ? Response.Status.OK.getStatusCode()
+                     : Response.Status.NOT_FOUND.getStatusCode();
+
         return Response.status(status)
-                     .entity(result.toString())
-                     .build();
-    } catch (JSONException e) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                     .entity("{\"error\":\"Invalid request format\"}")
-                     .build();
+                       .entity(result.toString())
+                       .build();
+
     } catch (Exception e) {
         logger.error("Error removing favorite", e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity("{\"error\":\"Server error\"}")
-                     .build();
+                       .entity("{\"error\":\"Server error\"}")
+                       .build();
     }
 }
 }

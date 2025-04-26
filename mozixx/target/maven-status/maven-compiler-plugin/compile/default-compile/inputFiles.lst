@@ -15,6 +15,7 @@ D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\config\JWT.java
 D:\ae\mozix\mozixx\src\main\java\filters\CORSFilter.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\ApplicationConfig.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\controller\FavoriteController.java
+D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\FavoritesOptionsResource.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Actors.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Movies.java
 D:\ae\mozix\mozixx\src\main\java\com\mycompany\mozixx\model\Users.java
