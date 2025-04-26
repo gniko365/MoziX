@@ -16,7 +16,7 @@ interface Movie {
   cover?: string;
   title?: string;
   genres?: Genre[];
-  
+  trailerLink?: string;
 }
 
 @Component({
@@ -33,18 +33,18 @@ export class CategoryInsideComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
 
   selectedMovie: any = null;
-          selectedMovie2: any = null;
-        showModal = false;
-        sanitizedTrailerLink: SafeResourceUrl | null = null;
-        isSidebarOpen = false;
-        selectedCategory = '';
-        isBookmarked = false;
+  selectedMovie2: any = null;
+  showModal = false;
+  sanitizedTrailerLink: SafeResourceUrl | null = null;
+  isSidebarOpen = false;
+  selectedCategory = '';
+  isBookmarked = false;
+  similarMovies: Movie[] = []; // Új tömb a hasonló filmek tárolására
 
   constructor(
     private route: ActivatedRoute,
     private categoryService: CategoryService,
     private sanitizer: DomSanitizer
-    
   ) {}
 
   ngOnInit() {
@@ -96,46 +96,64 @@ export class CategoryInsideComponent implements OnInit, OnDestroy {
   }
 
 
-  showMovieDetails(movieId: number): void {
+  showMovieDetails(movieId: number | undefined): void { // Módosított típus
+    if (movieId === undefined) {
+      console.warn('showMovieDetails called with undefined movieId');
+      return;
+    }
     const foundMovie = this.movies.find(m => m.movieId === movieId);
-    
+
     if (foundMovie) {
       this.selectedMovie = foundMovie;
-      
+
       if (this.selectedMovie.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
           this.selectedMovie.trailerLink
         );
       }
-      
+
       this.showModal = true;
+      this.loadSimilarMovies();
     } else {
       console.warn('Movie not found with ID:', movieId);
     }
   }
-  
+
+  loadSimilarMovies(): void {
+    this.categoryService.getVígjátékMovies().pipe( // Példaként a vígjátékokat használjuk, érdemes lehet a kategóriához illőt vagy egy általánosat használni
+      takeUntil(this.ngUnsubscribe),
+      map(data => {
+        if (Array.isArray(data)) {
+          return [...data].sort(() => 0.5 - Math.random()).slice(0, 6);
+        } else {
+          console.error('Data is not an array in loadSimilarMovies:', data);
+          return [];
+        }
+      })
+    ).subscribe({
+      next: (similar) => {
+        this.similarMovies = similar;
+      },
+      error: (err) => console.error('Hiba a hasonló filmek betöltése során:', err)
+    });
+  }
+
   closeModal(): void {
     this.showModal = false;
     this.selectedMovie = null;
+    this.similarMovies = [];
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
   toggleSidebar(category: string = ''): void {
     this.selectedCategory = category;
     this.isSidebarOpen = !!category;
+    if (category === 'Hasonló filmek' && this.selectedMovie) {
+      this.loadSimilarMovies();
+    }
   }
-  
+
   toggleBookmark() {
     this.isBookmarked = !this.isBookmarked;
   }
-  
 }

@@ -1,61 +1,42 @@
-<app-navbar></app-navbar>
-<div class="profile-component">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ <app-navbar></app-navbar>
+ <div class="profile-component">
 
-<div class="menu-container">
-    <div class="settings-icon">
-        <i class="fa fa-gear"></i>
+  <div class="menu-container">
+    <div class="settings-icon dropdown">
+      <i class="fa fa-gear" (click)="toggleDropdown()" id="icon"></i>
+      <div id="myDropdown" class="dropdown-content" [class.show]="isDropdownVisible">
+        <a (click)="logout()">Kijelentkezés</a>
+        <a href="#">Profil törlése</a>
+      </div>
     </div>
-</div>
-    
-    
-    <div class="profile-pic-container">
-        <img src="assets/FILMPOSTER.jpg" class="profile-pic" id="profile-pic">
-        <div class="profile-pic-overlay" [routerLink]="['/editprofil']">Profil szerkesztése</div>
-</div>
-<div class="right-component">
-    <h1 class="username">username</h1>
+  </div>
+
+
+  <div class="profile-pic-container">
+    <img src="assets/profil.webp" class="profile-pic" id="profile-pic">
+
+  </div>
+  <div class="right-component">
+    <h1 class="username">{{ username }}</h1>
     <div class="number-container">
-        <div class="number-component">
-            <h2>Mentett filmek:</h2>
-            <p class="counter">0</p>
-        </div>
-        <div class="number-component">
-            <h2>Hozzászólásaid:</h2>
-            <p class="counter">0</p>
-        </div>
+      <div class="number-component">
+        <h2>Mentett filmek:</h2>
+        <p class="counter">{{ savedMoviesCount }}</p>
+      </div>
     </div>
-</div>
-</div>
-<br>
-<br>
-<div class="saved-component">
-    <h3>Mentett filmek:</h3>
-</div>
-<div class="small-poster-component">
-<img src="assets/FILMPOSTER.jpg" class="small-poster-design">
-<img src="assets/FILMPOSTER.jpg" class="small-poster-design">
-<img src="assets/FILMPOSTER.jpg" class="small-poster-design">
-
-
-<div class="browse-component" [routerLink]="['/mainpage']">
+  </div>
+ </div>
+ <br>
+ <br>
+ <div class="saved-component">
+  <h3>Mentett filmek:</h3>
+ </div>
+ <div class="small-poster-component">
+  <div *ngFor="let movie of bookmarkedMovies">
+    <img [src]="movie?.cover" class="small-poster-design">
+   </div>
+  <div class="browse-component" [routerLink]="['/mainpage']">
     <p class="browse-text">Keress a filmjeink között</p>
-</div>
-
-</div>
-<br>
-<div class="saved-component">
-    <h3>Hozzászólásaid:</h3>
-</div>
-<div class="small-poster-component">
-<img src="assets/FILMPOSTER.jpg" class="small-poster-design">
-<img src="assets/FILMPOSTER.jpg" class="small-poster-design">
-
-
-<div class="browse-component" [routerLink]="['/mainpage']">
-    <p class="browse-text">Keress a filmjeink között</p>
-</div>
-
-</div>
-
-<br>
-
+  </div>
+ </div>

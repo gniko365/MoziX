@@ -6,53 +6,68 @@
     <a [routerLink]="['/mainpage']" class="logo">
       <img src="assets/Logo.png" alt="Logo" class="logo">
     </a>
-    <input type="text" placeholder="Search bar" class="search-bar">
+    <input type="text" placeholder="Keresés" class="search-bar">
     <nav>
       <ul class="menu">
-        <a [routerLink]="['/bestrated']">Legjobb értékelés</a>
-        <a [routerLink]="['/newrelease']">Legújabb megjelenések</a>
-        <a [routerLink]="['/category']">Kategóriák</a>
+        <li><a [routerLink]="['/bestrated']" routerLinkActive="active">Legjobb értékelés</a></li>
+        <li><a [routerLink]="['/newrelease']" routerLinkActive="active">Legújabb megjelenések</a></li>
+        <li><a [routerLink]="['/category']" routerLinkActive="active">Kategóriák</a></li>
       </ul>
     </nav>
-    <div class="user-icon-link" (click)="toggleSidebar('attekintes')">
-      <i class="fas fa-user-circle"></i>
+    <div class="user-icon-container">
+      <div class="user-profile-link" *ngIf="isLoggedIn">
+        <a [routerLink]="['/profil']" routerLinkActive="active" class="user-icon-link">
+          <i class="fas fa-user-circle"></i>
+        </a>
+      </div>
+
+      <div class="user-icon-link" *ngIf="!isLoggedIn" (click)="toggleSidebar('attekintes')">
+        <i class="fas fa-user-circle"></i>
+      </div>
     </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar" [class.active]="activeSidebar === 'attekintes'">
+    <div class="sidebar" [class.active]="activeSidebar === 'attekintes'" *ngIf="!isLoggedIn">
       <h2>{{ showLoginForm ? 'Bejelentkezés' : 'Regisztráció' }}</h2>
 
-      <!-- Regisztráció -->
-      <form *ngIf="!showLoginForm" (submit)="onRegisterSubmit($event)">
+      <form *ngIf="!showLoginForm" (ngSubmit)="onRegisterSubmit($event)">
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" placeholder="Adj meg egy email címet" required>
+          <input type="email" id="email" name="email" placeholder="Adj meg egy email címet" [(ngModel)]="registrationData.email" required>
         </div>
         <div class="form-group">
           <label for="username">Felhasználónév:</label>
-          <input type="text" id="username" name="username" placeholder="Adj meg egy felhasználónevet" required>
+          <input type="text" id="username" name="username" placeholder="Adj meg egy felhasználónevet" [(ngModel)]="registrationData.username" required>
         </div>
-        <div class="form-group">
+        <div class="form-group password-input">
           <label for="password">Jelszó:</label>
-          <input type="password" id="password" name="password" placeholder="Adj meg egy jelszót" required>
+          <input [type]="passwordVisible ? 'text' : 'password'" id="password" name="password" placeholder="Adj meg egy jelszót" [(ngModel)]="registrationData.password" required>
+          <i class="fas" [class.fa-eye]="!passwordVisible" [class.fa-eye-slash]="passwordVisible" (click)="togglePasswordVisibility()"></i>
         </div>
-        <div class="form-group">
+        <div class="password-requirements">
+          <div><i class="fas fa-exclamation-circle"></i> A jelszónak legalább 8 karakter hosszúnak kell lennie.</div>
+          <div><i class="fas fa-exclamation-circle"></i> A jelszónak tartalmaznia kell legalább egy számot.</div>
+          <div><i class="fas fa-exclamation-circle"></i> A jelszónak tartalmaznia kell legalább egy speciális karaktert.</div>
+        </div>
+        <div class="form-group password-input">
           <label for="confirm-password">Jelszó megerősítése:</label>
-          <input type="password" id="confirm-password" name="confirm-password" placeholder="Erősítsd meg a jelszavad" required>
+          <input [type]="confirmPasswordVisible ? 'text' : 'password'" id="confirm-password" name="confirm-password" placeholder="Erősítsd meg a jelszavad" [(ngModel)]="registrationData.confirmPassword" required>
+          <i class="fas" [class.fa-eye]="!confirmPasswordVisible" [class.fa-eye-slash]="confirmPasswordVisible" (click)="toggleConfirmPasswordVisibility()"></i>
         </div>
+        <div *ngIf="registrationErrorMessage" class="error-message">{{ registrationErrorMessage }}</div>
         <button type="submit" class="btn">Regisztráció</button>
       </form>
 
-      <!-- Login -->
-      <form *ngIf="showLoginForm" (submit)="onLoginSubmit($event)">
+      <form *ngIf="showLoginForm" (ngSubmit)="onLoginSubmit()">
         <div class="form-group">
           <label for="login-username">Felhasználónév:</label>
-          <input type="text" id="login-username" name="username" placeholder="Add meg a felhasználóneved" required>
+          <input type="text" id="login-username" name="username" placeholder="Add meg a felhasználóneved" [(ngModel)]="loginCredentials.username" required>
         </div>
-        <div class="form-group">
+        <div class="form-group password-input">
           <label for="login-password">Jelszó:</label>
-          <input type="password" id="login-password" name="password" placeholder="Add meg a jelszavad" required>
+          <input [type]="loginPasswordVisible ? 'text' : 'password'" id="login-password" name="password" placeholder="Add meg a jelszavad" [(ngModel)]="loginCredentials.password" required>
+          <i class="fas" [class.fa-eye]="!loginPasswordVisible" [class.fa-eye-slash]="loginPasswordVisible" (click)="toggleLoginPasswordVisibility()"></i>
         </div>
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
         <button type="submit" class="btn">Bejelentkezés</button>
       </form>
 

@@ -225,6 +225,30 @@ h1{
 
 
 @media (min-width: 769px) and (max-width: 999px) {
+    .rating-modal {
+        height: 20px;
+    }
+    
+    .rating-number-modal {
+        font-size: 20px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 3px;
+    }
+    
+    .rating-container-modal {
+        display: flex;
+        align-items: center;  
+        justify-content: start;  
+        gap: 5px;  
+    }
+
+    .modal-genre {
+        display: inline;
+        line-height: 1.6;
+        color: #444;
+      }
+
     .carousel-container {
         position: relative;
         width: 96%;
@@ -377,7 +401,7 @@ h1{
         max-width: 800px;
         width: 100%;
         position: relative;
-        max-height: 900px;
+        max-height: 90vh;
         overflow-y: auto;
       }
       
@@ -519,6 +543,7 @@ h1{
         padding: 1rem;
         border-radius: 10px;
         width: 180px;
+        height: 250px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
@@ -530,10 +555,10 @@ h1{
         border-radius: 6px;
     }
     
-    .film-title2 {
+    .film-title {
         font-weight: bold;
-        margin-top: 0.5rem;
-        font-size: 1rem;
+        margin-top: 0.2rem;
+        font-size: 13px;
     }
 
     .poster-container2 {
@@ -572,6 +597,30 @@ h1{
 }
 
 @media (min-width: 1000px) and (max-width: 1399px) {
+    .rating-modal {
+        height: 20px;
+    }
+    
+    .rating-number-modal {
+        font-size: 20px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 3px;
+    }
+    
+    .rating-container-modal {
+        display: flex;
+        align-items: center;  
+        justify-content: start;  
+        gap: 5px;  
+    }
+
+    .modal-genre {
+        display: inline;
+        line-height: 1.6;
+        color: #444;
+      }
+
     .carousel-container {
         position: relative;
         width: 1000%;
@@ -752,7 +801,7 @@ h1{
         max-width: 800px;
         width: 100%;
         position: relative;
-        max-height: 900px;
+        max-height: 90vh;
         overflow-y: auto;
       }
       
@@ -894,6 +943,7 @@ h1{
         padding: 1rem;
         border-radius: 10px;
         width: 180px;
+        height: 250px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
@@ -905,10 +955,10 @@ h1{
         border-radius: 6px;
     }
     
-    .film-title2 {
+    .film-title {
         font-weight: bold;
-        margin-top: 0.5rem;
-        font-size: 1rem;
+        margin-top: 0.2rem;
+        font-size: 13px;
     }
 
     .poster-container2 {
@@ -946,6 +996,30 @@ h1{
 }
 
 @media (min-width: 1400px) and (max-width: 1599px) {
+    .rating-modal {
+        height: 20px;
+    }
+    
+    .rating-number-modal {
+        font-size: 20px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 3px;
+    }
+    
+    .rating-container-modal {
+        display: flex;
+        align-items: center;  
+        justify-content: start;  
+        gap: 5px;  
+    }
+
+    .modal-genre {
+        display: inline;
+        line-height: 1.6;
+        color: #444;
+      }
+
     .carousel-container {
         position: relative;
         width: 1000%;
@@ -1196,7 +1270,7 @@ h1{
         max-width: 800px;
         width: 100%;
         position: relative;
-        max-height: 900px;
+        max-height: 90vh;
         overflow-y: auto;
       }
       
@@ -1338,6 +1412,7 @@ h1{
         padding: 1rem;
         border-radius: 10px;
         width: 180px;
+        height: 250px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
@@ -1349,10 +1424,10 @@ h1{
         border-radius: 6px;
     }
     
-    .film-title2 {
+    .film-title {
         font-weight: bold;
-        margin-top: 0.5rem;
-        font-size: 1rem;
+        margin-top: 0.2rem;
+        font-size: 13px;
     }
 
     .poster-container2 {
@@ -1391,6 +1466,30 @@ h1{
 
 
 @media (min-width: 1600px) and (max-width: 2000px) {
+    .modal-genre {
+        display: inline;
+        line-height: 1.6;
+        color: #444;
+      }
+      
+    .rating-modal {
+        height: 20px;
+    }
+    
+    .rating-number-modal {
+        font-size: 20px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 3px;
+    }
+    
+    .rating-container-modal {
+        display: flex;
+        align-items: center;  
+        justify-content: start;  
+        gap: 5px;  
+    }
+
     .carousel-container {
         position: relative;
         width: 1000%;
@@ -1556,7 +1655,7 @@ h1{
         max-width: 800px;
         width: 100%;
         position: relative;
-        max-height: 900px;
+        max-height: 90vh;
         overflow-y: auto;
       }
       
@@ -1698,6 +1797,7 @@ h1{
         padding: 1rem;
         border-radius: 10px;
         width: 180px;
+        height: 250px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
@@ -1709,10 +1809,10 @@ h1{
         border-radius: 6px;
     }
     
-    .film-title2 {
+    .film-title {
         font-weight: bold;
-        margin-top: 0.5rem;
-        font-size: 1rem;
+        margin-top: 0.2rem;
+        font-size: 13px;
     }
 
     .poster-container2 {
@@ -1835,6 +1935,30 @@ h1{
 }
 
 @media (min-width: 650px) and (max-width: 768px) {
+    .rating-modal {
+        height: 20px;
+    }
+    
+    .rating-number-modal {
+        font-size: 20px;  
+        color: rgb(255, 187, 0);     
+        font-weight: bold; 
+        margin-top: 3px;
+    }
+    
+    .rating-container-modal {
+        display: flex;
+        align-items: center;  
+        justify-content: start;  
+        gap: 5px;  
+    }
+
+    .modal-genre {
+        display: inline;
+        line-height: 1.6;
+        color: #444;
+      }
+
     .carousel-container {
         position: relative;
         width: 96%;
@@ -2001,7 +2125,7 @@ h1{
         max-width: 800px;
         width: 100%;
         position: relative;
-        max-height: 900px;
+        max-height: 90vh;
         overflow-y: auto;
       }
       
@@ -2143,6 +2267,7 @@ h1{
         padding: 1rem;
         border-radius: 10px;
         width: 180px;
+        height: 250px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s ease;
@@ -2154,10 +2279,10 @@ h1{
         border-radius: 6px;
     }
     
-    .film-title2 {
+    .film-title {
         font-weight: bold;
-        margin-top: 0.5rem;
-        font-size: 1rem;
+        margin-top: 0.2rem;
+        font-size: 13px;
     }
 
     .poster-container2 {

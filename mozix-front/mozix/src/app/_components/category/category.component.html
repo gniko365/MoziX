@@ -102,16 +102,16 @@
       </div>
       <h2>{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.title }}</h2>
       <div>
-        <p class="rating-container">
-          <img src="assets/STAR.png" class="rating">
-          <span class="rating-number">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.roundedRating }}</span>
+        <p class="rating-container-modal">
+          <img src="assets/STAR.png" class="rating-modal">
+          <span class="rating-number-modal">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.averageRating }}</span>
         </p>
         <p class="modal-time">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.length }} perc</p>
         <p class="modal-description">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.description }}</p>
-        <p class="modal-description">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.genres?.name }}</p>
+        <p class="modal-genre" *ngFor="let genre of (selectedMovie || selectedMovie2 || selectedMovie3)?.genres">{{ genre?.name }}, </p>
   
         <div *ngIf="(selectedMovie || selectedMovie2 || selectedMovie3)?.trailerLink">
-          <iframe width="735" height="350" 
+          <iframe width="100%" height="350" 
             [src]="sanitizedTrailerLink"
             frameborder="0" 
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
@@ -124,11 +124,9 @@
           <div class="category-component" (click)="toggleSidebar('Szereplők')">
             <p class="category-item">Szereplők</p>
           </div>
-          <div class="category-component" (click)="toggleSidebar('Értékelés')">
-            <p class="category-item">Értékelés</p>
-          </div>
+          
           <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
-            <p class="category-item">Hasonló filmek</p>
+            <p class="category-item">Ajánlott filmek</p>
           </div>
         </div>
   
@@ -139,53 +137,37 @@
             <div *ngIf="selectedCategory === 'Szereplők'">
               <br>
               <div class="actor-director-container">
-                <div>
+                <div *ngIf="(selectedMovie || selectedMovie2 || selectedMovie3)?.actors">
                   <h3>Szereplők:</h3>
-                  <div class="szereplo-container">
-                    <img [src]="(selectedMovie || selectedMovie2 || selectedMovie3)?.actors?.image" class="szereplo-kep">
-                    <p class="actor-name">{{ (selectedMovie || selectedMovie2)?.actors?.name }}</p>
+                  <div class="szereplo-container" *ngFor="let actor of (selectedMovie || selectedMovie2 || selectedMovie3)?.actors">
+                    <img [src]="actor?.image" class="szereplo-kep">
+                    <p class="actor-name">{{ actor?.name }}</p>
                   </div>
                 </div>
-                <div>
+                <div *ngIf="(selectedMovie || selectedMovie2 || selectedMovie3)?.directors">
                   <h3>Rendezők:</h3>
-                  <div class="szereplo-container">
-                    <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
-                    <p class="actor-name">{{ (selectedMovie || selectedMovie2 || selectedMovie3)?.directors?.name }}</p>
+                  <div class="szereplo-container" *ngFor="let director of (selectedMovie || selectedMovie2 || selectedMovie3)?.directors">
+                    <img [src]="director?.image" class="szereplo-kep"> <p class="actor-name">{{ director?.name }}</p>
                   </div>
                 </div>
               </div>
             </div>
   
-            <div *ngIf="selectedCategory === 'Értékelés'">
-              <br/>
-              <div class="rateing-container2">
-                <div class="rating-txt2">
-                  <span class="rating-number2">Értékelés: {{ (selectedMovie || selectedMovie2 || selectedMovie3)?.averageRating }} </span>
-                  <img src="assets/STAR.png" class="rating">
-                </div>
-                <div class="star-container">
-                  <img src="assets/STAR.png" class="rate">
-                  <img src="assets/STAR.png" class="rate">
-                  <img src="assets/STAR.png" class="rate">
-                  <img src="assets/STAR.png" class="rate">
-                  <img src="assets/STAR.png" class="rate">
-                </div>
-              </div>
-            </div>
-  
+            
+            
             <div *ngIf="selectedCategory === 'Hasonló filmek'">
               <br>
               <div class="films2">
-                <div class="film-box2" 
-                     *ngFor="let movie of (selectedMovie ? movies : movies2)" 
-                     (click)="selectedMovie ? showMovieDetails(movie.movieId) : showMovieDetails2(movie.movieId)">
+                <div class="film-box2"
+                     *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie.movieId)">
                   <img [src]="movie.cover" class="poszter2">
-                  <p class="film-title">{{ movie.title }}</p>
+                  <p class="film-title2">{{ movie.title }}</p>
                 </div>
               </div>
             </div>
+      
           </div>
         </div>
       </div>
-    </div>
-  </div>
+      </div>
+      </div>

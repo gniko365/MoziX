@@ -30,10 +30,11 @@
         </p>
       <p class="modal-time">{{ selectedLatestMovie.length }} perc</p>
       <p class="modal-description">{{ selectedLatestMovie.description }}</p>
-      <p class="modal-description">{{ selectedLatestMovie.genres.name }}</p>
+      <p class="modal-genre" *ngFor="let genre of selectedLatestMovie?.genres">{{ genre?.name }}, </p>
 
       <div *ngIf="selectedLatestMovie.trailerLink">
-        <iframe 
+        
+<iframe width="100%" height="350" 
           [src]="sanitizedTrailerLink"
           frameborder="0" 
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
@@ -46,11 +47,9 @@
         <div class="category-component" (click)="toggleSidebar('Szereplők')">
             <p class="category-item">Szereplők</p>
         </div>
-        <div class="category-component" (click)="toggleSidebar('Értékelés')">
-            <p class="category-item">Értékelés</p>
-        </div>
+        
         <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
-            <p class="category-item">Hasonló filmek</p>
+            <p class="category-item">Ajánlott filmek</p>
         </div>
     </div>
 
@@ -64,50 +63,37 @@
           <div class="actor-director-container">
               <div>
                   <h3>Szereplők:</h3>
-                  <div class="szereplo-container">
-                      <img src="selectedLatestMovie.actors.image" class="szereplo-kep">
-                      <p class="actor-name">{{ selectedLatestMovie.actors.name }}</p>
-                  </div>
+                  <div class="szereplo-container" *ngFor="let actor of selectedLatestMovie?.actors">
+                    <img [src]="actor?.image" class="szereplo-kep">
+                    <p class="actor-name">{{ actor?.name }}</p>
+                </div>
               </div>
               <div>
                   <h3>Rendezők:</h3>
-                  <div class="szereplo-container">
-                      <img src="assets/FILMPOSTER.jpg" class="szereplo-kep">
-                      <p class="actor-name">{{ selectedLatestMovie.directors.name }}</p>
-                  </div>
+                  <div class="szereplo-container" *ngFor="let director of selectedLatestMovie?.directors">
+                    <img [src]="director?.image" class="szereplo-kep">
+                    <p class="actor-name">{{ director?.name }}</p>
+                </div>
               </div>
           </div>
       </div>
 
-      <div *ngIf="selectedCategory === 'Értékelés'">
-            <br/>
-        <div class="rateing-container2">
-            <div class="rating-txt2">
-        <span class="rating-number2">Értékelés: {{ selectedLatestMovie.averageRating }} </span>
-                <img src="assets/STAR.png" class="rating">
-            </div>
-        <div class="star-container">
-            <img src="assets/STAR.png" class="rate">
-            <img src="assets/STAR.png" class="rate">
-            <img src="assets/STAR.png" class="rate">
-            <img src="assets/STAR.png" class="rate">
-            <img src="assets/STAR.png" class="rate">
-        </div>
-        </div>
-    </div>
+      
 
-    <div *ngIf="selectedCategory === 'Hasonló filmek'">
-      <br><br>
-      <div class="films2">
-          <div class="film-box2" *ngFor="let movie of latestMovies" (click)="showMovieDetails(movie.movieId)">
-              <img src="assets/FILMPOSTER.jpg" class="poszter2">
-              <p class="film-title">FILM</p>
+      <div *ngIf="selectedCategory === 'Hasonló filmek'">
+        <br>
+        <div class="films2">
+          <div class="film-box2"
+               *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie.movieId)">
+            <img [src]="movie.cover" class="poszter2">
+            <p class="film-title2">{{ movie.title }}</p>
           </div>
+        </div>
       </div>
-  </div>
+
+    </div>
   </div>
 </div>
-
-</div></div></div>
-
+</div>
+</div>
 
