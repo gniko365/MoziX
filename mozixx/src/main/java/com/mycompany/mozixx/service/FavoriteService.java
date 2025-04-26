@@ -19,6 +19,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
 import jdk.jpackage.internal.Log.Logger;
@@ -41,7 +42,7 @@ public class FavoriteService {
     EntityTransaction transaction = null;
     
     try {
-        // 1. JWT token validálása
+        // 1. JWT token validation
         int validationResult = JWT.validateJWT(jwtToken);
         if (validationResult != 1) {
             response.put("status", "error");
@@ -50,7 +51,7 @@ public class FavoriteService {
             return response;
         }
 
-        // 2. Felhasználó ID kinyerése
+        // 2. Get user ID
         Integer userId = JWT.getUserIdByToken(jwtToken);
         if (userId == null) {
             response.put("status", "error");
@@ -62,31 +63,56 @@ public class FavoriteService {
         transaction = em.getTransaction();
         transaction.begin();
 
-        // 3. Tárolt eljárás hívása
-        StoredProcedureQuery query = em.createStoredProcedureQuery("AddMovieToFavorites")
-            .registerStoredProcedureParameter("p_user_id", Integer.class, ParameterMode.IN)
-            .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
-            .setParameter("p_user_id", userId)
-            .setParameter("p_movie_id", movieId);
-
-        query.execute();
-        transaction.commit();
-
-        response.put("status", "success");
-        response.put("statusCode", 200);
-        response.put("message", "Film sikeresen hozzáadva a kedvencekhez");
+        // 3. Call stored procedure with native query to avoid result set expectation
+        try {
+            Query query = em.createNativeQuery(
+                "CALL AddMovieToFavorites(?, ?)")
+                .setParameter(1, userId)
+                .setParameter(2, movieId);
+            
+            query.executeUpdate();
+            transaction.commit();
+            
+            response.put("status", "success");
+            response.put("statusCode", 200);
+            response.put("message", "Film sikeresen hozzáadva a kedvencekhez");
+            
+        } catch (PersistenceException e) {
+            // Handle specific database errors
+            Throwable rootCause = getRootCause(e);
+            String errorMsg = rootCause.getMessage();
+            
+            if (errorMsg.contains("foreign key constraint")) {
+                response.put("message", "Érvénytelen felhasználó vagy film azonosító");
+            } else if (errorMsg.contains("duplicate entry")) {
+                response.put("message", "A film már szerepel a kedvencek között");
+            } else {
+                response.put("message", "Adatbázis hiba: " + errorMsg);
+            }
+            
+            response.put("status", "error");
+            response.put("statusCode", 400); // Bad request
+            transaction.rollback();
+        }
         
     } catch (Exception e) {
         if (transaction != null && transaction.isActive()) {
             transaction.rollback();
         }
-        
         response.put("status", "error");
         response.put("statusCode", 500);
-        response.put("message", "Szerverhiba: " + e.getMessage());
+        response.put("message", "Váratlan hiba: " + e.getMessage());
     }
     
     return response;
+}
+
+private Throwable getRootCause(Throwable throwable) {
+    Throwable rootCause = throwable;
+    while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+        rootCause = rootCause.getCause();
+    }
+    return rootCause;
 }
 
 
