@@ -210,37 +210,86 @@ private String toString(Object value) {
 }
     
     public JSONArray searchMoviesByName(String searchTerm) {
-    EntityManager em = getEntityManagerFactory().createEntityManager();
-    try {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("SearchMoviesByName")
-            .registerStoredProcedureParameter("p_search_term", String.class, ParameterMode.IN)
-            .setParameter("p_search_term", searchTerm);
-        
-        List<Object[]> results = query.getResultList();
-        JSONArray movies = new JSONArray();
-        
-        for (Object[] row : results) {
-            JSONObject movie = new JSONObject();
-            movie.put("movieId", row[0]);
-            movie.put("title", row[1]);
-            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-            movie.put("releaseYear", row[3]);
-            movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
-            movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
-            movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
-            movie.put("averageRating", row[7]);
-            movie.put("genres", row[8] != null ? row[8] : "");
-            movies.put(movie);
-        }
-        return movies;
-    } catch (Exception e) {
-        throw new RuntimeException("Hiba a filmek keresésekor: " + searchTerm, e);
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
+        EntityManager em = getEntityManagerFactory().createEntityManager();
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("SearchMoviesByName")
+                    .registerStoredProcedureParameter("p_search_term", String.class, ParameterMode.IN)
+                    .setParameter("p_search_term", searchTerm);
+
+            List<Object[]> results = query.getResultList();
+            JSONArray movies = new JSONArray();
+
+            for (Object[] row : results) {
+                JSONObject movie = new JSONObject();
+                int movieId = (int) row[0];
+                movie.put("movieId", movieId);
+                movie.put("title", row[1]);
+                movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+                movie.put("releaseYear", row[3]);
+                movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
+                movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
+                movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
+                movie.put("averageRating", row[7]);
+
+                movie.put("directors", getDirectorsByMovieId(em, movieId));
+                movie.put("actors", getActorsByMovieId(em, movieId));
+                movie.put("genres", getGenresByMovieId(em, movieId));
+
+                movies.put(movie);
+            }
+            return movies;
+        } catch (Exception e) {
+            throw new RuntimeException("Hiba a filmek keresésekor: " + searchTerm, e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
-}
+
+    private JSONArray getDirectorsByMovieId(EntityManager em, int movieId) {
+        List<Object[]> directorsResult = em.createNativeQuery("SELECT d.director_id AS id, d.name, d.director_image FROM movie_directors md JOIN directors d ON md.director_id = d.director_id WHERE md.movie_id = :movieId")
+                .setParameter("movieId", movieId)
+                .getResultList();
+        JSONArray directors = new JSONArray();
+        for (Object[] row : directorsResult) {
+            JSONObject director = new JSONObject();
+            director.put("id", row[0]);
+            director.put("name", row[1]);
+            director.put("image", row[2] != null ? row[2] : JSONObject.NULL); // Itt 'image' marad a JSON kulcs
+            directors.put(director);
+        }
+        return directors;
+    }
+
+    private JSONArray getActorsByMovieId(EntityManager em, int movieId) {
+        List<Object[]> actorsResult = em.createNativeQuery("SELECT a.actor_id AS id, a.name, a.actor_image FROM movie_actors ma JOIN actors a ON ma.actor_id = a.actor_id WHERE ma.movie_id = :movieId")
+                .setParameter("movieId", movieId)
+                .getResultList();
+        JSONArray actors = new JSONArray();
+        for (Object[] row : actorsResult) {
+            JSONObject actor = new JSONObject();
+            actor.put("id", row[0]);
+            actor.put("name", row[1]);
+            actor.put("image", row[2] != null ? row[2] : JSONObject.NULL); // Itt 'image' marad a JSON kulcs
+            actors.put(actor);
+        }
+        return actors;
+    }
+
+    private JSONArray getGenresByMovieId(EntityManager em, int movieId) {
+        List<Object[]> genresResult = em.createNativeQuery("SELECT g.genre_id AS id, g.name FROM movie_genres mg JOIN genres g ON mg.genre_id = g.genre_id WHERE mg.movie_id = :movieId")
+                .setParameter("movieId", movieId)
+                .getResultList();
+        JSONArray genres = new JSONArray();
+        for (Object[] row : genresResult) {
+            JSONObject genre = new JSONObject();
+            genre.put("id", row[0]);
+            genre.put("name", row[1]);
+            genres.put(genre);
+        }
+        return genres;
+    }
     public JSONObject getMovieById(int movieId) {
     EntityManager em = getEntityManagerFactory().createEntityManager();
     try {

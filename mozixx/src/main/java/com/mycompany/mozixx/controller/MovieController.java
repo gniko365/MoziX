@@ -116,39 +116,39 @@ public Response getLatestReleases() {
 }
     
     @GET
-@Path("/search")
-@Produces(MediaType.APPLICATION_JSON)
-public Response searchMoviesByName(@QueryParam("q") String searchTerm) {
-    try {
-        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchMoviesByName(@QueryParam("q") String searchTerm) {
+        try {
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                JSONObject error = new JSONObject();
+                error.put("status", "error");
+                error.put("message", "Keresési kifejezés megadása kötelező");
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(error.toString())
+                        .build();
+            }
+
+            JSONArray movies = movieService.searchMoviesByName(searchTerm);
+
+            JSONObject response = new JSONObject();
+            response.put("status", "success");
+            response.put("searchTerm", searchTerm);
+            response.put("count", movies.length());
+            response.put("movies", movies);
+
+            return Response.ok(response.toString()).build();
+
+        } catch (Exception e) {
             JSONObject error = new JSONObject();
             error.put("status", "error");
-            error.put("message", "Keresési kifejezés megadása kötelező");
-            return Response.status(Response.Status.BAD_REQUEST)
-                         .entity(error.toString())
-                         .build();
+            error.put("message", "Hiba történt a filmek keresése közben");
+            error.put("details", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(error.toString())
+                    .build();
         }
-        
-        JSONArray movies = movieService.searchMoviesByName(searchTerm);
-        
-        JSONObject response = new JSONObject();
-        response.put("status", "success");
-        response.put("searchTerm", searchTerm);
-        response.put("count", movies.length());
-        response.put("movies", movies);
-        
-        return Response.ok(response.toString()).build();
-        
-    } catch (Exception e) {
-        JSONObject error = new JSONObject();
-        error.put("status", "error");
-        error.put("message", "Hiba történt a filmek keresése közben");
-        error.put("details", e.getMessage());
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                     .entity(error.toString())
-                     .build();
     }
-}
 @GET
 @Path("/{id}")
 @Produces(MediaType.APPLICATION_JSON)
