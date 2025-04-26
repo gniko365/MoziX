@@ -11,8 +11,6 @@ export class MainpageService {
   private apiUrl2 = 'http://localhost:8080/mozixx/resources/movies/random';
   private apiUrl3 = 'http://localhost:8080/mozixx/resources/movies';
 
-
-
   constructor(private http: HttpClient) { }
 
   getMovies(): Observable<any[]> {
@@ -30,5 +28,4 @@ export class MainpageService {
   getMovieById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
-
 }

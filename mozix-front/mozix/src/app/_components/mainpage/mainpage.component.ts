@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
- import { NavbarComponent } from '../navbar/navbar.component';
- import { RouterLink, RouterOutlet } from '@angular/router';
- import { MainpageService } from '../../_services/mainpage.service';
- import { CommonModule } from '@angular/common';
- import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
- import { FavoriteService } from '../../_services/favorite.service'; // Importáld a FavoriteService-t
+import { NavbarComponent } from '../navbar/navbar.component';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { MainpageService } from '../../_services/mainpage.service';
+import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FavoriteService } from '../../_services/favorite.service'; // Importáld a FavoriteService-t
 
- @Component({
+@Component({
   selector: 'app-mainpage',
   standalone: true,
   imports: [NavbarComponent, RouterLink, RouterOutlet, CommonModule],
   templateUrl: './mainpage.component.html',
   styleUrls: ['./mainpage.component.css']
- })
- export class MainpageComponent implements OnInit {
+})
+export class MainpageComponent implements OnInit {
   movies: any[] = [];
   randomMovies: any[] = [];
   currentSlideIndex: number = 0;
@@ -23,36 +23,36 @@ import { Component, OnInit } from '@angular/core';
   similarMovies: any[] = [];
   isSidebarOpen: boolean = false;
   selectedCategory: string = '';
-  bookmarkedMovies: number[] = []; // Tömb az elmentett filmek azonosítóinak tárolására
-  isBookmarked: boolean = false; // Hozzáadtam ezt a sort
+  bookmarkedMovies: number[] = []; // Csak az ID-kat tároljuk itt a gyors ellenőrzéshez
+  isBookmarked: boolean = false;
 
   constructor(
     private mainpageService: MainpageService,
     private sanitizer: DomSanitizer,
-    private favoriteService: FavoriteService // Add hozzá a FavoriteService-t
+    private favoriteService: FavoriteService // Injectáld a FavoriteService-t
   ) { }
 
   ngOnInit(): void {
     this.loadMovies();
     this.startCarousel();
-    this.loadBookmarkedMovies(); // Töltsd be az elmentett filmeket a localStorage-ból
+    this.loadInitialBookmarks(); // Betöltjük a kedvenc ID-kat a backendről
   }
 
-  loadBookmarkedMovies(): void {
-    const storedBookmarks = localStorage.getItem('bookmarkedMovies');
-    this.bookmarkedMovies = storedBookmarks ? JSON.parse(storedBookmarks) : [];
-    this.updateBookmarkStatus(); // Ellenőrizzük a kezdeti könyvjelző állapotot
-  }
-
-  saveBookmarkedMovies(): void {
-    localStorage.setItem('bookmarkedMovies', JSON.stringify(this.bookmarkedMovies));
-    this.updateBookmarkStatus(); // Frissítjük a könyvjelző állapotát mentés után
+  loadInitialBookmarks(): void {
+    this.favoriteService.listFavorites().subscribe({
+      next: (response) => {
+        this.bookmarkedMovies = response.data.map((fav: any) => fav.movieId);
+        this.updateBookmarkStatus();
+      },
+      error: (error) => {
+        console.error('Hiba a kedvencek betöltésekor:', error);
+      }
+    });
   }
 
   updateBookmarkStatus(): void {
     this.isBookmarked = this.selectedMovie ? this.bookmarkedMovies.includes(this.selectedMovie.movieId) : false;
   }
-
 
   toggleBookmark() {
     if (this.selectedMovie) {
@@ -63,7 +63,7 @@ import { Component, OnInit } from '@angular/core';
         this.favoriteService.removeFavorite(movieId).subscribe({
           next: () => {
             this.bookmarkedMovies = this.bookmarkedMovies.filter(id => id !== movieId);
-            this.saveBookmarkedMovies();
+            this.updateBookmarkStatus();
           },
           error: (error) => {
             console.error('Hiba a kedvenc eltávolításakor:', error);
@@ -73,7 +73,7 @@ import { Component, OnInit } from '@angular/core';
         this.favoriteService.addFavorite(movieId).subscribe({
           next: () => {
             this.bookmarkedMovies.push(movieId);
-            this.saveBookmarkedMovies();
+            this.updateBookmarkStatus();
           },
           error: (error) => {
             console.error('Hiba a kedvenc hozzáadásakor:', error);
@@ -99,21 +99,18 @@ import { Component, OnInit } from '@angular/core';
       .slice(0, 3);
   }
 
-
   showMovieDetails(movieId: number): void {
     const foundMovie = this.movies.find(m => m.movieId === movieId);
     if (foundMovie) {
       this.selectedMovie = foundMovie;
-      this.updateBookmarkStatus(); // Frissítjük a könyvjelző állapotát a film részleteinek megjelenítésekor
-
+      this.updateBookmarkStatus();
       if (this.selectedMovie.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
           this.selectedMovie.trailerLink
         );
       }
-
       this.showModal = true;
-      this.loadSimilarMovies(); // Hívjuk meg a hasonló filmek betöltését
+      this.loadSimilarMovies();
     }
   }
 
@@ -135,8 +132,6 @@ import { Component, OnInit } from '@angular/core';
     this.isBookmarked = false; // Reseteljük a könyvjelző állapotát a modal bezárásakor
   }
 
-
-
   toggleSidebar(category: string = ''): void {
     this.selectedCategory = category;
     this.isSidebarOpen = !!category;
@@ -144,7 +139,6 @@ import { Component, OnInit } from '@angular/core';
       this.loadSimilarMovies(); // Betöltjük a hasonló filmeket, ha az oldalsáv nyílik és van kiválasztott film
     }
   }
-
 
   startCarousel(): void {
     setInterval(() => {
@@ -163,4 +157,4 @@ import { Component, OnInit } from '@angular/core';
 
     carousel.style.transform = `translateX(-${this.currentSlideIndex * 100}%)`;
   }
- }
+}

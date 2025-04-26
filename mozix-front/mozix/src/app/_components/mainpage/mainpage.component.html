@@ -1,33 +1,33 @@
 <app-navbar></app-navbar>
 
- <section>
- <div class="container-fluid">
+<section>
+  <div class="container-fluid">
 
 
     <div class="carousel-container">
       <div class="carousel">
-          <div *ngFor="let movie of randomMovies" class="carousel-slide active" >
-            <a (click)="showMovieDetails(movie.movieId)">
-              <img [src]="movie.cover"   class="carousel-item">
-            </a>
-          </div>
-          <div *ngFor="let movie of randomMovies" class="carousel-slide">
-            <a (click)="showMovieDetails(movie.movieId)">
+        <div *ngFor="let movie of randomMovies" class="carousel-slide active" >
+          <a (click)="showMovieDetails(movie.movieId)">
             <img [src]="movie.cover"   class="carousel-item">
-            </a>
-          </div>
-          <div *ngFor="let movie of randomMovies" class="carousel-slide">
-            <a (click)="showMovieDetails(movie.movieId)">
-            <img [src]="movie.cover"   class="carousel-item">
-            </a>
-          </div>
-
-
+          </a>
+        </div>
+        <div *ngFor="let movie of randomMovies" class="carousel-slide">
+          <a (click)="showMovieDetails(movie.movieId)">
+          <img [src]="movie.cover"   class="carousel-item">
+          </a>
+        </div>
+        <div *ngFor="let movie of randomMovies" class="carousel-slide">
+          <a (click)="showMovieDetails(movie.movieId)">
+          <img [src]="movie.cover"   class="carousel-item">
+          </a>
         </div>
 
 
-        <button class="prev" (click)="moveSlide(-1)">&#10094;</button>
-          <button class="next" (click)="moveSlide(1)">&#10095;</button>
+      </div>
+
+
+      <button class="prev" (click)="moveSlide(-1)">&#10094;</button>
+        <button class="next" (click)="moveSlide(1)">&#10095;</button>
 
     </div>
     <div class="film-container">
@@ -49,11 +49,11 @@
       </div>
     </div>
  </div>
- </section>
+</section>
 
- <br/>
- <br/>
- <section>
+<br/>
+<br/>
+<section>
 
   <div class="component">
     <div class="title-container">
@@ -72,18 +72,18 @@
 
 
 
- </section>
+</section>
 
 
- <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <button class="close-btn" (click)="closeModal()">&times;</button>
     <br>
     <div class="poster-container2">
       <img [src]="selectedMovie.cover" class="modal-poster" id="overlay">
       <div class="bookmark-icon" (click)="toggleBookmark()">
-        <img *ngIf="!bookmarkedMovies.includes(selectedMovie?.movieId)" src="assets/bookmark.png" class="bookmark">
-        <img *ngIf="bookmarkedMovies.includes(selectedMovie?.movieId)" src="assets/bookmarkfilled.png" class="bookmark-filled">
+        <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
+        <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
       </div>
     </div>
       <h2>{{ selectedMovie.title }}</h2>
@@ -124,7 +124,7 @@
 
       <div *ngIf="selectedCategory === 'Szereplők'">
 
- <br>
+<br>
         <div class="actor-director-container">
           <div>
 
@@ -156,7 +156,7 @@
         <br>
         <div class="films2">
           <div class="film-box2"
-              *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie.movieId)">
+               *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie.movieId)">
             <img [src]="movie.cover" class="poszter2">
             <p class="film-title2">{{ movie.title }}</p>
           </div>
@@ -164,7 +164,7 @@
       </div>
 
     </div>
- </div>
- </div>
- </div>
- </div>
+</div>
+</div>
+</div>
+</div>
