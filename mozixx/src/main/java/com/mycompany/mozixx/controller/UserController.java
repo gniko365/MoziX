@@ -169,29 +169,39 @@ private JSONObject createErrorResponse(int statusCode, String message) {
         }
     }
     
-    @DELETE
-    @Path("/delete/{userId}")
-    public Response deleteUser(@PathParam("userId") Integer userId) {
-        try {
-            userService.beginTransaction();
-            Users user = userService.getEntityManager().find(Users.class, userId);
-            if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                               .entity("{\"error\": \"User not found\"}")
-                               .build();
-            }
-            userService.getEntityManager().remove(user);
-            userService.commitTransaction();
-            return Response.ok(new JSONObject().put("message", "User deleted successfully").toString()).build();
-        } catch (Exception e) {
-            userService.rollbackTransaction();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("{\"error\": \"" + e.getMessage() + "\"}")
-                           .build();
-        } finally {
-            userService.close();
+    // UserController.java
+
+@DELETE
+@Path("/delete/{userId}")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public Response deleteUser(@PathParam("userId") Integer userId, String jsonBody) {
+    try {
+        JSONObject request = new JSONObject(jsonBody);
+        if (!request.has("password") || request.getString("password").isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(createErrorResponse(400, "A jelszó megadása kötelező").toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
+        String password = request.getString("password");
+        JSONObject result = userService.deleteUser(userId, password);
+        return Response.status(result.getInt("statusCode"))
+                .entity(result.toString())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    } catch (JSONException e) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity(createErrorResponse(400, "Érvénytelen JSON formátum").toString())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(createErrorResponse(500, "Szerverhiba történt: " + e.getMessage()).toString())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
+}
     
     @GET
 @Path("/all")

@@ -247,19 +247,55 @@ public class UserService {
     }
 }
 
-    public void deleteUser(int userId) {
-        try {
-            beginTransaction();
-            Users user = em.find(Users.class, userId);
-            if (user != null) {
-                em.remove(user);
-            }
-            commitTransaction();
-        } catch (Exception e) {
-            rollbackTransaction();
-            throw e;
+    // UserService.java
+
+public JSONObject deleteUser(int userId, String password) {
+    JSONObject response = new JSONObject();
+    EntityTransaction transaction = null;
+    try {
+        transaction = em.getTransaction();
+        transaction.begin();
+
+        Users user = em.find(Users.class, userId);
+        if (user == null) {
+            response.put("status", "not_found");
+            response.put("statusCode", 404);
+            response.put("message", "Felhasználó nem található");
+            return response;
+        }
+
+        // Jelszó ellenőrzése
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            response.put("status", "unauthorized");
+            response.put("statusCode", 401);
+            response.put("message", "Hibás jelszó");
+            return response;
+        }
+
+        em.remove(user);
+        transaction.commit();
+
+        response.put("status", "success");
+        response.put("statusCode", 200);
+        response.put("message", "Felhasználó sikeresen törölve");
+
+    } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+            transaction.rollback();
+        }
+        response.put("status", "error");
+        response.put("statusCode", 500);
+        response.put("message", "Szerverhiba történt: " + e.getMessage());
+    } finally {
+        if (em != null && em.isOpen()) {
+            em.close();
+        }
+        if (emf != null && emf.isOpen()) {
+            emf.close();
         }
     }
+    return response;
+}
 
     public List<Users> getAllUsers() {
     return em.createQuery("SELECT u FROM Users u", Users.class).getResultList();
