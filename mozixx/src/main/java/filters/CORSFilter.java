@@ -37,7 +37,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
                 "Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add(
                 "Access-Control-Allow-Headers",
-                "origin, content-type, accept, authorization, x-requested-with");
+                "origin, content-type, accept, authorization, x-requested-with, X-Password"); // Hozzáadtuk az X-Password-ot
         responseContext.getHeaders().add(
                 "Access-Control-Allow-Methods",
                 "GET, POST, PUT, DELETE, OPTIONS, HEAD");
