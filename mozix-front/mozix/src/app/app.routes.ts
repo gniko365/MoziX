@@ -9,7 +9,7 @@ import { BestratedinsideComponent } from './_components/bestratedinside/bestrate
 import { NewreleaseComponent } from './_components/newrelease/newrelease.component';
 import { ProfilComponent } from './_components/profil/profil.component';
 import { EditprofilComponent } from './_components/editprofil/editprofil.component';
-import { SearchResultsComponent } from './_components/search-result/search-result.component';
+import { SearchResultsComponent } from './_components/search-results/search-results.component';
 
 export const routes: Routes = [
   {path: '', redirectTo:'/mainpage', pathMatch:'full'},
