@@ -9,6 +9,7 @@ import { BestratedinsideComponent } from './_components/bestratedinside/bestrate
 import { NewreleaseComponent } from './_components/newrelease/newrelease.component';
 import { ProfilComponent } from './_components/profil/profil.component';
 import { EditprofilComponent } from './_components/editprofil/editprofil.component';
+import { SearchResultsComponent } from './_components/search-result/search-result.component';
 
 export const routes: Routes = [
   {path: '', redirectTo:'/mainpage', pathMatch:'full'},
@@ -22,6 +23,7 @@ export const routes: Routes = [
   {path: 'newrelease', component:NewreleaseComponent},
   {path: 'profil', component:ProfilComponent},
   {path: 'editprofil', component:EditprofilComponent},
+  { path: 'search-results', component: SearchResultsComponent }, // Hozzáadva a keresési eredmények útvonala
   {
     path: 'vígjáték',
     component: CategoryInsideComponent,
