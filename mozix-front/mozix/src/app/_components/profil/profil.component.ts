@@ -5,12 +5,14 @@ import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { LoginService } from '../../_services/login.service';
 import { FavoriteService } from '../../_services/favorite.service';
 import { CommonModule, NgIf } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // Importáld a DomSanitizer-t
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+// Importáld a FormsModule-ot
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profil',
   standalone: true,
-  imports: [NavbarComponent, RouterLink, RouterOutlet, CommonModule, NgIf], // Add NgIf to imports
+  imports: [NavbarComponent, RouterLink, RouterOutlet, CommonModule, NgIf, FormsModule], // Add FormsModule to imports
   templateUrl: './profil.component.html',
   styleUrl: './profil.component.css'
 })
@@ -26,17 +28,27 @@ export class ProfilComponent implements OnInit {
   isSidebarOpen: boolean = false; // Oldalsáv állapota
   selectedCategory: string = ''; // Kiválasztott kategória az oldalsávban
   isBookmarked: boolean = false; // Jelzi, hogy a jelenleg megtekintett film a kedvencek között van-e
+  showDeleteConfirmation = false; // Jelzi a jelszó megerősítő ablak láthatóságát
+  deletePassword = ''; // A felhasználó által beírt jelszó
+  deleteErrorMessage = ''; // Hibaüzenet a törléshez
+  userId: string | null = null; // Felhasználói azonosító tárolása a komponensben
 
   constructor(
     private router: Router,
     private loginService: LoginService,
     private favoriteService: FavoriteService,
     private sanitizer: DomSanitizer // Injectáld a DomSanitizer-t
-  ) { }
+  ) {
+    this.userId = localStorage.getItem('id');
+    console.log('UserId a konstruktorban:', this.userId);
+  }
 
   ngOnInit(): void {
+    console.log('Profil komponens inicializálódik...');
     this.loadUsername();
-    this.loadBookmarkedMoviesWithDetails(); // Módosított metódus a részletek betöltéséhez
+    this.loadBookmarkedMoviesWithDetails();
+    this.userId = localStorage.getItem('id'); // Javítva: 'id' lekérése
+    console.log('UserId az ngOnInit-ban:', this.userId);
   }
 
   loadUsername(): void {
@@ -70,7 +82,68 @@ export class ProfilComponent implements OnInit {
   logout() {
     this.loginService.logout();
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('id'); // Javítva: 'id' eltávolítása
     this.router.navigate(['/mainpage']);
+  }
+
+  // Új metódus a profil törlésének megerősítéséhez
+  confirmDeleteProfile() {
+    this.showDeleteConfirmation = true;
+  }
+
+  // Metódus a profil törléséhez a jelszó ellenőrzése után
+  deleteProfile() {
+    const userIdToDelete = localStorage.getItem('id'); // Javítva: 'id' lekérése
+    console.log('Törlés kísérlet elején ID (közvetlen):', userIdToDelete, 'jelszó:', this.deletePassword); // Hozzáadva a logolás elején
+    console.log('A localStorage tartalma a törlés előtt:', localStorage); // ÚJ SOR
+    if (!userIdToDelete) {
+      console.error('Felhasználói azonosító nem található.');
+      return;
+    }
+    this.loginService.deleteUser(userIdToDelete, this.deletePassword).subscribe({
+      next: (response) => {
+        console.log('Sikeres profil törlés:', response);
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('username');
+        localStorage.removeItem('id'); // Javítva: 'id' eltávolítása
+        this.router.navigate(['/mainpage']); // Átirányítás a főoldalra
+      },
+      error: (error) => {
+        console.error('Hiba a profil törlésekor:', error);
+        this.deleteErrorMessage = 'Hibás jelszó vagy a törlés nem sikerült.';
+      }
+    });
+    this.closeDeleteConfirmation(); // Bezárjuk a megerősítő ablakot
+  }
+
+  closeDeleteConfirmation() {
+    this.showDeleteConfirmation = false;
+    this.deletePassword = '';
+    this.deleteErrorMessage = '';
+  }
+
+  updateDeletePassword(event: any) {
+    this.deletePassword = event.target.value;
+  }
+
+  togglePasswordVisibility(inputId: string, eyeIconId: string): void {
+    const passwordInput = document.getElementById(inputId) as HTMLInputElement;
+    const eyeIcon = document.getElementById(eyeIconId) as HTMLElement;
+
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      if (eyeIcon) {
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+      }
+    } else {
+      passwordInput.type = 'password';
+      if (eyeIcon) {
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+      }
+    }
   }
 
   showMovieDetails(movie: any): void { // A paraméter most egy film objektum

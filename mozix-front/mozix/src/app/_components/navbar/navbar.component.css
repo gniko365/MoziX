@@ -205,6 +205,8 @@ cursor: pointer;
 
 @media (max-width: 768px) {
 
+
+
 .password-requirements {
   font-size: 10px;
   color: #555;
@@ -348,6 +350,35 @@ nav {
 
 
 @media (min-width: 1200px) {
+.sidebar .error-message {
+  background-color: #fdecea; /* Világos pirosas háttér */
+  color: #d9534f; /* Sötétebb piros szöveg */
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #d9534f; /* Piros keret */
+  font-size: 0.9em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Stílus a jelszó követelményekhez */
+.sidebar .password-requirements {
+  margin-top: 10px;
+  padding-left: 15px;
+  font-size: 0.85em;
+  
+}
+
+.sidebar .password-requirements div {
+  margin-bottom: 5px;
+}
+
+.sidebar .password-requirements div i {
+  margin-right: 5px;
+  
+}
+
 .password-requirements {
   font-size: 0.8em;
   color: #555;
@@ -485,6 +516,49 @@ nav {
 }
 
 @media (min-width: 1600px) {
+
+
+.sidebar .error-message {
+background-color: #fdecea; /* Világos pirosas háttér */
+color: #d9534f; /* Sötétebb piros szöveg */
+padding: 10px;
+margin-top: 10px;
+border-radius: 5px;
+border: 1px solid #d9534f; /* Piros keret */
+font-size: 0.9em;
+text-align: center;
+margin-bottom: 20px;
+}
+
+/* Stílus a jelszó követelményekhez */
+.sidebar .password-requirements {
+margin-top: 10px;
+padding-left: 15px;
+font-size: 0.85em;
+
+}
+
+.sidebar .password-requirements div {
+margin-bottom: 5px;
+}
+
+.sidebar .password-requirements div i {
+margin-right: 5px;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 .search-container {
   position: relative;
   display: flex;
@@ -803,6 +877,36 @@ color: #777;
 
 
 @media (min-width: 769px) and (max-width: 1100px) {
+.sidebar .error-message {
+  background-color: #fdecea; /* Világos pirosas háttér */
+  color: #d9534f; /* Sötétebb piros szöveg */
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #d9534f; /* Piros keret */
+  font-size: 0.9em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Stílus a jelszó követelményekhez */
+.sidebar .password-requirements {
+  margin-top: 10px;
+  padding-left: 15px;
+  font-size: 0.85em;
+  
+}
+
+.sidebar .password-requirements div {
+  margin-bottom: 5px;
+}
+
+.sidebar .password-requirements div i {
+  margin-right: 5px;
+  
+}
+
+
 .password-requirements {
   font-size: 12px;
   color: #555;
@@ -1060,6 +1164,37 @@ font-size: 13px;
 
 
 @media (min-width: 1100px) and (max-width: 1200px) {
+.sidebar .error-message {
+  background-color: #fdecea; /* Világos pirosas háttér */
+  color: #d9534f; /* Sötétebb piros szöveg */
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #d9534f; /* Piros keret */
+  font-size: 0.9em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Stílus a jelszó követelményekhez */
+.sidebar .password-requirements {
+  margin-top: 10px;
+  padding-left: 15px;
+  font-size: 0.85em;
+  
+}
+
+.sidebar .password-requirements div {
+  margin-bottom: 5px;
+}
+
+.sidebar .password-requirements div i {
+  margin-right: 5px;
+  
+}
+
+
+
 .password-requirements {
   font-size: 0.8em;
   color: #555;

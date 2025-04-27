@@ -5,9 +5,10 @@ import { CommonModule } from '@angular/common';
 import { NewreleaseService } from '../../_services/newrelease.service';
 import { MainpageService } from '../../_services/mainpage.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FavoriteService } from '../../_services/favorite.service';
 
 @Component({
-  selector: 'app-newrelease', // Konzisztens név
+  selector: 'app-newrelease',
   standalone: true,
   imports: [
     NavbarComponent,
@@ -16,43 +17,67 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
     CommonModule,
   ],
   templateUrl: './newrelease.component.html',
-  styleUrl: './newrelease.component.css' // Javított elérési út
+  styleUrl: './newrelease.component.css'
 })
-export class NewreleaseComponent implements OnInit { // Implementálja az OnInit-et
+export class NewreleaseComponent implements OnInit {
   latestMovies: any[] = [];
   selectedLatestMovie: any = null;
   sanitizedTrailerLink: SafeResourceUrl | null = null;
   showModal = false;
   isSidebarOpen: boolean = false;
   selectedCategory: string = '';
+  bookmarkedMovies: number[] = [];
   isBookmarked: boolean = false;
-  similarMovies: any[] = []; // Új tömb a hasonló filmek tárolására
+  similarMovies: any[] = [];
+  selectedMovieId: number | null = null;
 
-  constructor(private newreleaseService: NewreleaseService, mainpageService: MainpageService, private sanitizer: DomSanitizer) {} // Konzisztens név
+  constructor(
+    private newreleaseService: NewreleaseService,
+    private mainpageService: MainpageService,
+    private sanitizer: DomSanitizer,
+    private favoriteService: FavoriteService
+  ) { }
 
   ngOnInit(): void {
     this.loadLatestMovies();
+    this.loadInitialBookmarks();
   }
+
+  loadInitialBookmarks(): void {
+    this.favoriteService.listFavorites().subscribe({
+      next: (response) => {
+        this.bookmarkedMovies = response.data.map((fav: any) => fav.movieId);
+        this.updateBookmarkStatus();
+      },
+      error: (error) => {
+        console.error('Hiba a kedvencek betöltésekor:', error);
+      }
+    });
+  }
+
+  updateBookmarkStatus(): void {
+    this.isBookmarked = this.selectedLatestMovie ? this.bookmarkedMovies.includes(this.selectedLatestMovie.movieId) : false;
+  }
+
 
   loadLatestMovies(): void {
     this.newreleaseService.getLatestMovies().subscribe({
-      next: (data) => { // Javított nyíl függvény szintaxis
+      next: (data) => {
         this.latestMovies = data;
         this.selectLatestMovies();
       },
-      error: (err) => console.error('Hiba filmek betöltése során: ', err) // Javított nyíl függvény
+      error: (err) => console.error('Hiba filmek betöltése során: ', err)
     });
   }
 
   private selectLatestMovies(): void {
-    // Véletlenszerű rendezés és az első 8 elem kiválasztása
     this.latestMovies = [...this.latestMovies]
       .sort(() => 0.5 - Math.random())
       .slice(0, 8);
   }
 
 
-  showMovieDetails(movieId: number | undefined): void { // Módosított típus
+  showMovieDetails(movieId: number | undefined): void {
     if (movieId === undefined) {
       console.warn('showMovieDetails called with undefined movieId');
       return;
@@ -60,6 +85,7 @@ export class NewreleaseComponent implements OnInit { // Implementálja az OnInit
     const foundMovie = this.latestMovies.find(m => m.movieId === movieId);
     if (foundMovie) {
       this.selectedLatestMovie = foundMovie;
+      this.updateBookmarkStatus();
 
       if (this.selectedLatestMovie.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -73,7 +99,7 @@ export class NewreleaseComponent implements OnInit { // Implementálja az OnInit
   }
 
   loadSimilarMovies(): void {
-    this.newreleaseService.getLatestMovies().subscribe({ // Feltételezzük, hogy ez a service hívás megfelelő a véletlenszerű filmekhez
+    this.newreleaseService.getLatestMovies().subscribe({
       next: (data) => {
         if (Array.isArray(data)) {
           this.similarMovies = [...data].sort(() => 0.5 - Math.random()).slice(0, 6);
@@ -90,6 +116,7 @@ export class NewreleaseComponent implements OnInit { // Implementálja az OnInit
     this.showModal = false;
     this.selectedLatestMovie = null;
     this.similarMovies = [];
+    this.isBookmarked = false;
   }
 
 
@@ -102,6 +129,31 @@ export class NewreleaseComponent implements OnInit { // Implementálja az OnInit
   }
 
   toggleBookmark() {
-    this.isBookmarked = !this.isBookmarked;
+    if (this.selectedLatestMovie) {
+      const movieId = this.selectedLatestMovie.movieId;
+      const isCurrentlyBookmarked = this.bookmarkedMovies.includes(movieId);
+
+      if (isCurrentlyBookmarked) {
+        this.favoriteService.removeFavorite(movieId).subscribe({
+          next: () => {
+            this.bookmarkedMovies = this.bookmarkedMovies.filter(id => id !== movieId);
+            this.updateBookmarkStatus();
+          },
+          error: (error) => {
+            console.error('Hiba a kedvenc eltávolításakor:', error);
+          }
+        });
+      } else {
+        this.favoriteService.addFavorite(movieId).subscribe({
+          next: () => {
+            this.bookmarkedMovies.push(movieId);
+            this.updateBookmarkStatus();
+          },
+          error: (error) => {
+            console.error('Hiba a kedvenc hozzáadásakor:', error);
+          }
+        });
+      }
+    }
   }
 }

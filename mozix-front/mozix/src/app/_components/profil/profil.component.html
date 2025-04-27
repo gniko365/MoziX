@@ -7,7 +7,7 @@
       <i class="fa fa-gear" (click)="toggleDropdown()" id="icon"></i>
       <div id="myDropdown" class="dropdown-content" [class.show]="isDropdownVisible">
         <a (click)="logout()">Kijelentkezés</a>
-        <a href="#">Profil törlése</a>
+        <a (click)="confirmDeleteProfile()">Profil törlése</a>
       </div>
     </div>
   </div>
@@ -33,9 +33,34 @@
 <div class="small-poster-component">
   <div *ngFor="let movie of bookmarkedMovies">
     <img [src]="movie?.cover" class="small-poster-design" (click)="showMovieDetails(movie)">
-   </div>
+  </div>
   <div class="browse-component" [routerLink]="['/mainpage']">
     <p class="browse-text">Keress a filmjeink között</p>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDeleteConfirmation">
+  <div class="modal-content delete-confirmation" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeDeleteConfirmation()">&times;</button>
+    <h3>Biztosan törölni szeretnéd a profilodat?</h3>
+    <p>A folytatáshoz add meg a jelszavad:</p>
+    <div style="position: relative;">
+      <input type="password" [(ngModel)]="deletePassword" (input)="updateDeletePassword($event)" placeholder="Jelszó" id="deletePasswordInput" style="padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd; /* Még világosabb szürke border */
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1rem;">
+      <button type="button" class="password-toggle" (click)="$event.stopPropagation(); togglePasswordVisibility('deletePasswordInput', 'deletePasswordEye')" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; background: none; border: none; padding: 0; margin: 0; outline: none; z-index: 2;">
+        <i class="fa fa-eye" id="deletePasswordEye" style="font-size: 1.1rem; margin-bottom: 18px;"></i>
+      </button>
+    </div>
+    <p class="error-message" *ngIf="deleteErrorMessage">{{ deleteErrorMessage }}</p>
+    <div class="button-group">
+      <button class="btn btn-secondary" (click)="closeDeleteConfirmation()">Mégse</button>
+      <button class="btn btn-danger" (click)="deleteProfile()" [disabled]="!deletePassword">Törlés</button>
+    </div>
   </div>
 </div>
 
@@ -50,23 +75,23 @@
         <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
       </div>
     </div>
-      <h2>{{ selectedMovie?.title }}</h2>
-      <div>
-        <p class="rating-container-modal">
-          <img src="assets/STAR.png" class="rating-modal">
-          <span class="rating-number-modal">{{ selectedMovie?.averageRating }}</span>
-        </p>
+    <h2>{{ selectedMovie?.title }}</h2>
+    <div>
+      <p class="rating-container-modal">
+        <img src="assets/STAR.png" class="rating-modal">
+        <span class="rating-number-modal">{{ selectedMovie?.averageRating }}</span>
+      </p>
       <p class="modal-time">{{ selectedMovie?.length }} perc</p>
       <p class="modal-description">{{ selectedMovie?.description }}</p>
       <p class="modal-genre" *ngFor="let genre of selectedMovie?.genres">{{ genre?.name }}</p>
 
       <div *ngIf="selectedMovie?.trailerLink">
         <iframe width="100%" height="350"
-          [src]="sanitizedTrailerLink"
-          frameborder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="video">
+                [src]="sanitizedTrailerLink"
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                class="video">
         </iframe>
       </div>
 
@@ -79,37 +104,38 @@
         </div>
       </div>
 
-    <div class="sidebar" *ngIf="isSidebarOpen">
-      <div class="sidebar-content">
-        <span class="close" (click)="toggleSidebar()">&times;</span>
+      <div class="sidebar" *ngIf="isSidebarOpen">
+        <div class="sidebar-content">
+          <span class="close" (click)="toggleSidebar()">&times;</span>
 
-        <div *ngIf="selectedCategory === 'Szereplők'">
-          <br>
-          <div class="actor-director-container">
-            <div>
-              <h3>Szereplők:</h3>
-              <div class="szereplo-container" *ngFor="let actor of selectedMovie?.actors">
-                <img [src]="actor?.image" class="szereplo-kep">
-                <p class="actor-name">{{ actor?.name }}</p>
+          <div *ngIf="selectedCategory === 'Szereplők'">
+            <br>
+            <div class="actor-director-container">
+              <div>
+                <h3>Szereplők:</h3>
+                <div class="szereplo-container" *ngFor="let actor of selectedMovie?.actors">
+                  <img [src]="actor?.image" class="szereplo-kep">
+                  <p class="actor-name">{{ actor?.name }}</p>
+                </div>
               </div>
-            </div>
-            <div>
-              <h3>Rendezők:</h3>
-              <div class="szereplo-container" *ngFor="let director of selectedMovie?.directors">
-                <img [src]="director?.image" class="szereplo-kep">
-                <p class="actor-name">{{ director?.name }}</p>
+              <div>
+                <h3>Rendezők:</h3>
+                <div class="szereplo-container" *ngFor="let director of selectedMovie?.directors">
+                  <img [src]="director?.image" class="szereplo-kep">
+                  <p class="actor-name">{{ director?.name }}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div *ngIf="selectedCategory === 'Hasonló filmek'">
-          <br>
-          <div class="films2">
-            <div class="film-box2"
-                 *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie)">
-              <img [src]="movie?.cover" class="poszter2">
-              <p class="film-title2">{{ movie?.title }}</p>
+          <div *ngIf="selectedCategory === 'Hasonló filmek'">
+            <br>
+            <div class="films2">
+              <div class="film-box2"
+                   *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie)">
+                <img [src]="movie?.cover" class="poszter2">
+                <p class="film-title2">{{ movie?.title }}</p>
+              </div>
             </div>
           </div>
         </div>

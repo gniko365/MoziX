@@ -1,0 +1,113 @@
+<app-navbar></app-navbar>
+<h1>Keresési eredmények a következőre: "{{ searchQuery }}"</h1>
+
+<div *ngIf="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Betöltés...</p>
+</div>
+
+<div *ngIf="error" class="error-message">
+    <div class="error-container">
+        <p class="error-text">{{ error }}</p>
+    </div>
+</div>
+
+<div class="film-component">
+    <div class="films" *ngFor="let movie of searchResults" (click)="showMovieDetails(movie.movieId)">
+        <div class="film-box">
+            <img [src]="movie.cover" class="poster">
+            <p class="film-title">{{ movie.title }}</p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!loading && !error && searchResults.length === 0 && searchQuery">
+    Nincs találat.
+</div>
+
+<div *ngIf="!searchQuery">
+    Kérlek, adj meg egy keresési kifejezést.
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <br>
+        <div class="poster-container2">
+            <img [src]="selectedMovie?.cover" class="modal-poster" id="overlay">
+            <div class="bookmark-icon" (click)="toggleBookmark()">
+                <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
+                <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
+            </div>
+        </div>
+        <h2>{{ selectedMovie?.title }}</h2>
+        <div>
+            <p class="rating-container">
+                <img src="assets/STAR.png" class="rating">
+                <span class="rating-number">{{ selectedMovie?.averageRating }}</span>
+            </p>
+            <p class="modal-time">{{ selectedMovie?.length }} perc</p>
+            <p class="modal-description">{{ selectedMovie?.description }}</p>
+            <p class="modal-genre" *ngFor="let genre of selectedMovie?.genres">{{ genre?.name }}, </p>
+
+            <div *ngIf="selectedMovie?.trailerLink">
+                <iframe width="100%" height="350"
+                        [src]="sanitizedTrailerLink"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        class="video">
+                </iframe>
+            </div>
+
+            <div class="Kategoriak">
+                <div class="category-component" (click)="toggleSidebar('Szereplők')">
+                    <p class="category-item">Szereplők</p>
+                </div>
+
+                <div class="category-component" (click)="toggleSidebar('Hasonló filmek')">
+                    <p class="category-item">Ajánlott filmek</p>
+                </div>
+            </div>
+
+            <div class="sidebar" *ngIf="isSidebarOpen">
+                <div class="sidebar-content">
+                    <span class="close" (click)="toggleSidebar()">&times;</span>
+
+                    <div *ngIf="selectedCategory === 'Szereplők'">
+                        <br>
+                        <div class="actor-director-container">
+                            <div>
+                                <h3>Szereplők:</h3>
+                                <div class="szereplo-container" *ngFor="let actor of selectedMovie?.actors">
+                                    <img [src]="actor?.image" class="szereplo-kep">
+                                    <p class="actor-name">{{ actor?.name }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3>Rendezők:</h3>
+                                <div class="szereplo-container" *ngFor="let director of selectedMovie?.directors">
+                                    <img [src]="director?.image" class="szereplo-kep">
+                                    <p class="actor-name">{{ director?.name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div *ngIf="selectedCategory === 'Hasonló filmek'">
+                        <br>
+                        <div class="films2">
+                            <div class="film-box2"
+                                 *ngFor="let movie of similarMovies" (click)="showMovieDetails(movie.movieId)">
+                                <img [src]="movie.cover" class="poszter2">
+                                <p class="film-title2">{{ movie.title }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

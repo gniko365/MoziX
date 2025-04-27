@@ -4,6 +4,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../_services/category.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FavoriteService } from '../../_services/favorite.service';
 
 @Component({
   selector: 'app-category',
@@ -32,15 +33,45 @@ export class CategoryComponent implements OnInit {
   sanitizedTrailerLink: SafeResourceUrl | null = null;
   isSidebarOpen = false;
   selectedCategory = '';
-  isBookmarked = false;
-  similarMovies: any[] = []; // Új tömb a hasonló filmek tárolására
+  bookmarkedMovies: number[] = [];
+  isBookmarked: boolean = false;
+  similarMovies: any[] = [];
 
-  constructor(private categoryService: CategoryService, private sanitizer: DomSanitizer) {} // Konzisztens név
+  constructor(
+    private categoryService: CategoryService,
+    private sanitizer: DomSanitizer,
+    private favoriteService: FavoriteService
+  ) { }
 
   ngOnInit(): void {
     this.loadMovies();
     this.loadMovies2();
     this.loadMovies3();
+    this.loadInitialBookmarks();
+  }
+
+  loadInitialBookmarks(): void {
+    this.favoriteService.listFavorites().subscribe({
+      next: (response) => {
+        this.bookmarkedMovies = response.data.map((fav: any) => fav.movieId);
+        this.updateBookmarkStatus();
+      },
+      error: (error) => {
+        console.error('Hiba a kedvencek betöltésekor:', error);
+      }
+    });
+  }
+
+  updateBookmarkStatus(): void {
+    if (this.selectedMovie) {
+      this.isBookmarked = this.bookmarkedMovies.includes(this.selectedMovie.movieId);
+    } else if (this.selectedMovie2) {
+      this.isBookmarked = this.bookmarkedMovies.includes(this.selectedMovie2.movieId);
+    } else if (this.selectedMovie3) {
+      this.isBookmarked = this.bookmarkedMovies.includes(this.selectedMovie3.movieId);
+    } else {
+      this.isBookmarked = false;
+    }
   }
 
 
@@ -90,29 +121,27 @@ export class CategoryComponent implements OnInit {
 
   private selectMovies(): void {
     const shuffled = [...this.movies].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 7); // Get first 6 movies
+    const selected = shuffled.slice(0, 7);
     this.mainMovie = selected[0];
-    this.galleryMovies = selected.slice(1, 7); // Get movies 2-6
+    this.galleryMovies = selected.slice(1, 7);
   }
 
   private selectMovies2(): void {
     const shuffled = [...this.movies2].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 7); // Get first 6 movies
+    const selected = shuffled.slice(0, 7);
     this.mainMovie2 = selected[0];
-    this.galleryMovies2 = selected.slice(1, 7); // Get movies 2-6
+    this.galleryMovies2 = selected.slice(1, 7);
   }
 
   private selectMovies3(): void {
     const shuffled = [...this.movies3].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, 7); // Get first 6 movies
+    const selected = shuffled.slice(0, 7);
     this.mainMovie3 = selected[0];
-    this.galleryMovies3 = selected.slice(1, 7); // Get movies 2-6
+    this.galleryMovies3 = selected.slice(1, 7);
   }
 
 
-
-
-  showMovieDetails(movieId: number | undefined): void { // Módosított típus
+  showMovieDetails(movieId: number | undefined): void {
     console.log('Attempting to show details for movie ID:', movieId);
     if (movieId === undefined) {
       console.warn('showMovieDetails called with undefined movieId');
@@ -123,7 +152,9 @@ export class CategoryComponent implements OnInit {
 
     if (foundMovie) {
       this.selectedMovie = foundMovie;
-      this.selectedMovie2 = null; // Clear other movie type
+      this.selectedMovie2 = null;
+      this.selectedMovie3 = null;
+      this.updateBookmarkStatus();
 
       if (this.selectedMovie.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -132,12 +163,12 @@ export class CategoryComponent implements OnInit {
       }
 
       this.showModal = true;
-      this.loadSimilarMovies(); // Hívjuk meg a hasonló filmek betöltését
+      this.loadSimilarMovies();
       console.log('Modal should be visible now');
     }
   }
 
-  showMovieDetails2(movieId: number | undefined): void { // Módosított típus
+  showMovieDetails2(movieId: number | undefined): void {
     console.log('Attempting to show details for movie2 ID:', movieId);
     if (movieId === undefined) {
       console.warn('showMovieDetails2 called with undefined movieId');
@@ -148,7 +179,9 @@ export class CategoryComponent implements OnInit {
 
     if (foundMovie) {
       this.selectedMovie2 = foundMovie;
-      this.selectedMovie = null; // Clear other movie type
+      this.selectedMovie = null;
+      this.selectedMovie3 = null;
+      this.updateBookmarkStatus();
 
       if (this.selectedMovie2.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -157,12 +190,12 @@ export class CategoryComponent implements OnInit {
       }
 
       this.showModal = true;
-      this.loadSimilarMovies(); // Hívjuk meg a hasonló filmek betöltését
+      this.loadSimilarMovies();
       console.log('Modal should be visible now');
     }
   }
 
-  showMovieDetails3(movieId: number | undefined): void { // Módosított típus
+  showMovieDetails3(movieId: number | undefined): void {
     console.log('Attempting to show details for movie3 ID:', movieId);
     if (movieId === undefined) {
       console.warn('showMovieDetails3 called with undefined movieId');
@@ -175,6 +208,7 @@ export class CategoryComponent implements OnInit {
       this.selectedMovie3 = foundMovie;
       this.selectedMovie = null;
       this.selectedMovie2 = null;
+      this.updateBookmarkStatus();
 
       if (this.selectedMovie3.trailerLink) {
         this.sanitizedTrailerLink = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -183,14 +217,14 @@ export class CategoryComponent implements OnInit {
       }
 
       this.showModal = true;
-      this.loadSimilarMovies(); // Hívjuk meg a hasonló filmek betöltését
+      this.loadSimilarMovies();
       console.log('Modal should be visible now');
     }
   }
 
 
   loadSimilarMovies(): void {
-    this.categoryService.getMovies().subscribe({ // Feltételezzük, hogy ez a service hívás megfelelő a véletlenszerű filmekhez
+    this.categoryService.getMovies().subscribe({
       next: (data) => {
         if (Array.isArray(data)) {
           this.similarMovies = [...data].sort(() => 0.5 - Math.random()).slice(0, 6);
@@ -208,9 +242,10 @@ export class CategoryComponent implements OnInit {
     this.showModal = false;
     this.selectedMovie = null;
     this.selectedMovie2 = null;
-    this.selectedMovie3 = null; // Add this line
+    this.selectedMovie3 = null;
     this.sanitizedTrailerLink = null;
-    this.similarMovies = []; // Clear similar movies on modal close
+    this.similarMovies = [];
+    this.isBookmarked = false;
   }
 
 
@@ -223,6 +258,38 @@ export class CategoryComponent implements OnInit {
   }
 
   toggleBookmark() {
-    this.isBookmarked = !this.isBookmarked;
+    let movieId: number | undefined;
+    if (this.selectedMovie) {
+      movieId = this.selectedMovie.movieId;
+    } else if (this.selectedMovie2) {
+      movieId = this.selectedMovie2.movieId;
+    } else if (this.selectedMovie3) {
+      movieId = this.selectedMovie3.movieId;
+    }
+
+    if (movieId) {
+      const isCurrentlyBookmarked = this.bookmarkedMovies.includes(movieId);
+      if (isCurrentlyBookmarked) {
+        this.favoriteService.removeFavorite(movieId).subscribe({
+          next: () => {
+            this.bookmarkedMovies = this.bookmarkedMovies.filter(id => id !== movieId);
+            this.updateBookmarkStatus();
+          },
+          error: (error) => {
+            console.error('Hiba a kedvenc eltávolításakor:', error);
+          }
+        });
+      } else {
+        this.favoriteService.addFavorite(movieId).subscribe({
+          next: () => {
+            this.bookmarkedMovies.push(movieId);
+            this.updateBookmarkStatus();
+          },
+          error: (error) => {
+            console.error('Hiba a kedvenc hozzáadásakor:', error);
+          }
+        });
+      }
+    }
   }
 }

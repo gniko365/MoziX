@@ -29,23 +29,23 @@
       <button class="close-btn" (click)="closeModal()">&times;</button>
       <br>
       <div class="poster-container2">
-        <img [src]="selectedMovie.cover" class="modal-poster" id="overlay">
+        <img [src]="selectedMovie?.cover" class="modal-poster" id="overlay">
         <div class="bookmark-icon" (click)="toggleBookmark()">
           <img *ngIf="!isBookmarked" src="assets/bookmark.png" class="bookmark">
           <img *ngIf="isBookmarked" src="assets/bookmarkfilled.png" class="bookmark-filled">
         </div>
       </div>
-        <h2>{{ selectedMovie.title }}</h2>
+        <h2>{{ selectedMovie?.title }}</h2>
         <div>
           <p class="rating-container-modal">
             <img src="assets/STAR.png" class="rating-modal">
-            <span class="rating-number-modal">{{ selectedMovie.averageRating }}</span>
+            <span class="rating-number-modal">{{ selectedMovie?.averageRating }}</span>
           </p>
-        <p class="modal-time">{{ selectedMovie.length }} perc</p>
-        <p class="modal-description">{{ selectedMovie.description }}</p>
+        <p class="modal-time">{{ selectedMovie?.length }} perc</p>
+        <p class="modal-description">{{ selectedMovie?.description }}</p>
         <p class="modal-genre" *ngFor="let genre of selectedMovie?.genres">{{ genre?.name }}, </p>
   
-        <div *ngIf="selectedMovie.trailerLink">
+        <div *ngIf="selectedMovie?.trailerLink">
           
 <iframe width="100%" height="350" 
     [src]="sanitizedTrailerLink"
