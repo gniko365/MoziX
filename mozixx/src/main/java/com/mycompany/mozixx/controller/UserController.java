@@ -173,34 +173,19 @@ private JSONObject createErrorResponse(int statusCode, String message) {
 
 @DELETE
 @Path("/delete/{userId}")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public Response deleteUser(@PathParam("userId") Integer userId, String jsonBody) {
-    try {
-        JSONObject request = new JSONObject(jsonBody);
-        if (!request.has("password") || request.getString("password").isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(createErrorResponse(400, "A jelszó megadása kötelező").toString())
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-        String password = request.getString("password");
-        JSONObject result = userService.deleteUser(userId, password);
-        return Response.status(result.getInt("statusCode"))
-                .entity(result.toString())
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    } catch (JSONException e) {
+public Response deleteUser(@PathParam("userId") Integer userId, @HeaderParam("X-Password") String password) {
+    if (password == null || password.isEmpty()) {
         return Response.status(Response.Status.BAD_REQUEST)
-                .entity(createErrorResponse(400, "Érvénytelen JSON formátum").toString())
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    } catch (Exception e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(createErrorResponse(500, "Szerverhiba történt: " + e.getMessage()).toString())
+                .entity(createErrorResponse(400, "A jelszó megadása kötelező az X-Password header-ben").toString())
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }
+    JSONObject result = userService.deleteUser(userId, password);
+    return Response.status(result.getInt("statusCode"))
+            .entity(result.toString())
+            .type(MediaType.APPLICATION_JSON)
+            .build();
 }
     
     @GET
