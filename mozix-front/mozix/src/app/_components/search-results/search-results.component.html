@@ -21,8 +21,8 @@
     </div>
 </div>
 
-<div *ngIf="!loading && !error && searchResults.length === 0 && searchQuery">
-    Nincs találat.
+<div *ngIf="!loading && !error && searchResults.length === 0 && searchQuery" class="error-container">
+    <p class="error-text">Nincs találat.</p>
 </div>
 
 <div *ngIf="!searchQuery">
