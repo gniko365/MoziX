@@ -22,9 +22,7 @@
 </div>
 
 <div *ngIf="!loading && !error && searchResults.length === 0 && searchQuery">
-    <div class="error-container">
-        <p class="error-text">Nincs találat.</p>
-    </div>
+    Nincs találat.
 </div>
 
 <div *ngIf="!searchQuery">
@@ -49,6 +47,7 @@
                 <span class="rating-number">{{ selectedMovie?.averageRating }}</span>
             </p>
             <p class="modal-time">{{ selectedMovie?.length }} perc</p>
+            <p class="modal-description">Megjelenés éve: {{ selectedMovie?.releaseYear }}</p>
             <p class="modal-description">{{ selectedMovie?.description }}</p>
             <p class="modal-genre" *ngFor="let genre of selectedMovie?.genres">{{ genre?.name }}, </p>
 

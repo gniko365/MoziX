@@ -216,6 +216,7 @@
           <span class="rating-number3">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.roundedRating }}</span>
         </p>
         <p class="modal-time">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.length }} perc</p>
+        <p class="modal-description">Megjelenés éve: {{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.releaseYear }}</p>
         <p class="modal-description">{{ (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.description }}</p>
         <p class="modal-genre" *ngFor="let genre of (selectedMovie || selectedMovie2 || selectedMovie3 || selectedMovie4 || selectedMovie5)?.genres">{{ genre?.name }}, </p>
   

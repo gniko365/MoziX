@@ -64,16 +64,14 @@ export class NewreleaseComponent implements OnInit {
     this.newreleaseService.getLatestMovies().subscribe({
       next: (data) => {
         this.latestMovies = data;
-        this.selectLatestMovies();
+        this.selectInitialLatestMovies();
       },
       error: (err) => console.error('Hiba filmek betöltése során: ', err)
     });
   }
 
-  private selectLatestMovies(): void {
-    this.latestMovies = [...this.latestMovies]
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 8);
+  private selectInitialLatestMovies(): void {
+    this.latestMovies = this.latestMovies.slice(0, 8);
   }
 
 
@@ -102,7 +100,8 @@ export class NewreleaseComponent implements OnInit {
     this.newreleaseService.getLatestMovies().subscribe({
       next: (data) => {
         if (Array.isArray(data)) {
-          this.similarMovies = [...data].sort(() => 0.5 - Math.random()).slice(0, 6);
+          // Assuming the API returns similar movies or all movies, we filter out the selected one
+          this.similarMovies = data.filter(movie => movie.movieId !== this.selectedLatestMovie?.movieId).slice(0, 6);
         } else {
           console.error('Data is not an array in loadSimilarMovies:', data);
           this.similarMovies = [];

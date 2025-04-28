@@ -23,6 +23,7 @@ interface Movie {
   averageRating?: number;
   actors?: any[];
   directors?: any[];
+  releaseYear?: number;
 }
 
 @Component({
