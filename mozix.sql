@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 26, 2025 at 09:53 PM
+-- Generation Time: May 28, 2025 at 04:11 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -1661,12 +1661,18 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (74, 'vao', 'vao', '$2a$10$x/bXN3Yg3.ZhTKfWse.pXOm3WTjd.KtReUDpFL5YkHmU4bOxrlnCC', '2025-04-25', 'user'),
 (75, 'teso', 'teso', '$2a$10$Z5nf8aEwuHaQ/FkBjnEz8eSUKxdGQRnCgxffNB.tT8IAAHlOxoJBe', '2025-04-25', 'user'),
 (76, 'faszom', 'faszom', '$2a$10$g0vBX747kZiXQVUw7O9eY.u3NsdXh6Z/v9iBU8uXSQyayKMRTyCVm', '2025-04-25', 'user'),
-(77, 'cigány', 'cigány', '$2a$10$APF1jdAEXyjzt1WUfSnaOOxUHzObZYi3Vw3rhp8FrCRd924Ds/SPS', '2025-04-25', 'user'),
 (78, 'automsaasdfsdfdfaosasdo', 'vaovoaasdfvsdfsdadsffsovaova@gmail.com', '$2a$10$ELEIpuTYHRchtmTw2/q4/OjzN3RrkoPnslVpMdNf1W8D7lUr1b9Gy', '2025-04-25', 'user'),
 (79, 'faa', 'faa', '$2a$10$xYJA4bIRJSfonKH3nzaY5.DoMkMPiJmjwcSfU2f1LDzlEiE9daS.u', '2025-04-25', 'user'),
 (80, 'rere', 'rere', '$2a$10$6wp3Co60PuhpmU1Q9v/bFOLVYoTx7q.aaR.bi/GhA9gEsOVfvyXe.', '2025-04-25', 'user'),
 (81, 'ref', 'ref', '$2a$10$pH2p2R94MOmZJVSCJdoqueQDUySSHftyrz3CipVEaVzL8yEUYEDMK', '2025-04-25', 'user'),
-(82, 'bazsika', 'nagyb66205@gmail.com', '$2a$10$yhOb/pupe6BMDN8s.lqIkeTDQfHvgNq3kPsHMbFi2Y5w13.4VFZ06', '2025-04-26', 'user');
+(82, 'bazsika', 'nagyb66205@gmail.com', '$2a$10$yhOb/pupe6BMDN8s.lqIkeTDQfHvgNq3kPsHMbFi2Y5w13.4VFZ06', '2025-04-26', 'user'),
+(86, 'acigigányokat', 'szeretem@gmail.com', '$2a$10$QBXpC3AoOtkLrZrVijhAOeFj7IvVF6MjWzZlszf.zjBumcGYfp3oe', '2025-04-27', 'user'),
+(87, 'meno', 'srac', 'c40e16de4ae054b7e5c2f39d7d5db8c4cc4a08dbec35ab4f00b391bbbb042ea736bd4d0af12b51a7f1f72f1d85f50b0bc020884116579c3af72ac31b295c75d8', '2025-04-28', 'admin'),
+(88, 'ciganyka', 'ciganyka', '$2a$10$glDlrrQe/19g2s4J20F0SefGXptS2lJp9zCpZnbFbs1E4bq4F0jry', '2025-04-28', 'user'),
+(89, 'adminuser', 'admin@example.com', '$2a$10$YHFVYXWZ9baGE1xco5r60Oz2OFvU8akpqFyLpc3fqbRLc5Tof/FTy', '2025-04-28', 'admin'),
+(90, 'asdfasdfadsfasdf', 'asdasassasaas@gmail.com', '$2a$10$VJznch4xJIwr1geRYVGfG.14gwtGPrHAqzk1K.AtVMOBL8nuCAqH2', '2025-04-28', 'user'),
+(92, 'menővagyok', 'nagyb66asdf05@gmail.com', '$2a$10$z0QU3qXPPvEkHL7eR621k.7gpuhrXJBuupA501IIp1JGDnBmYHGki', '2025-04-28', 'user'),
+(93, 'admin', 'admin@gmail.com', '8265f89089a96abb42cdd525ec36dee4d7c1766191651e37fc054fcba5f8f2d85eada32a4596e6079e9cb17b7662923a51d8a55bf31e74e76bcd7204d76476e0', '2025-05-28', 'admin');
 
 -- --------------------------------------------------------
 
@@ -1703,7 +1709,10 @@ INSERT INTO `user_favorites` (`favorite_id`, `user_id`, `movie_id`, `added_at`) 
 (23, 82, 136, '2025-04-26 20:09:13'),
 (24, 82, 142, '2025-04-26 20:40:01'),
 (25, 82, 120, '2025-04-26 20:40:12'),
-(26, 82, 106, '2025-04-26 20:41:41');
+(26, 82, 106, '2025-04-26 20:41:41'),
+(30, 86, 127, '2025-04-27 21:34:11'),
+(33, 92, 102, '2025-04-28 21:42:54'),
+(34, 92, 120, '2025-04-28 21:53:15');
 
 --
 -- Indexes for dumped tables
@@ -1817,13 +1826,13 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
 
 --
 -- AUTO_INCREMENT for table `user_favorites`
 --
 ALTER TABLE `user_favorites`
-  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables
