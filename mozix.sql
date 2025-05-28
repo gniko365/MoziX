@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 28, 2025 at 04:11 PM
+-- Generation Time: May 28, 2025 at 06:09 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -1672,7 +1672,8 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (89, 'adminuser', 'admin@example.com', '$2a$10$YHFVYXWZ9baGE1xco5r60Oz2OFvU8akpqFyLpc3fqbRLc5Tof/FTy', '2025-04-28', 'admin'),
 (90, 'asdfasdfadsfasdf', 'asdasassasaas@gmail.com', '$2a$10$VJznch4xJIwr1geRYVGfG.14gwtGPrHAqzk1K.AtVMOBL8nuCAqH2', '2025-04-28', 'user'),
 (92, 'menővagyok', 'nagyb66asdf05@gmail.com', '$2a$10$z0QU3qXPPvEkHL7eR621k.7gpuhrXJBuupA501IIp1JGDnBmYHGki', '2025-04-28', 'user'),
-(93, 'admin', 'admin@gmail.com', '8265f89089a96abb42cdd525ec36dee4d7c1766191651e37fc054fcba5f8f2d85eada32a4596e6079e9cb17b7662923a51d8a55bf31e74e76bcd7204d76476e0', '2025-05-28', 'admin');
+(93, 'admin', 'admin@gmail.com', '8265f89089a96abb42cdd525ec36dee4d7c1766191651e37fc054fcba5f8f2d85eada32a4596e6079e9cb17b7662923a51d8a55bf31e74e76bcd7204d76476e0', '2025-05-28', 'admin'),
+(94, 'nagyonmeno', 'menoez', '$2a$10$E.iQZRyhX/WeqGs9HX356O3ND40hy9yKdhaWPAu62W8HBTFOxPJP6', '2025-05-28', 'user');
 
 -- --------------------------------------------------------
 
@@ -1712,7 +1713,10 @@ INSERT INTO `user_favorites` (`favorite_id`, `user_id`, `movie_id`, `added_at`) 
 (26, 82, 106, '2025-04-26 20:41:41'),
 (30, 86, 127, '2025-04-27 21:34:11'),
 (33, 92, 102, '2025-04-28 21:42:54'),
-(34, 92, 120, '2025-04-28 21:53:15');
+(34, 92, 120, '2025-04-28 21:53:15'),
+(35, 94, 124, '2025-05-28 18:05:28'),
+(36, 94, 103, '2025-05-28 18:05:33'),
+(37, 94, 104, '2025-05-28 18:05:35');
 
 --
 -- Indexes for dumped tables
@@ -1786,7 +1790,7 @@ ALTER TABLE `users`
 ALTER TABLE `user_favorites`
   ADD PRIMARY KEY (`favorite_id`),
   ADD UNIQUE KEY `unique_favorite` (`user_id`,`movie_id`),
-  ADD KEY `movie_id` (`movie_id`);
+  ADD KEY `user_favorites_ibfk_2` (`movie_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1814,7 +1818,7 @@ ALTER TABLE `genres`
 -- AUTO_INCREMENT for table `movies`
 --
 ALTER TABLE `movies`
-  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=151;
+  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -1826,13 +1830,13 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `user_favorites`
 --
 ALTER TABLE `user_favorites`
-  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints for dumped tables
@@ -1874,7 +1878,7 @@ ALTER TABLE `ratings`
 --
 ALTER TABLE `user_favorites`
   ADD CONSTRAINT `user_favorites_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `user_favorites_ibfk_2` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`);
+  ADD CONSTRAINT `user_favorites_ibfk_2` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`movie_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
