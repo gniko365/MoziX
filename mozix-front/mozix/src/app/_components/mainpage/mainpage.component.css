@@ -1,3 +1,27 @@
+.delete-button-wrapper {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    z-index: 10;
+}
+
+.delete-button-custom {
+width: 100px; 
+height: 100px; 
+background-color: red; 
+border-radius: 10px; 
+border: 2px solid #fff; 
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+}
+
+.delete-icon-custom {
+color: white;
+font-size: 40px; /* Hogy jobban látható legyen */
+}
+
 .carousel-container {
     position: relative;
     width: 1160px;

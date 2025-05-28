@@ -4,7 +4,8 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { MainpageService } from '../../_services/mainpage.service';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { FavoriteService } from '../../_services/favorite.service'; // Importáld a FavoriteService-t
+import { FavoriteService } from '../../_services/favorite.service';
+import { MovieService } from '../../_services/movie.service';
 
 @Component({
   selector: 'app-mainpage',
@@ -23,19 +24,45 @@ export class MainpageComponent implements OnInit {
   similarMovies: any[] = [];
   isSidebarOpen: boolean = false;
   selectedCategory: string = '';
-  bookmarkedMovies: number[] = []; // Csak az ID-kat tároljuk itt a gyors ellenőrzéshez
+  bookmarkedMovies: number[] = [];
   isBookmarked: boolean = false;
+  isAdminUser: boolean = false; 
 
   constructor(
     private mainpageService: MainpageService,
     private sanitizer: DomSanitizer,
-    private favoriteService: FavoriteService // Injectáld a FavoriteService-t
+    private favoriteService: FavoriteService,
+    private movieService: MovieService 
   ) { }
 
   ngOnInit(): void {
     this.loadMovies();
     this.startCarousel();
-    this.loadInitialBookmarks(); // Betöltjük a kedvenc ID-kat a backendről
+    this.loadInitialBookmarks();
+    this.checkAdminStatus(); 
+  }
+
+
+  getJwtToken(): string | null {
+    return localStorage.getItem('jwtToken'); 
+  }
+
+  
+  checkAdminStatus(): void {
+    const token = this.getJwtToken();
+   
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isAdminUser = payload?.role === 'admin'; 
+      } catch (error) {
+        console.error('Hiba a JWT dekódolásakor:', error);
+        this.isAdminUser = false;
+      }
+    } else {
+      this.isAdminUser = false;
+    }
+    console.log('Admin user:', this.isAdminUser);
   }
 
   loadInitialBookmarks(): void {
@@ -119,7 +146,7 @@ export class MainpageComponent implements OnInit {
       next: (data) => {
         this.similarMovies = [...data]
           .sort(() => 0.6 - Math.random())
-          .slice(0, 6); // Például 5 hasonló filmet kérünk le
+          .slice(0, 6);
       },
       error: (err) => console.error('Hiba hasonló filmek betöltése során: ', err)
     });
@@ -128,15 +155,15 @@ export class MainpageComponent implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.selectedMovie = null;
-    this.similarMovies = []; // Töröljük a hasonló filmeket a modal bezárásakor
-    this.isBookmarked = false; // Reseteljük a könyvjelző állapotát a modal bezárásakor
+    this.similarMovies = [];
+    this.isBookmarked = false;
   }
 
   toggleSidebar(category: string = ''): void {
     this.selectedCategory = category;
     this.isSidebarOpen = !!category;
     if (category === 'Hasonló filmek' && this.selectedMovie) {
-      this.loadSimilarMovies(); // Betöltjük a hasonló filmeket, ha az oldalsáv nyílik és van kiválasztott film
+      this.loadSimilarMovies();
     }
   }
 
@@ -156,5 +183,26 @@ export class MainpageComponent implements OnInit {
     this.currentSlideIndex = (this.currentSlideIndex + step + totalSlides) % totalSlides;
 
     carousel.style.transform = `translateX(-${this.currentSlideIndex * 100}%)`;
+  }
+
+  deleteThisMovie(): void {
+    if (this.selectedMovie && this.isAdminUser) {
+      const movieId = this.selectedMovie.movieId;
+      const token = this.getJwtToken();
+      if (token) {
+        this.movieService.deleteMovie(movieId, token).subscribe({
+          next: (response) => {
+            console.log('Film sikeresen törölve:', response);
+            this.closeModal();
+            this.loadMovies();
+          },
+          error: (error) => {
+            console.error('Hiba a film törlése során:', error);
+          }
+        });
+      } else {
+        console.error('Nincs JWT token.');
+      }
+    }
   }
 }
