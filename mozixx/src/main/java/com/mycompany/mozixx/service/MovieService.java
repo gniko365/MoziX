@@ -33,181 +33,190 @@ public class MovieService {
     }
     
     public JSONArray getRandomMovies(int count) {
-    EntityManager em = getEntityManagerFactory().createEntityManager();
-    try {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetRandomMovies");
-        
-        List<Object[]> results = query.getResultList();
-        JSONArray movies = new JSONArray();
-        
-        for (Object[] row : results) {
-            JSONObject movie = new JSONObject();
-            movie.put("movieId", row[0]);
-            movie.put("title", row[1]);
-            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-            movie.put("averageRating", row[3]);
-            movies.put(movie);
-        }
-        return movies;
-    } catch (Exception e) {
-        throw new RuntimeException("Hiba a filmek lekérdezésekor", e);
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
+        EntityManager em = getEntityManagerFactory().createEntityManager();
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("GetRandomMovies");
+            
+            List<Object[]> results = query.getResultList();
+            JSONArray movies = new JSONArray();
+            
+            for (Object[] row : results) {
+                JSONObject movie = new JSONObject();
+                movie.put("movieId", row[0]);
+                movie.put("title", row[1]);
+                movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+                movie.put("averageRating", row[3]);
+                movies.put(movie);
+            }
+            return movies;
+        } catch (Exception e) {
+            throw new RuntimeException("Hiba a filmek lekérdezésekor", e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
-}
     
     public JSONArray getMoviesWithDetails() {
-    ArrayList<Map<String, Object>> movieList = new ArrayList<>(); 
-    JSONArray jsonArray = new JSONArray();
-    
-    try {
-        movieList = Movies.getMoviesWithDetails();
+        ArrayList<Map<String, Object>> movieList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
         
-        for (Map<String, Object> movie : movieList) {
-            JSONObject jsonMovie = new JSONObject();
-            // Alap adatok
-            jsonMovie.put("movieId", movie.get("movieId"));
-            jsonMovie.put("title", movie.get("title"));
-            jsonMovie.put("cover", movie.get("cover"));
-            jsonMovie.put("releaseYear", movie.get("releaseYear"));
-            jsonMovie.put("length", movie.get("length"));
-            jsonMovie.put("description", movie.get("description"));
-            jsonMovie.put("trailerLink", movie.get("trailerLink"));
-            jsonMovie.put("averageRating", movie.get("averageRating"));
+        try {
+            // Feltételezzük, hogy a Movies.getMoviesWithDetails() metódus létezik és működik
+            // Ha ez egy adatbázis hívás, akkor az EntityManager-t itt kellene kezelni
+            // Mivel a Movies osztály nincs megadva, feltételezzük, hogy ez egy statikus segédmetódus
+            movieList = Movies.getMoviesWithDetails();
             
-            // Rendezők JSON tömbbe
-            JSONArray directorsArray = new JSONArray();
-            for (Map<String, String> director : (List<Map<String, String>>) movie.get("directors")) {
-                JSONObject directorJson = new JSONObject();
-                directorJson.put("id", director.get("id"));
-                directorJson.put("name", director.get("name"));
-                directorJson.put("image", director.get("image"));
-                directorsArray.put(directorJson);
+            for (Map<String, Object> movie : movieList) {
+                JSONObject jsonMovie = new JSONObject();
+                // Alap adatok
+                jsonMovie.put("movieId", movie.get("movieId"));
+                jsonMovie.put("title", movie.get("title"));
+                jsonMovie.put("cover", movie.get("cover"));
+                jsonMovie.put("releaseYear", movie.get("releaseYear"));
+                jsonMovie.put("length", movie.get("length"));
+                jsonMovie.put("description", movie.get("description"));
+                jsonMovie.put("trailerLink", movie.get("trailerLink"));
+                jsonMovie.put("averageRating", movie.get("averageRating"));
+                
+                // Rendezők JSON tömbbe
+                JSONArray directorsArray = new JSONArray();
+                if (movie.get("directors") instanceof List) {
+                    for (Map<String, String> director : (List<Map<String, String>>) movie.get("directors")) {
+                        JSONObject directorJson = new JSONObject();
+                        directorJson.put("id", director.get("id"));
+                        directorJson.put("name", director.get("name"));
+                        directorJson.put("image", director.get("image"));
+                        directorsArray.put(directorJson);
+                    }
+                }
+                jsonMovie.put("directors", directorsArray);
+                
+                // Színészek JSON tömbbe
+                JSONArray actorsArray = new JSONArray();
+                if (movie.get("actors") instanceof List) {
+                    for (Map<String, String> actor : (List<Map<String, String>>) movie.get("actors")) {
+                        JSONObject actorJson = new JSONObject();
+                        actorJson.put("id", actor.get("id"));
+                        actorJson.put("name", actor.get("name"));
+                        actorJson.put("image", actor.get("image"));
+                        actorsArray.put(actorJson);
+                    }
+                }
+                jsonMovie.put("actors", actorsArray);
+                
+                // Műfajok JSON tömbbe
+                JSONArray genresArray = new JSONArray();
+                if (movie.get("genres") instanceof List) {
+                    for (Map<String, String> genre : (List<Map<String, String>>) movie.get("genres")) {
+                        JSONObject genreJson = new JSONObject();
+                        genreJson.put("id", genre.get("id"));
+                        genreJson.put("name", genre.get("name"));
+                        genresArray.put(genreJson);
+                    }
+                }
+                jsonMovie.put("genres", genresArray);
+                
+                jsonArray.put(jsonMovie);
             }
-            jsonMovie.put("directors", directorsArray);
-            
-            // Színészek JSON tömbbe
-            JSONArray actorsArray = new JSONArray();
-            for (Map<String, String> actor : (List<Map<String, String>>) movie.get("actors")) {
-                JSONObject actorJson = new JSONObject();
-                actorJson.put("id", actor.get("id"));
-                actorJson.put("name", actor.get("name"));
-                actorJson.put("image", actor.get("image"));
-                actorsArray.put(actorJson);
-            }
-            jsonMovie.put("actors", actorsArray);
-            
-            // Műfajok JSON tömbbe
-            JSONArray genresArray = new JSONArray();
-            for (Map<String, String> genre : (List<Map<String, String>>) movie.get("genres")) {
-                JSONObject genreJson = new JSONObject();
-                genreJson.put("id", genre.get("id"));
-                genreJson.put("name", genre.get("name"));
-                genresArray.put(genreJson);
-            }
-            jsonMovie.put("genres", genresArray);
-            
-            jsonArray.put(jsonMovie);
+        } catch (Exception e) {
+            System.err.println("Error fetching movies: " + e.getMessage());
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        System.err.println("Error fetching movies: " + e.getMessage());
-        e.printStackTrace();
+        
+        return jsonArray;
     }
-    
-    return jsonArray;
-}
     
     public List<Map<String, Object>> getLatestReleases() {
-    EntityManager em = getEntityManagerFactory().createEntityManager();
-    try {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetLatestReleases");
-        query.execute();
-        List<Object[]> resultList = query.getResultList();
-        List<Map<String, Object>> movies = new ArrayList<>();
-        
-        for (Object[] row : resultList) {
-            Map<String, Object> movie = new HashMap<>();
-            movie.put("movieId", parseInt(row[0]));
-            movie.put("title", toString(row[1]));
-            movie.put("cover", toString(row[2]));
-            movie.put("releaseYear", parseInt(row[3]));
-            movie.put("length", parseInt(row[4]));
-            movie.put("description", toString(row[5]));
-            movie.put("trailerLink", toString(row[6]));
-            movie.put("averageRating", row[7] != null ? ((Number)row[7]).doubleValue() : null);
+        EntityManager em = getEntityManagerFactory().createEntityManager();
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("GetLatestReleases");
+            query.execute();
+            List<Object[]> resultList = query.getResultList();
+            List<Map<String, Object>> movies = new ArrayList<>();
             
-            // Rendezők feldolgozása
-            movie.put("directors", parsePeopleInfo(toString(row[8]), "director"));
-            
-            // Színészek feldolgozása
-            movie.put("actors", parsePeopleInfo(toString(row[9]), "actor"));
-            
-            // Műfajok feldolgozása
-            movie.put("genres", parseGenresInfo(toString(row[10])));
-            
-            movies.add(movie);
-        }
-        return movies;
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
-        }
-    }
-}
-
-private List<Map<String, Object>> parsePeopleInfo(String info, String type) {
-    List<Map<String, Object>> result = new ArrayList<>();
-    if (info != null && !info.trim().isEmpty()) {
-        String[] people = info.split("\\|");
-        for (String person : people) {
-            String[] parts = person.split(":", 3); // Korlátozzuk 3 részre a URL miatt
-            if (parts.length == 3) {
-                Map<String, Object> personMap = new HashMap<>();
-                personMap.put("id", parseInt(parts[0]));
-                personMap.put("name", parts[1]);
-                personMap.put("image", parts[2].isEmpty() ? null : parts[2]);
-                personMap.put("type", type);
-                result.add(personMap);
+            for (Object[] row : resultList) {
+                Map<String, Object> movie = new HashMap<>();
+                movie.put("movieId", parseInt(row[0]));
+                movie.put("title", toString(row[1]));
+                movie.put("cover", toString(row[2]));
+                movie.put("releaseYear", parseInt(row[3]));
+                movie.put("length", parseInt(row[4]));
+                movie.put("description", toString(row[5]));
+                movie.put("trailerLink", toString(row[6]));
+                movie.put("averageRating", row[7] != null ? ((Number)row[7]).doubleValue() : null);
+                
+                // Rendezők feldolgozása
+                movie.put("directors", parsePeopleInfo(toString(row[8]), "director"));
+                
+                // Színészek feldolgozása
+                movie.put("actors", parsePeopleInfo(toString(row[9]), "actor"));
+                
+                // Műfajok feldolgozása
+                movie.put("genres", parseGenresInfo(toString(row[10])));
+                
+                movies.add(movie);
+            }
+            return movies;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
             }
         }
     }
-    return result;
-}
 
-private List<Map<String, Object>> parseGenresInfo(String info) {
-    List<Map<String, Object>> result = new ArrayList<>();
-    if (info != null && !info.trim().isEmpty()) {
-        String[] genres = info.split("\\|");
-        for (String genre : genres) {
-            String[] parts = genre.split(":");
-            if (parts.length >= 2) {
-                Map<String, Object> genreMap = new HashMap<>();
-                genreMap.put("id", parseInt(parts[0]));
-                genreMap.put("name", parts[1]);
-                result.add(genreMap);
+    private List<Map<String, Object>> parsePeopleInfo(String info, String type) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (info != null && !info.trim().isEmpty()) {
+            String[] people = info.split("\\|");
+            for (String person : people) {
+                String[] parts = person.split(":", 3); // Korlátozzuk 3 részre a URL miatt
+                if (parts.length == 3) {
+                    Map<String, Object> personMap = new HashMap<>();
+                    personMap.put("id", parseInt(parts[0]));
+                    personMap.put("name", parts[1]);
+                    personMap.put("image", parts[2].isEmpty() ? null : parts[2]);
+                    personMap.put("type", type);
+                    result.add(personMap);
+                }
             }
         }
+        return result;
     }
-    return result;
-}
 
-private Integer parseInt(Object value) {
-    if (value == null) return null;
-    try {
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
+    private List<Map<String, Object>> parseGenresInfo(String info) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (info != null && !info.trim().isEmpty()) {
+            String[] genres = info.split("\\|");
+            for (String genre : genres) {
+                String[] parts = genre.split(":");
+                if (parts.length >= 2) {
+                    Map<String, Object> genreMap = new HashMap<>();
+                    genreMap.put("id", parseInt(parts[0]));
+                    genreMap.put("name", parts[1]);
+                    result.add(genreMap);
+                }
+            }
         }
-        return Integer.parseInt(value.toString());
-    } catch (NumberFormatException e) {
-        return null;
+        return result;
     }
-}
 
-private String toString(Object value) {
-    return value != null ? value.toString() : null;
-}
+    private Integer parseInt(Object value) {
+        if (value == null) return null;
+        try {
+            if (value instanceof Number) {
+                return ((Number) value).intValue();
+            }
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private String toString(Object value) {
+        return value != null ? value.toString() : null;
+    }
     
     public JSONArray searchMoviesByName(String searchTerm) {
         EntityManager em = getEntityManagerFactory().createEntityManager();
@@ -291,37 +300,86 @@ private String toString(Object value) {
         return genres;
     }
     public JSONObject getMovieById(int movieId) {
-    EntityManager em = getEntityManagerFactory().createEntityManager();
-    try {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("GetMovieById")
-            .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
-            .setParameter("p_movie_id", movieId);
-        
-        List<Object[]> results = query.getResultList();
-        
-        if (results.isEmpty()) {
-            return null;
-        }
-        
-        Object[] row = results.get(0);
-        JSONObject movie = new JSONObject();
-        movie.put("movieId", row[0]);
-        movie.put("title", row[1]);
-        movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
-        movie.put("releaseYear", row[3]);
-        movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
-        movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
-        movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
-        movie.put("averageRating", row[7]);
-        movie.put("genres", row[8] != null ? row[8] : "");
-        
-        return movie;
-    } catch (Exception e) {
-        throw new RuntimeException("Hiba a film lekérdezésekor ID alapján: " + movieId, e);
-    } finally {
-        if (em != null && em.isOpen()) {
-            em.close();
+        EntityManager em = getEntityManagerFactory().createEntityManager();
+        try {
+            StoredProcedureQuery query = em.createStoredProcedureQuery("GetMovieById")
+                .registerStoredProcedureParameter("p_movie_id", Integer.class, ParameterMode.IN)
+                .setParameter("p_movie_id", movieId);
+            
+            List<Object[]> results = query.getResultList();
+            
+            if (results.isEmpty()) {
+                return null;
+            }
+            
+            Object[] row = results.get(0);
+            JSONObject movie = new JSONObject();
+            movie.put("movieId", row[0]);
+            movie.put("title", row[1]);
+            movie.put("cover", row[2] != null ? row[2] : JSONObject.NULL);
+            movie.put("releaseYear", row[3]);
+            movie.put("length", row[4] != null ? row[4] : JSONObject.NULL);
+            movie.put("description", row[5] != null ? row[5] : JSONObject.NULL);
+            movie.put("trailerLink", row[6] != null ? row[6] : JSONObject.NULL);
+            movie.put("averageRating", row[7]);
+            movie.put("genres", row[8] != null ? row[8] : "");
+            
+            return movie;
+        } catch (Exception e) {
+            throw new RuntimeException("Hiba a film lekérdezésekor ID alapján: " + movieId, e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
-}
+
+    /**
+     * Töröl egy filmet az adatbázisból a megadott azonosító alapján.
+     *
+     * @param movieId A törlendő film azonosítója.
+     * @return Egy JSONObject, amely a törlés sikerességét vagy hibáját jelzi.
+     */
+    public JSONObject deleteMovie(int movieId) {
+        JSONObject response = new JSONObject();
+        EntityManager em = null;
+        EntityTransaction transaction = null;
+        try {
+            em = getEntityManagerFactory().createEntityManager();
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            // Film keresése azonosító alapján
+            Movies movie = em.find(Movies.class, movieId);
+
+            if (movie == null) {
+                response.put("status", "error");
+                response.put("statusCode", 404);
+                response.put("message", "Film nem található a megadott azonosítóval.");
+                transaction.rollback();
+                return response;
+            }
+
+            // Film törlése
+            em.remove(movie);
+            transaction.commit();
+
+            response.put("status", "success");
+            response.put("statusCode", 200);
+            response.put("message", "Film sikeresen törölve.");
+
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            response.put("status", "error");
+            response.put("statusCode", 500);
+            response.put("message", "Hiba történt a film törlése közben: " + e.getMessage());
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+        return response;
+    }
 }

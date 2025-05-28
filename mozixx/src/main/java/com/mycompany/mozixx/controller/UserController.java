@@ -121,10 +121,11 @@ private JSONObject createErrorResponse(int statusCode, String message) {
         .put("message", message);
 }
 
-    @POST
-    @Path("registerAdmin")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerAdmin(@HeaderParam("token") String jwt, String bodyString) {
+        @POST
+@Path("registerAdmin")
+@Consumes(MediaType.APPLICATION_JSON)
+public Response registerAdmin(String bodyString) {
+    try {
         JSONObject body = new JSONObject(bodyString);
 
         Users u = new Users(
@@ -132,10 +133,16 @@ private JSONObject createErrorResponse(int statusCode, String message) {
                 body.getString("username"),
                 body.getString("password")
         );
-
-        JSONObject obj = layer.registerAdmin(u, jwt);
+        JSONObject obj = userService.registerAdmin(u); // JWT nélkül hívjuk meg a service-t
         return Response.status(obj.getInt("statusCode")).entity(obj.toString()).type(MediaType.APPLICATION_JSON).build();
+    } catch (JSONException e) {
+        return Response.status(400)
+                .entity(createErrorResponse(400, "Érvénytelen JSON formátum").toString())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
+}
+
     
     @GET
     @Path("getAllUser")
@@ -270,4 +277,5 @@ public Response updateUsername(String requestBody) {
                      .build();
     }
 }
+
 }
