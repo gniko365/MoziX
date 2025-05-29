@@ -22,8 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
 
-// Spring Framework annotációk eltávolítva
-//@Service
 public class UserService {
     private final EntityManagerFactory emf;
     private final EntityManager em;
@@ -132,7 +130,6 @@ public class UserService {
             commitTransaction();
 
             if (user != null) {
-                // Jelszó ellenőrzése a BCrypt segítségével
                 if (BCrypt.checkpw(password, user.getPassword())) {
                     response.put("status", "success");
                     response.put("statusCode", 200);
@@ -169,7 +166,6 @@ public class UserService {
             transaction = em.getTransaction();
             transaction.begin();
 
-            // 1. Validációk
             if (isEmailAlreadyRegistered(user.getEmail())) {
                 response.put("status", "error");
                 response.put("statusCode", 409);
@@ -186,12 +182,10 @@ public class UserService {
                 return response;
             }
 
-            // 2. Jelszó hash-elés
             user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
             user.setRegistrationDate(new Date());
             user.setRole(Role.user);
 
-            // 3. Mentés
             em.persist(user);
             transaction.commit();
 
@@ -235,10 +229,9 @@ public class UserService {
             return response;
         }
 
-        // Jelszó hash-elés
         user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         user.setRegistrationDate(new Date());
-        user.setRole(Role.admin); // Beállítjuk a szerepkört adminra
+        user.setRole(Role.admin);
 
         em.persist(user);
         transaction.commit();
@@ -292,7 +285,6 @@ public class UserService {
         }
 }
 
-    // UserService.java
 
 public JSONObject deleteUser(int userId, String password) {
     JSONObject response = new JSONObject();
@@ -309,7 +301,6 @@ public JSONObject deleteUser(int userId, String password) {
             return response;
         }
 
-        // Jelszó ellenőrzése
         if (!BCrypt.checkpw(password, user.getPassword())) {
             response.put("status", "unauthorized");
             response.put("statusCode", 401);
@@ -400,7 +391,6 @@ public JSONObject deleteUser(int userId, String password) {
             tx = em.getTransaction();
             tx.begin();
 
-            // 1. Felhasználó keresése ID alapján
             Users user = em.find(Users.class, userId);
             if (user == null) {
                 response.put("status", "error");
@@ -408,21 +398,18 @@ public JSONObject deleteUser(int userId, String password) {
                 return response;
             }
 
-            // 2. Jelszó ellenőrzése
             if (!BCrypt.checkpw(currentPassword, user.getPassword())) {
                 response.put("status", "error");
                 response.put("message", "Incorrect password");
                 return response;
             }
 
-            // 3. Felhasználónév validációk
             if (newUsername == null || newUsername.trim().isEmpty()) {
                 response.put("status", "error");
                 response.put("message", "Username cannot be empty");
                 return response;
             }
 
-            // 4. Egyediség ellenőrzés
             TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(u) FROM Users u WHERE u.username = :username AND u.userId != :userId",
                 Long.class);
@@ -435,7 +422,6 @@ public JSONObject deleteUser(int userId, String password) {
                 return response;
             }
 
-            // 5. Módosítás végrehajtása
             user.setUsername(newUsername);
             em.merge(user);
             tx.commit();

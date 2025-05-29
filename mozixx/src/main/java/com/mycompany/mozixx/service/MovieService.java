@@ -63,9 +63,6 @@ public class MovieService {
         JSONArray jsonArray = new JSONArray();
         
         try {
-            // Feltételezzük, hogy a Movies.getMoviesWithDetails() metódus létezik és működik
-            // Ha ez egy adatbázis hívás, akkor az EntityManager-t itt kellene kezelni
-            // Mivel a Movies osztály nincs megadva, feltételezzük, hogy ez egy statikus segédmetódus
             movieList = Movies.getMoviesWithDetails();
             
             for (Map<String, Object> movie : movieList) {
@@ -147,13 +144,10 @@ public class MovieService {
                 movie.put("trailerLink", toString(row[6]));
                 movie.put("averageRating", row[7] != null ? ((Number)row[7]).doubleValue() : null);
                 
-                // Rendezők feldolgozása
                 movie.put("directors", parsePeopleInfo(toString(row[8]), "director"));
                 
-                // Színészek feldolgozása
                 movie.put("actors", parsePeopleInfo(toString(row[9]), "actor"));
                 
-                // Műfajok feldolgozása
                 movie.put("genres", parseGenresInfo(toString(row[10])));
                 
                 movies.add(movie);
@@ -333,13 +327,7 @@ public class MovieService {
             }
         }
     }
-
-    /**
-     * Töröl egy filmet az adatbázisból a megadott azonosító alapján.
-     *
-     * @param movieId A törlendő film azonosítója.
-     * @return Egy JSONObject, amely a törlés sikerességét vagy hibáját jelzi.
-     */
+    
     public JSONObject deleteMovie(int movieId) {
         JSONObject response = new JSONObject();
         EntityManager em = null;
@@ -349,7 +337,6 @@ public class MovieService {
             transaction = em.getTransaction();
             transaction.begin();
 
-            // Film keresése azonosító alapján
             Movies movie = em.find(Movies.class, movieId);
 
             if (movie == null) {
@@ -360,7 +347,6 @@ public class MovieService {
                 return response;
             }
 
-            // Film törlése
             em.remove(movie);
             transaction.commit();
 

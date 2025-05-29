@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 28, 2025 at 06:09 PM
+-- Generation Time: May 29, 2025 at 06:58 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.3.1
 
@@ -1637,43 +1637,41 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `registration_d
 (32, 'ákoska', 'elkepeszto1995@gmail.com', '*0821C7D9F57AAB8C9ABF26B56F573571229FA626', '2025-01-17', 'user'),
 (36, 'elsoezenaneven', 'nagyb6605@gmail.com', 'igeniskapitány0123!', '2025-01-17', 'user'),
 (44, 'petike', 'horvathtibor@gmail.com', '082635b2eb16500b82ea6b7a05d175b233e907c8f33c9eb60acda370fd386b094ff2371aa1c0e750b0687e34aa210766fb57460b3cf31290d847a7570a464b91', '2025-01-17', 'admin'),
-(45, 'fasz', 'szopo', 'jaha', '2025-01-31', 'user'),
+(45, 'igazi', 'legigazibb', 'jaha', '2025-01-31', 'user'),
 (46, 'ujfelhasználó', 'uj@example.com', 'ujjelszó', '2025-02-25', 'user'),
 (48, 'ujfelhasználó2', 'uj@exampple.com', 'Ujjelszó1!', '2025-02-26', 'user'),
-(49, 'faszosom', 'uj@valami.com', 'Ujjelszó1!', '2025-02-26', 'user'),
 (50, 'hatalma', 'faszosom@gmail.hu', 'Hatalom6!', '2025-02-27', 'user'),
 (51, 'hatalmaa', 'faszossom@gmail.hu', 'Hatalom6!', '2025-03-04', 'user'),
 (52, 'wáááopoo', 'vicces@gmail.hu', 'Hatalom6!', '2025-03-04', 'user'),
 (53, 'tesztfelhasználó', 'teszt@example.com', 'titkosjelszó', '2023-10-01', 'user'),
-(56, 'ákoskaa', 'faszm@gmail.com', 'igeniskapitány0123!', '2025-03-13', 'user'),
+(56, 'ákoskaa', 'guiu@gmail.com', 'igeniskapitány0123!', '2025-03-13', 'user'),
 (57, 'trallala', 'trallalero@gmail.com', '$2a$10$CKf62aHNooKglXM4PN0APuU4srVeLMScYUXle8zbAIoy3sK9K3rG.', '2025-03-13', 'user'),
 (59, 'waawaa', 'madness@gmail.com', 'Porquedillo4!', '2025-03-29', 'user'),
-(61, '000', 'zsanett@gml.com', 'zsanett', '2025-04-23', 'user'),
-(63, 'nignog', 'cacafu', 'Por', '2025-04-24', 'user'),
+(61, '000', 'pluh@gml.com', 'pluuh', '2025-04-23', 'user'),
+(63, 'torta', 'cacafu', 'Por', '2025-04-24', 'user'),
 (65, 'utaloma', 'cacafufff@gmail.com', '$2a$10$CWAQlZtQ3jkCfVMdO0DiBeLsc8UXFvjiP9INCR1GJSB8kZJ9a6Pba', '2025-04-24', 'user'),
 (67, 'utalomaaa', 'cacafufffff@gmail.com', '$2a$10$.JZoa76U.qKGuiLKazkp3Oin789x8j3KORmQutiwaF4FkpjbF2Fiu', '2025-04-24', 'user'),
 (68, 'utalomaassa', 'cacafufssffff@gmail.com', '$2a$10$UpqSq7kG2XEy5.rOwSy1Ju9onuHG.0oyzM.K3Bra3u3Ex8vNmuFoS', '2025-04-24', 'user'),
 (69, 'automoso', 'vaovoavovaova@gmail.com', 'Porprosdfsdfsdfoo0!', '2025-04-24', 'user'),
 (70, 'automosasdo', 'vaovoavsdfsovaova@gmail.com', '$2a$10$gPnVuR414J84fpevqe39ie4/xKtwLlsTTjqFHRHsq7foXWa0HfoP2', '2025-04-24', 'user'),
-(71, 'szexelem', 'nagyb6600005@gmail.com', '$2a$10$huaKLPkC3h0kZI6mLdyZ7uCOAL/k5aXB2qqF.xIFAoin1iAt7jxwi', '2025-04-24', 'user'),
+(71, 'forrokalyha', 'nagyb6600005@gmail.com', '$2a$10$huaKLPkC3h0kZI6mLdyZ7uCOAL/k5aXB2qqF.xIFAoin1iAt7jxwi', '2025-04-24', 'user'),
 (72, 'automsdfaosasdo', 'vaovoaasdfvsdfsovaova@gmail.com', '$2a$10$BNfO16CWBBJBegKDdOdRzOwWm2hZQJwIHThz7yVFpZIHhPXaJw3Sm', '2025-04-24', 'user'),
 (73, 'automsasdfdfaosasdo', 'vaovoaasdfvsdfsdfsovaova@gmail.com', '$2a$10$yT9sjtPIFc10inM8osnlb.GfwoptEwrT3jh9KBFJz0CX3jlcMM9hq', '2025-04-25', 'user'),
 (74, 'vao', 'vao', '$2a$10$x/bXN3Yg3.ZhTKfWse.pXOm3WTjd.KtReUDpFL5YkHmU4bOxrlnCC', '2025-04-25', 'user'),
 (75, 'teso', 'teso', '$2a$10$Z5nf8aEwuHaQ/FkBjnEz8eSUKxdGQRnCgxffNB.tT8IAAHlOxoJBe', '2025-04-25', 'user'),
-(76, 'faszom', 'faszom', '$2a$10$g0vBX747kZiXQVUw7O9eY.u3NsdXh6Z/v9iBU8uXSQyayKMRTyCVm', '2025-04-25', 'user'),
+(76, 'furdokadx', 'gundelltakacs', '$2a$10$g0vBX747kZiXQVUw7O9eY.u3NsdXh6Z/v9iBU8uXSQyayKMRTyCVm', '2025-04-25', 'user'),
 (78, 'automsaasdfsdfdfaosasdo', 'vaovoaasdfvsdfsdadsffsovaova@gmail.com', '$2a$10$ELEIpuTYHRchtmTw2/q4/OjzN3RrkoPnslVpMdNf1W8D7lUr1b9Gy', '2025-04-25', 'user'),
-(79, 'faa', 'faa', '$2a$10$xYJA4bIRJSfonKH3nzaY5.DoMkMPiJmjwcSfU2f1LDzlEiE9daS.u', '2025-04-25', 'user'),
+(79, 'tung', 'tung', '$2a$10$xYJA4bIRJSfonKH3nzaY5.DoMkMPiJmjwcSfU2f1LDzlEiE9daS.u', '2025-04-25', 'user'),
 (80, 'rere', 'rere', '$2a$10$6wp3Co60PuhpmU1Q9v/bFOLVYoTx7q.aaR.bi/GhA9gEsOVfvyXe.', '2025-04-25', 'user'),
 (81, 'ref', 'ref', '$2a$10$pH2p2R94MOmZJVSCJdoqueQDUySSHftyrz3CipVEaVzL8yEUYEDMK', '2025-04-25', 'user'),
 (82, 'bazsika', 'nagyb66205@gmail.com', '$2a$10$yhOb/pupe6BMDN8s.lqIkeTDQfHvgNq3kPsHMbFi2Y5w13.4VFZ06', '2025-04-26', 'user'),
-(86, 'acigigányokat', 'szeretem@gmail.com', '$2a$10$QBXpC3AoOtkLrZrVijhAOeFj7IvVF6MjWzZlszf.zjBumcGYfp3oe', '2025-04-27', 'user'),
+(86, 'szem', 'szeretem@gmail.com', '$2a$10$QBXpC3AoOtkLrZrVijhAOeFj7IvVF6MjWzZlszf.zjBumcGYfp3oe', '2025-04-27', 'user'),
 (87, 'meno', 'srac', 'c40e16de4ae054b7e5c2f39d7d5db8c4cc4a08dbec35ab4f00b391bbbb042ea736bd4d0af12b51a7f1f72f1d85f50b0bc020884116579c3af72ac31b295c75d8', '2025-04-28', 'admin'),
-(88, 'ciganyka', 'ciganyka', '$2a$10$glDlrrQe/19g2s4J20F0SefGXptS2lJp9zCpZnbFbs1E4bq4F0jry', '2025-04-28', 'user'),
+(88, 'friggy', 'mendemonda', '$2a$10$glDlrrQe/19g2s4J20F0SefGXptS2lJp9zCpZnbFbs1E4bq4F0jry', '2025-04-28', 'user'),
 (89, 'adminuser', 'admin@example.com', '$2a$10$YHFVYXWZ9baGE1xco5r60Oz2OFvU8akpqFyLpc3fqbRLc5Tof/FTy', '2025-04-28', 'admin'),
 (90, 'asdfasdfadsfasdf', 'asdasassasaas@gmail.com', '$2a$10$VJznch4xJIwr1geRYVGfG.14gwtGPrHAqzk1K.AtVMOBL8nuCAqH2', '2025-04-28', 'user'),
 (92, 'menővagyok', 'nagyb66asdf05@gmail.com', '$2a$10$z0QU3qXPPvEkHL7eR621k.7gpuhrXJBuupA501IIp1JGDnBmYHGki', '2025-04-28', 'user'),
-(93, 'admin', 'admin@gmail.com', '8265f89089a96abb42cdd525ec36dee4d7c1766191651e37fc054fcba5f8f2d85eada32a4596e6079e9cb17b7662923a51d8a55bf31e74e76bcd7204d76476e0', '2025-05-28', 'admin'),
-(94, 'nagyonmeno', 'menoez', '$2a$10$E.iQZRyhX/WeqGs9HX356O3ND40hy9yKdhaWPAu62W8HBTFOxPJP6', '2025-05-28', 'user');
+(93, 'admin', 'admin@gmail.com', '8265f89089a96abb42cdd525ec36dee4d7c1766191651e37fc054fcba5f8f2d85eada32a4596e6079e9cb17b7662923a51d8a55bf31e74e76bcd7204d76476e0', '2025-05-28', 'admin');
 
 -- --------------------------------------------------------
 
@@ -1714,9 +1712,9 @@ INSERT INTO `user_favorites` (`favorite_id`, `user_id`, `movie_id`, `added_at`) 
 (30, 86, 127, '2025-04-27 21:34:11'),
 (33, 92, 102, '2025-04-28 21:42:54'),
 (34, 92, 120, '2025-04-28 21:53:15'),
-(35, 94, 124, '2025-05-28 18:05:28'),
-(36, 94, 103, '2025-05-28 18:05:33'),
-(37, 94, 104, '2025-05-28 18:05:35');
+(42, 89, 110, '2025-05-29 18:25:27'),
+(43, 89, 120, '2025-05-29 18:25:29'),
+(44, 89, 127, '2025-05-29 18:25:31');
 
 --
 -- Indexes for dumped tables
@@ -1818,13 +1816,13 @@ ALTER TABLE `genres`
 -- AUTO_INCREMENT for table `movies`
 --
 ALTER TABLE `movies`
-  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+  MODIFY `movie_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1836,7 +1834,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_favorites`
 --
 ALTER TABLE `user_favorites`
-  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `favorite_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- Constraints for dumped tables

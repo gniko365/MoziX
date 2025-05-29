@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mozixx.service;
 
 import java.nio.charset.StandardCharsets;
@@ -19,10 +15,7 @@ import javax.persistence.StoredProcedureQuery;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- *
- * @author szter
- */
+
 public class GenreService {
     private static final EntityManagerFactory emf = 
         Persistence.createEntityManagerFactory("mozixx-1.0-SNAPSHOT");
@@ -42,7 +35,6 @@ public class GenreService {
         
         for (Object[] row : results) {
             JSONObject jsonMovie = new JSONObject();
-            // Basic movie info
             jsonMovie.put("movieId", row[0]);
             jsonMovie.put("title", row[1]);
             jsonMovie.put("cover", row[2]);
@@ -100,7 +92,6 @@ public class GenreService {
     return jsonArray;
 }
 
-// Reuse these helper methods from your existing code
 private static List<Map<String, String>> parsePeopleInfo(String info, String type) {
     List<Map<String, String>> result = new ArrayList<>();
     if (info != null && !info.trim().isEmpty()) {
