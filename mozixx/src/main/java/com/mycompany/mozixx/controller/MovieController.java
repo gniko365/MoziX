@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mozixx.controller;
 
 import com.mycompany.mozixx.config.JWT; // Szükséges a JWT ellenőrzéshez
@@ -201,38 +197,46 @@ public class MovieController {
     @DELETE
     @Path("/{movieId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteMovie(@HeaderParam("token") String jwt, @PathParam("movieId") int movieId) {
-        // 1. JWT érvényességének ellenőrzése
+    public Response deleteMovie(@HeaderParam("Authorization") String authHeader, @PathParam("movieId") int movieId) {
+        // 1. Authorization fejléc ellenőrzése
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(new JSONObject().put("status", "error").put("message", "Érvénytelen Authorization fejléc. Használd a 'Bearer <token>' formátumot.").toString())
+                           .type(MediaType.APPLICATION_JSON)
+                           .build();
+        }
+
+        // 2. Token kivonása az Authorization fejlécből
+        String jwt = authHeader.substring(7); // "Bearer " (7 karakter) eltávolítása
+
+        // 3. JWT érvényességének ellenőrzése
         int isValid = JWT.validateJWT(jwt);
         if (isValid == 2) { // Invalid token
-            return Response.status(498) // Custom status code for InvalidToken
+            return Response.status(498)
                            .entity(new JSONObject().put("status", "error").put("message", "Invalid Token").toString())
                            .type(MediaType.APPLICATION_JSON)
                            .build();
         } else if (isValid == 0) { // Token expired
-            return Response.status(401) // Unauthorized
+            return Response.status(401)
                            .entity(new JSONObject().put("status", "error").put("message", "Token Expired").toString())
                            .type(MediaType.APPLICATION_JSON)
                            .build();
         }
 
-        // 2. Szerepkör ellenőrzése
-        // Feltételezzük, hogy a JWT osztályban van egy statikus metódus, ami visszaadja a szerepkört a tokenből.
-        // Ha nincs, akkor ezt implementálni kell a JWT.java fájlban.
-        // Példa: public static String getRoleFromToken(String jwtToken) { ... }
-        String userRole = JWT.getUserRoleByToken(jwt); // Helyes metódusnév használata
+        // 4. Szerepkör ellenőrzése
+        String userRole = JWT.getUserRoleByToken(jwt);
 
         if (!"admin".equalsIgnoreCase(userRole)) {
-            return Response.status(Response.Status.FORBIDDEN) // 403 Forbidden
+            return Response.status(Response.Status.FORBIDDEN)
                            .entity(new JSONObject().put("status", "error").put("message", "Nincs jogosultságod ehhez a művelethez. Admin jogosultság szükséges.").toString())
                            .type(MediaType.APPLICATION_JSON)
                            .build();
         }
 
-        // 3. Film törlése a service rétegen keresztül
+        // 5. Film törlése a service rétegen keresztül
         JSONObject result = movieService.deleteMovie(movieId);
 
-        // 4. Válasz összeállítása a service eredménye alapján
+        // 6. Válasz összeállítása
         return Response.status(result.getInt("statusCode"))
                        .entity(result.toString())
                        .type(MediaType.APPLICATION_JSON)

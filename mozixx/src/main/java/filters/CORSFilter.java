@@ -6,6 +6,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 @Provider
@@ -14,11 +15,18 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     private final static Logger log = Logger.getLogger(CORSFilter.class.getName());
 
     @Override
-    public void filter(ContainerRequestContext requestContext) {
+    public void filter(ContainerRequestContext requestContext) throws IOException {
         log.info("Filtering request context");
         if (isPreflightRequest(requestContext)) {
-            log.info("Preflight request detected, aborting with OK response");
-            requestContext.abortWith(Response.ok().build());
+            log.info("Preflight request detected, aborting with CORS headers");
+
+            Response.ResponseBuilder builder = Response.ok();
+            builder.header("Access-Control-Allow-Origin", requestContext.getHeaderString("Origin"));
+            builder.header("Access-Control-Allow-Credentials", "true");
+            builder.header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-Password, token");
+            builder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+
+            requestContext.abortWith(builder.build());
         }
     }
 
@@ -28,21 +36,22 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext,
-                       ContainerResponseContext responseContext) {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         log.info("Filtering response context");
-        responseContext.getHeaders().add(
-                "Access-Control-Allow-Origin", "*");
-        responseContext.getHeaders().add(
-                "Access-Control-Allow-Credentials", "true");
-        responseContext.getHeaders().add(
-                "Access-Control-Allow-Headers",
-                "origin, content-type, accept, authorization, x-requested-with, X-Password"); // Hozzáadtuk az X-Password-ot
-        responseContext.getHeaders().add(
-                "Access-Control-Allow-Methods",
+
+        String origin = requestContext.getHeaderString("Origin");
+        if (origin != null) {
+            responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
+        } else {
+            responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+        }
+
+        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        responseContext.getHeaders().add("Access-Control-Allow-Headers",
+                "origin, content-type, accept, authorization, x-requested-with, X-Password, token");
+        responseContext.getHeaders().add("Access-Control-Allow-Methods",
                 "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-        responseContext.getHeaders().add(
-                "Access-Control-Expose-Headers",
+        responseContext.getHeaders().add("Access-Control-Expose-Headers",
                 "content-type, authorization");
     }
 }
